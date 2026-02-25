@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Consulta de Inscrições - Graça/CE</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header><img src="Captura de tela 2026-02-23 080257.png" alt="Governo Municipal de Graça" class="logo-prefeitura"></header>
+
+    <div class="admin-table-container" style="margin-bottom: 40px;">
+        <div class="card-header" style="background-color: var(--verde-escuro);">
+            <h2>🔍 Consulta de Alunos Cadastrados</h2>
+            <p style="margin-top: 5px; opacity: 0.9; font-size: 14px;">Lista pública de transporte acadêmico</p>
+        </div>
+
+        <div style="padding:20px; display:flex; gap:10px; flex-wrap: wrap;">
+            <input type="text" id="busca" placeholder="Filtrar por nome ou protocolo..." onkeyup="renderizar()" style="padding:10px; flex:1; min-width: 200px; border-radius:5px; border:1px solid #ccc;">
+            <a href="index.html" class="btn btn-aluno" style="width:auto; padding:10px 20px;">⬅ Voltar ao Início</a>
+        </div>
+        
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Protocolo</th>
+                        <th>Nome do Aluno (A-Z)</th>
+                        <th>Instituição</th>
+                        <th>Embarque</th>
+                        <th>Prioridade</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="lista">
+                    <tr><td colspan="6" style="text-align:center; padding: 30px;">⏳ Buscando dados na nuvem...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // === NOVO LINK ATUALIZADO ===
+        const API_URL = "https://script.google.com/macros/s/AKfycbweGK2rXp93F1SscdG99Hc6FjZQrOo8DJp5pJVOEBSPn19HvhE8lz_RVQtfLch3E-Q/exec"; 
+        
+        let dadosNuvem = [];
+
+        function buscarDadosNuvem() {
+            fetch(API_URL).then(res => res.json()).then(data => {
+                dadosNuvem = data.sort((a, b) => a.nome.localeCompare(b.nome)); 
+                renderizar();
+            }).catch(err => {
+                document.getElementById('lista').innerHTML = '<tr><td colspan="6" style="text-align:center; color:red;">❌ Não foi possível carregar as informações.</td></tr>';
+            });
+        }
+
+        function renderizar() {
+            const busca = document.getElementById('busca').value.toLowerCase();
+            const tbody = document.getElementById('lista');
+            tbody.innerHTML = '';
+
+            dadosNuvem.forEach((aluno) => {
+                if(aluno.nome.toLowerCase().includes(busca) || aluno.proto.toLowerCase().includes(busca)) {
+                    
+                    let textoPrioridade = "Não";
+                    if (aluno.comorbidade === "Sim") {
+                        textoPrioridade = `<span style="background:var(--amarelo); color:white; padding:4px 10px; border-radius:15px; font-size:12px; font-weight:bold;">Sim ♿</span>`;
+                    }
+
+                    tbody.innerHTML += `<tr>
+                        <td><strong>${aluno.proto}</strong></td>
+                        <td>${aluno.nome}</td>
+                        <td>${aluno.instituicao}</td>
+                        <td>${aluno.embarque}</td>
+                        <td>${textoPrioridade}</td>
+                        <td style="color:${aluno.status === 'Pendente' ? 'orange' : 'green'}">
+                            <strong>${aluno.status === 'Pendente' ? 'Em Análise' : aluno.status}</strong>
+                        </td>
+                    </tr>`;
+                }
+            });
+
+            if (tbody.innerHTML === '') {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 20px;">Nenhum cadastro encontrado.</td></tr>`;
+            }
+        }
+        window.onload = buscarDadosNuvem;
+    </script>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Rota Azul - Graça/CE</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .tabs-container { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+        .btn-tab { padding: 10px 20px; border: 2px solid #ccc; background-color: transparent; color: #555; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; }
+        .btn-tab:hover { background-color: #f0f0f0; }
+        .btn-tab.ativo-azul { background-color: #0056b3; color: white; border-color: #0056b3; text-shadow: 1px 1px 2px rgba(0,0,0,0.2); }
+    </style>
+</head>
+<body style="background-color: var(--fundo);">
+    <header><img src="Captura de tela 2026-02-23 080257.png" alt="Governo Municipal de Graça" class="logo-prefeitura"></header>
+
+    <main class="main-content">
+        <div class="card" style="border-top: 5px solid #0056b3; max-width: 900px;">
+            <div class="card-header" style="background-color: #0056b3; color: white;">
+                <h2 style="margin:0; text-shadow: 1px 1px 2px rgba(0,0,0,0.2);">🚌 Rota: Ônibus Azul</h2>
+                <p style="margin-top:10px; opacity:0.9;">Selecione o turno e o dia da semana</p>
+            </div>
+            
+            <div style="padding: 30px; text-align: center;">
+                <h4 style="color: #004085; margin-bottom: 10px;">1. Selecione o Turno</h4>
+                <div class="tabs-container" id="filtro-turno">
+                    <button class="btn-tab ativo-azul" onclick="selecionarTab('turno', this)">MANHÃ</button>
+                    <button class="btn-tab" onclick="selecionarTab('turno', this)">NOITE</button>
+                </div>
+
+                <h4 style="color: #004085; margin-bottom: 10px; margin-top: 20px;">2. Selecione o Dia</h4>
+                <div class="tabs-container" id="filtro-dia">
+                    <button class="btn-tab ativo-azul" onclick="selecionarTab('dia', this)">SEGUNDA</button>
+                    <button class="btn-tab" onclick="selecionarTab('dia', this)">TERÇA</button>
+                    <button class="btn-tab" onclick="selecionarTab('dia', this)">QUARTA</button>
+                    <button class="btn-tab" onclick="selecionarTab('dia', this)">QUINTA</button>
+                    <button class="btn-tab" onclick="selecionarTab('dia', this)">SEXTA</button>
+                </div>
+
+                <div id="conteudo-rota" style="background: #f8f9fa; padding: 30px; border-radius: 8px; border: 1px dashed #ccc; margin-top: 20px; min-height: 150px; display: flex; align-items: center; justify-content: center;"></div>
+                <a href="index.html" class="btn" style="background-color: #555; color: white; display: inline-block; padding: 12px 25px; width: auto; margin-top: 30px;">⬅ Voltar ao Início</a>
+            </div>
+        </div>
+    </main>
+
+<script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbweGK2rXp93F1SscdG99Hc6FjZQrOo8DJp5pJVOEBSPn19HvhE8lz_RVQtfLch3E-Q/exec"; // COLOQUE A URL AQUI
+        let dadosNuvem = [];
+
+        window.onload = () => {
+            document.getElementById('conteudo-rota').innerHTML = '<p style="color: #666; font-size: 16px;">⏳ Buscando alunos na nuvem...</p>';
+            fetch(API_URL).then(res => res.json()).then(data => { dadosNuvem = data; atualizarPainel(); })
+            .catch(err => { document.getElementById('conteudo-rota').innerHTML = '<p style="color: red;">❌ Erro ao carregar os dados.</p>'; });
+        };
+
+        function selecionarTab(grupo, elementoClicado) {
+            elementoClicado.parentElement.querySelectorAll('.btn-tab').forEach(btn => btn.classList.remove('ativo-azul'));
+            elementoClicado.classList.add('ativo-azul');
+            atualizarPainel();
+        }
+
+        function atualizarPainel() {
+            const turnoAtivo = document.querySelector('#filtro-turno .ativo-azul').innerText.toUpperCase();
+            const diaAtivo = document.querySelector('#filtro-dia .ativo-azul').innerText.toUpperCase();
+            const painel = document.getElementById('conteudo-rota');
+            
+            const instituicoesAmarelo = ["UNINTA", "FLF", "FACULDADE LUCIANO FEIJÃO", "LUCIANO FEIJÃO", "ANHANGUERA", "GRAU TÉCNICO", "GRAU TECNICO", "UVA-CCS", "UVA CCS"];
+
+            const alunosFiltrados = dadosNuvem.filter(aluno => {
+                if (aluno.status !== 'Aprovado') return false;
+
+                const diaTurnoCombo = diaAtivo + "-" + turnoAtivo; 
+                let viajaNesseTurno = false;
+
+                if (aluno.dias && aluno.dias.includes(diaTurnoCombo)) {
+                    viajaNesseTurno = true;
+                } else if (aluno.dias && aluno.dias.includes(diaAtivo) && aluno.turno === turnoAtivo && !aluno.dias.includes("-")) {
+                    viajaNesseTurno = true;
+                }
+
+                if (!viajaNesseTurno) return false;
+
+                const instAluno = aluno.instituicao.toUpperCase().trim();
+                const vaiNoAmarelo = instituicoesAmarelo.some(inst => instAluno.includes(inst));
+                if (vaiNoAmarelo) return false;
+
+                return true; 
+            });
+
+            alunosFiltrados.sort((a, b) => a.nome.localeCompare(b.nome));
+
+            let html = `
+            <div class="table-responsive" style="width: 100%;">
+                <table style="width: 100%; border-collapse: collapse; background: white; text-align: left;">
+                    <thead><tr style="background-color: #0056b3; color: white;">
+                        <th style="padding: 12px; border-radius: 8px 0 0 0;">Nome do Aluno</th><th style="padding: 12px;">Instituição</th><th style="padding: 12px; border-radius: 0 8px 0 0;">Embarque</th>
+                    </tr></thead><tbody>`;
+
+            if (alunosFiltrados.length === 0) {
+                html += `<tr><td colspan="3" style="text-align: center; padding: 30px; color: #666;">Nenhum aluno cadastrado para viajar na <strong>${diaAtivo} (${turnoAtivo})</strong> nesta rota.</td></tr>`;
+            } else {
+                alunosFiltrados.forEach(aluno => {
+                    let seloPrioridade = aluno.comorbidade === "Sim" ? ` <span style="background:var(--amarelo); color:white; padding:2px 6px; border-radius:10px; font-size:10px; font-weight:bold;">♿</span>` : "";
+                    html += `<tr style="border-bottom: 1px solid #eee;"><td style="padding: 12px;"><strong>${aluno.nome}</strong>${seloPrioridade}</td><td style="padding: 12px;">${aluno.instituicao}</td><td style="padding: 12px;">${aluno.embarque}</td></tr>`;
+                });
+            }
+            html += `</tbody></table></div>`;
+            painel.innerHTML = html;
+            painel.style.padding = "0"; painel.style.border = "none";
+        }
+    </script>
+</body>
+</html>

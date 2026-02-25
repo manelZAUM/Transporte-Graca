@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Painel Secretaria - Graça</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+    <div id="login-screen" style="position:fixed; top:0; left:0; width:100%; height:100%; background:var(--fundo); z-index:9999; display:flex; align-items:center; justify-content:center;">
+        <div class="card" style="padding:40px; text-align:center; max-width: 400px;">
+            <h2 style="color:var(--verde-principal); margin-bottom:20px;">Acesso Restrito</h2>
+            <p style="margin-bottom: 20px; color: #666;">Faça login com uma conta autorizada da Secretaria</p>
+            <div id="g_id_onload" data-client_id="902660911703-a0g6tp2fg4uajfl0mo22aodmf827aod7.apps.googleusercontent.com" data-callback="handleGoogleLogin" data-auto_prompt="false"></div>
+            <div class="g_id_signin" data-type="standard" data-theme="outline" data-size="large" style="display: flex; justify-content: center; margin-bottom: 20px;"></div>
+            <p id="erro-login" style="color:red; display:none; margin-top:15px; font-weight:bold;"></p>
+            <br><br><a href="index.html" style="color:var(--verde-escuro); text-decoration:none;">⬅ Voltar ao Início</a>
+        </div>
+    </div>
+
+    <header><img src="Captura de tela 2026-02-23 080257.png" alt="Governo Municipal de Graça" class="logo-prefeitura"></header>
+
+    <div class="admin-table-container">
+        <div class="card-header"><h2>📊 Gestão de Cadastros</h2></div>
+        
+        <div style="padding:20px; display:flex; gap:10px; flex-wrap: wrap; align-items: center; background: #f8f9fa; border-bottom: 1px solid #eee;">
+            <input type="text" id="busca" placeholder="Buscar por nome ou protocolo..." onkeyup="renderizar()" style="padding:10px; flex:1; min-width: 200px; border-radius:5px; border:1px solid #ccc;">
+            <button onclick="abrirCadastro()" class="btn btn-aluno" style="width:auto; padding:10px 20px; margin:0;">➕ Novo Cadastro</button>
+            <button onclick="exportar()" class="btn btn-admin" style="width:auto; padding:10px 20px; margin:0;">📥 Exportar Excel</button>
+            <button onclick="sairPainel()" class="btn" style="background:#555; color:white; width:auto; padding:10px 20px;">🚪 Sair</button>
+        </div>
+
+        <div id="area-cadastro" style="display:none; background: white; border-bottom: 3px solid var(--verde-principal); padding: 30px;">
+            <h3 id="titulo-form" style="color: var(--verde-principal); margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px;">📝 Preencher Ficha do Aluno</h3>
+            
+            <form id="formCadastro" style="display: flex; flex-direction: column; gap: 15px;">
+                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    <div style="flex: 2; min-width: 200px;"><label>Nome Completo</label><input type="text" id="nome" required style="width: 100%; padding: 10px; border: 1px solid #ccc;"></div>
+                    <div style="flex: 1; min-width: 150px;"><label>Nascimento</label><input type="text" id="nascimento" placeholder="DD/MM/AAAA" required style="width: 100%; padding: 10px; border: 1px solid #ccc;"></div>
+                </div>
+                
+                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 150px;"><label>RG</label><input type="text" id="rg" required style="width: 100%; padding: 10px; border: 1px solid #ccc;"></div>
+                    <div style="flex: 1; min-width: 150px;"><label>CPF</label><input type="text" id="cpf" required style="width: 100%; padding: 10px; border: 1px solid #ccc;"></div>
+                    <div style="flex: 1; min-width: 150px;"><label>WhatsApp</label><input type="text" id="telefone" placeholder="(88) 9XXXX-XXXX" required style="width: 100%; padding: 10px; border: 1px solid #ccc;"></div>
+                </div>
+                
+                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 100%;"><label>Endereço Completo</label><input type="text" id="endereco" required style="width: 100%; padding: 10px; border: 1px solid #ccc;"></div>
+                </div>
+                
+                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 200px;">
+                        <label>Instituição de Ensino</label>
+                        <select id="instituicao" required onchange="verificarOutra()" style="width: 100%; padding: 10px; border: 1px solid #ccc;">
+                            <option value="">Selecione...</option>
+                            <option value="UVA">UVA-Campus CIDAO</option>
+                            <option value="UVA">UVA-Campus CCS</option>
+                            <option value="UVA">UVA-Campus BETÂNIA</option>
+                            <option value="UVA">UVA-Campus CCH</option>    
+                            <option value="IFCE">IFCE</option>
+                            <option value="UNINTA">UNINTA</option>
+                            <option value="UFC">UFC</option>
+                            <option value="FLF">FLF</option>
+                            <option value="OUTRA">OUTRA</option>
+                        </select>
+                        <input type="text" id="inst_outra" placeholder="Digite a instituição..." style="display:none; width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; background-color: #fdfdfd;">
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 15px; flex-wrap: wrap; background: #f9f9f9; padding: 15px; border: 1px solid #ccc; border-radius: 5px;">
+                    <div style="flex: 1; min-width: 200px;">
+                        <label style="color: var(--verde-escuro); font-weight: bold;">Turno Predominante</label>
+                        <select id="turno" required style="width: 100%; padding: 10px; border: 1px solid #ccc; margin-top: 5px;">
+                            <option value="">Selecione...</option>
+                            <option value="MANHÃ">MANHÃ</option>
+                            <option value="TARDE">TARDE</option>
+                            <option value="NOITE">NOITE</option>
+                        </select>
+                    </div>
+                    <div style="flex: 2; min-width: 250px;">
+                        <label style="color: var(--verde-escuro); font-weight: bold;">Dias da semana neste turno:</label>
+                        <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 10px;">
+                            <label><input type="checkbox" id="chk_prin_SEGUNDA" value="SEGUNDA"> SEG</label>
+                            <label><input type="checkbox" id="chk_prin_TERÇA" value="TERÇA"> TER</label>
+                            <label><input type="checkbox" id="chk_prin_QUARTA" value="QUARTA"> QUA</label>
+                            <label><input type="checkbox" id="chk_prin_QUINTA" value="QUINTA"> QUI</label>
+                            <label><input type="checkbox" id="chk_prin_SEXTA" value="SEXTA"> SEX</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background: #eef5fa; padding: 15px; border-radius: 8px; border: 1px dashed #0056b3;">
+                    <label style="color: #0056b3; font-weight: bold;">Vai algum dia em outro horário?</label>
+                    <div style="display: flex; gap: 15px; padding: 10px 0;">
+                        <label><input type="radio" name="tem_outro" value="Sim" onchange="document.getElementById('div_outro_horario').style.display='block'"> Sim</label>
+                        <label><input type="radio" name="tem_outro" value="Não" checked onchange="document.getElementById('div_outro_horario').style.display='none'"> Não</label>
+                    </div>
+
+                    <div id="div_outro_horario" style="display: none; margin-top: 10px; padding-top: 15px; border-top: 1px solid #cce0f5;">
+                        <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                            <div style="flex: 1; min-width: 200px;">
+                                <label>Qual é o outro turno?</label>
+                                <select id="turno_outro" style="width: 100%; padding: 10px; border: 1px solid #ccc; margin-top: 5px;">
+                                    <option value="">Selecione...</option>
+                                    <option value="MANHÃ">MANHÃ</option>
+                                    <option value="TARDE">TARDE</option>
+                                    <option value="NOITE">NOITE</option>
+                                </select>
+                            </div>
+                            <div style="flex: 2; min-width: 250px;">
+                                <label>Quais dias nesse outro turno?</label>
+                                <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 10px;">
+                                    <label><input type="checkbox" id="chk_outro_SEGUNDA" value="SEGUNDA"> SEG</label>
+                                    <label><input type="checkbox" id="chk_outro_TERÇA" value="TERÇA"> TER</label>
+                                    <label><input type="checkbox" id="chk_outro_QUARTA" value="QUARTA"> QUA</label>
+                                    <label><input type="checkbox" id="chk_outro_QUINTA" value="QUINTA"> QUI</label>
+                                    <label><input type="checkbox" id="chk_outro_SEXTA" value="SEXTA"> SEX</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 200px;">
+                        <label>Ponto de Embarque</label>
+                        <select id="embarque" required style="width: 100%; padding: 10px; border: 1px solid #ccc;">
+                            <option value="">Selecione...</option><option value="SEDE">SEDE</option><option value="BARRO VERMELHO">BARRO VERMELHO</option>
+                            <option value="LAPA">LAPA</option><option value="VILA">VILA</option>
+                        </select>
+                    </div>
+                    <div style="flex: 1; min-width: 180px;">
+                        <label>Mora em Sobral?</label>
+                        <div style="display: flex; gap: 15px; padding: 10px 0;">
+                            <label><input type="radio" name="sobral" value="Sim" required> Sim</label>
+                            <label><input type="radio" name="sobral" value="Não"> Não</label>
+                        </div>
+                    </div>
+                    <div style="flex: 1; min-width: 200px;">
+                        <label style="color: var(--amarelo);">Possui Comorbidade (Prioridade)?</label>
+                        <div style="display: flex; gap: 15px; padding: 10px 0;">
+                            <label><input type="radio" name="comorbidade" value="Sim" required> Sim</label>
+                            <label><input type="radio" name="comorbidade" value="Não"> Não</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 15px;">
+                    <button type="submit" id="btnSubmit" class="btn btn-aluno" style="padding: 12px 30px;">💾 Salvar Cadastro</button>
+                    <button type="button" onclick="fecharCadastro()" class="btn" style="padding: 12px 30px; background: #ccc; color: #333;">Cancelar</button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="table-responsive">
+            <table>
+                <thead><tr><th>Protocolo</th><th>Nome</th><th>Instituição</th><th>Embarque</th><th>Prioridade</th><th>Status</th><th>Ações</th></tr></thead>
+                <tbody id="lista">
+                    <tr><td colspan="7" style="text-align:center; padding: 30px;">⏳ Carregando...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const EMAILS_AUTORIZADOS = ["manoelfariaspr@gmail.com"]; 
+        const API_URL = "https://script.google.com/macros/s/AKfycbweGK2rXp93F1SscdG99Hc6FjZQrOo8DJp5pJVOEBSPn19HvhE8lz_RVQtfLch3E-Q/exec"; 
+        
+        let dadosNuvem = [];
+        let idEdicaoAtual = null;
+        const diasSemana = ['SEGUNDA', 'TERÇA', 'QUARTA', 'QUINTA', 'SEXTA'];
+
+        function decodeJwt(token) {
+            const base64Url = token.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            return JSON.parse(decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')));
+        }
+
+        function handleGoogleLogin(response) {
+            const payload = decodeJwt(response.credential);
+            if (EMAILS_AUTORIZADOS.includes(payload.email)) {
+                document.getElementById('login-screen').style.display = 'none';
+                sessionStorage.setItem('sec_logado', 'sim');
+                buscarDadosNuvem();
+            } else {
+                document.getElementById('erro-login').innerText = "❌ Acesso negado.";
+                document.getElementById('erro-login').style.display = 'block';
+            }
+        }
+
+        function sairPainel() { sessionStorage.removeItem('sec_logado'); window.location.reload(); }
+        
+        function abrirCadastro() { 
+            idEdicaoAtual = null; 
+            document.getElementById('titulo-form').innerText = "📝 Preencher Ficha do Aluno";
+            document.getElementById('btnSubmit').innerText = "💾 Salvar Cadastro";
+            document.getElementById('formCadastro').reset();
+            document.getElementById('inst_outra').style.display = 'none';
+            document.getElementById('div_outro_horario').style.display = 'none';
+            document.getElementById('area-cadastro').style.display = 'block'; 
+        }
+
+        function fecharCadastro() { 
+            document.getElementById('area-cadastro').style.display = 'none'; 
+            document.getElementById('formCadastro').reset(); 
+            idEdicaoAtual = null;
+        }
+        
+        function verificarOutra() {
+            const inst = document.getElementById('instituicao').value;
+            const campoOutra = document.getElementById('inst_outra');
+            if (inst === 'OUTRA') {
+                campoOutra.style.display = 'block';
+                campoOutra.required = true; 
+            } else {
+                campoOutra.style.display = 'none';
+                campoOutra.required = false;
+            }
+        }
+
+        function editar(id) {
+            let aluno = dadosNuvem.find(a => a.id == id);
+            if(aluno) {
+                idEdicaoAtual = aluno.id;
+                document.getElementById('titulo-form').innerText = "✏️ Atualizar Dados do Aluno";
+                document.getElementById('btnSubmit').innerText = "🔄 Atualizar Cadastro";
+                
+                document.getElementById('nome').value = aluno.nome;
+                document.getElementById('nascimento').value = aluno.nascimento;
+                document.getElementById('rg').value = aluno.rg;
+                document.getElementById('cpf').value = aluno.cpf;
+                document.getElementById('endereco').value = aluno.endereco;
+                document.getElementById('telefone').value = aluno.telefone;
+                
+                let instSelect = document.getElementById('instituicao');
+                let opcoesInst = Array.from(instSelect.options).map(o => o.value);
+                if(opcoesInst.includes(aluno.instituicao)) {
+                    instSelect.value = aluno.instituicao;
+                    document.getElementById('inst_outra').style.display = 'none';
+                } else {
+                    instSelect.value = 'OUTRA';
+                    document.getElementById('inst_outra').style.display = 'block';
+                    document.getElementById('inst_outra').value = aluno.instituicao;
+                }
+
+                document.getElementById('embarque').value = aluno.embarque;
+                if(aluno.sobral) document.querySelector(`input[name="sobral"][value="${aluno.sobral}"]`).checked = true;
+                if(aluno.comorbidade) document.querySelector(`input[name="comorbidade"][value="${aluno.comorbidade}"]`).checked = true;
+
+                // Restaura os horários
+                document.getElementById('turno').value = aluno.turno;
+                diasSemana.forEach(dia => {
+                    document.getElementById('chk_prin_' + dia).checked = false;
+                    document.getElementById('chk_outro_' + dia).checked = false;
+                });
+                document.querySelector('input[name="tem_outro"][value="Não"]').checked = true;
+                document.getElementById('div_outro_horario').style.display = 'none';
+                document.getElementById('turno_outro').value = '';
+
+                if(aluno.dias) {
+                    let diasSalvos = aluno.dias.split(', ');
+                    let outroTurno = null;
+
+                    diasSalvos.forEach(diaValor => {
+                        let partes = diaValor.split('-');
+                        let nomeDia = partes[0];
+                        let turnoDia = partes[1] || aluno.turno;
+                        
+                        if(turnoDia === aluno.turno) {
+                            let cbPrin = document.getElementById('chk_prin_' + nomeDia);
+                            if(cbPrin) cbPrin.checked = true;
+                        } else {
+                            outroTurno = turnoDia;
+                            let cbOutro = document.getElementById('chk_outro_' + nomeDia);
+                            if(cbOutro) cbOutro.checked = true;
+                        }
+                    });
+
+                    if(outroTurno) {
+                        document.querySelector('input[name="tem_outro"][value="Sim"]').checked = true;
+                        document.getElementById('div_outro_horario').style.display = 'block';
+                        document.getElementById('turno_outro').value = outroTurno;
+                    }
+                }
+
+                document.getElementById('area-cadastro').style.display = 'block';
+                window.scrollTo(0, 0); 
+            }
+        }
+
+        document.getElementById('formCadastro').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnSubmit');
+            btn.innerText = "⏳ Enviando..."; btn.disabled = true;
+
+            // Transforma as escolhas da UI na combinação perfeita
+            let diasFinais = [];
+            let turnoPrin = document.getElementById('turno').value;
+            let temOutro = document.querySelector('input[name="tem_outro"]:checked').value === 'Sim';
+            let turnoOutro = document.getElementById('turno_outro').value;
+
+            diasSemana.forEach(dia => {
+                if (temOutro && document.getElementById('chk_outro_' + dia).checked) {
+                    diasFinais.push(`${dia}-${turnoOutro}`);
+                } else if (document.getElementById('chk_prin_' + dia).checked) {
+                    diasFinais.push(`${dia}-${turnoPrin}`);
+                }
+            });
+            
+            let instFinal = document.getElementById('instituicao').value;
+            if(instFinal === 'OUTRA') instFinal = document.getElementById('inst_outra').value;
+
+            const p = "GR-" + Math.floor(Math.random() * 90000 + 10000);
+            
+            const dados = {
+                action: idEdicaoAtual ? "edit" : "add", 
+                id: idEdicaoAtual ? idEdicaoAtual : Date.now().toString(), 
+                data: new Date().toLocaleDateString('pt-br'),
+                proto: p, 
+                nome: document.getElementById('nome').value,
+                nascimento: document.getElementById('nascimento').value,
+                rg: document.getElementById('rg').value,
+                cpf: document.getElementById('cpf').value,
+                endereco: document.getElementById('endereco').value,
+                telefone: document.getElementById('telefone').value,
+                instituicao: instFinal,
+                turno: turnoPrin,
+                dias: diasFinais.join(', '), // Salva a combinação mágica
+                embarque: document.getElementById('embarque').value,
+                sobral: document.querySelector('input[name="sobral"]:checked').value,
+                comorbidade: document.querySelector('input[name="comorbidade"]:checked').value,
+                status: 'Aprovado' 
+            };
+            
+            fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(dados) })
+            .then(() => { 
+                alert(idEdicaoAtual ? "Cadastro atualizado com sucesso!" : "Salvo com sucesso!\nProtocolo: " + p); 
+                fecharCadastro(); 
+                btn.disabled = false; 
+                buscarDadosNuvem(); 
+            })
+            .catch(err => { alert("Erro de conexão."); btn.innerText = "💾 Salvar Cadastro"; btn.disabled = false; });
+        });
+
+        function buscarDadosNuvem() {
+            fetch(API_URL).then(res => res.json()).then(data => { dadosNuvem = data.reverse(); renderizar(); })
+            .catch(err => { document.getElementById('lista').innerHTML = '<tr><td colspan="7">❌ Erro na conexão.</td></tr>'; });
+        }
+
+        function renderizar() {
+            const busca = document.getElementById('busca').value.toLowerCase();
+            const tbody = document.getElementById('lista');
+            tbody.innerHTML = '';
+            
+            dadosNuvem.forEach((aluno) => {
+                if(aluno.nome.toLowerCase().includes(busca) || aluno.proto.toLowerCase().includes(busca)) {
+                    let textoPrioridade = "Não";
+                    if (aluno.comorbidade === "Sim") {
+                        textoPrioridade = `<span style="background:var(--amarelo); color:white; padding:4px 10px; border-radius:15px; font-size:12px; font-weight:bold;">Sim ♿</span>`;
+                    }
+                    tbody.innerHTML += `<tr>
+                        <td><strong>${aluno.proto}</strong></td>
+                        <td>${aluno.nome}</td>
+                        <td>${aluno.instituicao}</td>
+                        <td>${aluno.embarque}</td>
+                        <td>${textoPrioridade}</td>
+                        <td style="color:${aluno.status=='Pendente'?'orange':'green'}"><strong>${aluno.status}</strong></td>
+                        <td>
+                            ${aluno.status === 'Pendente' ? `<button onclick="aprovar('${aluno.id}')" title="Aprovar">✅</button>` : `<span style="width:28px; display:inline-block;"></span>`}
+                            <button onclick="editar('${aluno.id}')" title="Editar Dados" style="cursor:pointer; padding:5px; border:none; background:none; font-size:18px;">✏️</button>
+                            <button onclick="remover('${aluno.id}')" title="Remover" style="cursor:pointer; padding:5px; border:none; background:none; font-size:18px;">❌</button>
+                        </td>
+                    </tr>`;
+                }
+            });
+            if (tbody.innerHTML === '') tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;">Nenhum cadastro.</td></tr>`;
+        }
+
+        function aprovar(id) {
+            if(confirm("Aprovar aluno?")) {
+                let index = dadosNuvem.findIndex(a => a.id == id);
+                if(index !== -1) dadosNuvem[index].status = 'Aprovado';
+                renderizar();
+                fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: "approve", id: id }) });
+            }
+        }
+
+        function remover(id) {
+            if(confirm("Excluir cadastro?")) {
+                let index = dadosNuvem.findIndex(a => a.id == id);
+                if(index !== -1) dadosNuvem.splice(index, 1);
+                renderizar();
+                fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: "delete", id: id }) });
+            }
+        }
+
+        function exportar() {
+            let csv = "\uFEFFData;Protocolo;Nome;Nascimento;RG;CPF;Endereço;Telefone;Instituição;Turno;Dias;Embarque;Sobral;Comorbidade;Status\n";
+            dadosNuvem.forEach(a => csv += `${a.data};${a.proto};${a.nome};${a.nascimento};${a.rg};${a.cpf};${a.endereco};${a.telefone};${a.instituicao};${a.turno};${a.dias};${a.embarque};${a.sobral};${a.comorbidade};${a.status}\n`);
+            const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+            const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "transporte_completo.csv"; link.click();
+        }
+
+        window.onload = () => { if(sessionStorage.getItem('sec_logado') === 'sim') { document.getElementById('login-screen').style.display = 'none'; buscarDadosNuvem(); } };
+    </script>
+</body>
+</html>

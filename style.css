@@ -1,0 +1,207 @@
+/* Paleta de Cores Oficial - Prefeitura de Graça */
+:root {
+    --verde-principal: #008a3d;
+    --verde-escuro: #1a5c37;
+    --amarelo: #f9a825;
+    --fundo: #f0f2f5;
+    --branco: #ffffff;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background-color: var(--fundo);
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Cabeçalho Padronizado */
+header {
+    background-color: var(--branco);
+    text-align: center;
+    padding: 15px;
+    border-bottom: 5px solid var(--amarelo);
+    z-index: 10;
+    display: flex; /* Para centralizar a imagem */
+    justify-content: center;
+    align-items: center;
+}
+
+/* Logotipo da Prefeitura no Cabeçalho */
+/* Cabeçalho Padronizado - Aba Verde */
+header {
+    background-color: var(--verde-escuro); /* Deixa a aba inteira verde escura */
+    text-align: center;
+    padding: 15px;
+    border-bottom: 5px solid var(--amarelo); /* Mantém o filete amarelo elegante embaixo */
+    z-index: 10;
+    display: flex; 
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2); /* Dá uma leve sombra para destacar do resto do site */
+}
+
+/* Logotipo da Prefeitura no Cabeçalho */
+.logo-prefeitura {
+    max-height: 80px; /* Aumentei levemente para dar mais destaque */
+    width: auto;      
+    display: block;
+    background-color: var(--branco); /* Fundo branco para a logo não sumir no verde */
+    padding: 10px 25px; /* Espaço interno ao redor da logo */
+    border-radius: 50px; /* Deixa as bordas bem arredondadas, estilo pílula */
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Sombrinha no cartão branco */
+}
+
+/* Container Principal */
+.main-content {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Efeito de Fundo no Index */
+.bg-universitarios::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-image: url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=1470&auto=format&fit=crop');
+    background-size: cover;
+    background-position: center;
+    filter: blur(5px) brightness(0.4) grayscale(20%);
+    z-index: -1;
+    transform: scale(1.1);
+}
+
+/* Cards */
+.card {
+    background: var(--branco);
+    width: 100%;
+    max-width: 600px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    overflow: hidden;
+    z-index: 2;
+}
+
+.card-header { background-color: var(--verde-principal); color: white; padding: 30px; text-align: center; }
+
+/* Botões Estilo Pílula */
+.btn-group { padding: 30px; display: flex; flex-direction: column; gap: 15px; }
+.btn {
+    padding: 16px; border-radius: 50px; border: none;
+    font-size: 15px; font-weight: bold; text-decoration: none;
+    text-align: center; text-transform: uppercase; transition: 0.3s; cursor: pointer;
+}
+.btn-aluno { background-color: var(--verde-principal); color: white; }
+.btn-admin { background-color: var(--amarelo); color: white; }
+.btn:hover { filter: brightness(90%); transform: translateY(-2px); }
+
+/* Formulários */
+.field { margin-bottom: 15px; text-align: left; padding: 0 30px; }
+label { display: block; font-weight: bold; margin-bottom: 5px; color: var(--verde-escuro); }
+input[type="text"], input[type="password"], select { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; }
+.radio-group { display: flex; gap: 20px; padding: 10px 0; }
+input[type="file"] { width: 100%; padding: 10px; background: #f8f9fa; border: 1px dashed var(--verde-principal); border-radius: 8px; }
+
+/* Tabela Admin e Consulta */
+.admin-table-container { max-width: 1100px; width: 95%; background: white; margin: 20px auto; border-radius: 10px; overflow: hidden; }
+table { width: 100%; border-collapse: collapse; }
+th { background: var(--verde-principal); color: white; padding: 15px; text-align: left; }
+td { padding: 12px; border-bottom: 1px solid #eee; font-size: 14px; }
+
+/* Rodapé Oficial Padronizado */
+footer {
+    background-color: var(--verde-escuro);
+    color: white;
+    padding: 40px 20px 20px; /* Padding inferior menor para a faixa final */
+    font-size: 13px;
+    text-align: center; /* Centraliza o conteúdo do rodapé */
+}
+
+/* Logotipo da Secretaria no Rodapé */
+.footer-logo-container {
+    margin-bottom: 40px; /* ⬅️ Aumentei um pouquinho o espaçamento abaixo dela */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.logo-secretaria {
+    max-height: 180px; /* ⬅️ Aumentamos de 110px para 180px para dar bastante destaque */
+    width: auto;
+    display: block;
+    margin: 0 auto; /* Reforça a centralização */
+}
+
+.footer-grid {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    text-align: left; /* Volta o texto da grid para a esquerda */
+}
+
+.footer-section h4 { border-bottom: 2px solid var(--amarelo); display: inline-block; padding-bottom: 5px; margin-bottom: 15px; }
+.social-strip { background-color: #14462a; text-align: center; padding: 15px; margin-top: 40px; }
+
+/* --- Melhorias de Responsividade para Mobile --- */
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 768px) {
+    .admin-table-container {
+        width: 100%;
+        border-radius: 0;
+        margin: 0;
+    }
+    .main-content {
+        padding: 20px 10px;
+    }
+    th, td {
+        white-space: nowrap;
+    }
+    /* Ajuste do logo da prefeitura no mobile */
+    .logo-prefeitura {
+        max-height: 50px;
+    }
+}
+
+/* --- Estilos do Mapa --- */
+.map-section {
+    max-width: 1100px;
+    width: 95%;
+    margin: 40px auto;
+    background: var(--branco);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+#mapa {
+    height: 400px;
+    width: 100%;
+    border-radius: 10px;
+    border: 2px solid var(--verde-principal);
+    z-index: 1; /* Garante que o mapa não sobreponha outros menus */
+}
+
+@media (max-width: 768px) {
+    .map-section {
+        padding: 15px;
+    }
+    #mapa {
+        height: 300px;
+    }
+}
