@@ -22,6 +22,30 @@
             </div>
             
             <div style="padding: 30px; text-align: center;">
+
+                <div style="margin-bottom: 30px; text-align: left; background: #fffdf5; padding: 20px; border-radius: 8px; border: 1px solid #e6b800;">
+                    <h4 style="color: #b38f00; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
+                        🗺️ Trajeto e Paradas Oficiais
+                    </h4>
+                    
+                    <div style="width: 100%; height: 300px; border-radius: 8px; overflow: hidden; border: 1px solid #ccc;">
+                        <iframe width="100%" height="100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" 
+                        src="https://maps.google.com/maps?q=Sobral,%20Cear%C3%A1&t=&z=10&ie=UTF8&iwloc=&output=embed"></iframe>
+                    </div>
+
+                    <div style="display: flex; gap: 20px; margin-top: 15px; flex-wrap: wrap;">
+                        <div style="flex: 1; min-width: 200px;">
+                            <strong style="color: #333;">📍 Embarques em Graça:</strong>
+                            <p style="font-size: 14px; color: #666; margin-top: 5px;">✔ Sede<br>✔ Barro Vermelho<br>✔ Lapa<br>✔ Vila</p>
+                        </div>
+                        <div style="flex: 1; min-width: 200px;">
+                            <strong style="color: #333;">🏫 Desembarques em Sobral:</strong>
+                            <p style="font-size: 14px; color: #666; margin-top: 5px; font-weight: bold;">
+                                ✔ UNINTA<br>✔ Fac. Luciano Feijão (FLF)<br>✔ Anhanguera<br>✔ Grau Técnico<br>✔ UVA (Campus CCS)
+                            </p>
+                        </div>
+                    </div>
+                </div>
                 <h4 style="color: #b38f00; margin-bottom: 10px;">1. Selecione o Turno</h4>
                 <div class="tabs-container" id="filtro-turno">
                     <button class="btn-tab ativo-amarelo" onclick="selecionarTab('turno', this)">MANHÃ</button>
@@ -44,7 +68,7 @@
     </main>
 
 <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbweGK2rXp93F1SscdG99Hc6FjZQrOo8DJp5pJVOEBSPn19HvhE8lz_RVQtfLch3E-Q/exec"; // COLOQUE A URL AQUI
+        const API_URL = "https://script.google.com/macros/s/AKfycbweGK2rXp93F1SscdG99Hc6FjZQrOo8DJp5pJVOEBSPn19HvhE8lz_RVQtfLch3E-Q/exec"; 
         let dadosNuvem = [];
 
         window.onload = () => {
