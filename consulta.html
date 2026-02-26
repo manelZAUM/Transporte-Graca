@@ -63,6 +63,25 @@
             </div>
         </div>
 
+        <h3 style="color: var(--verde-escuro); margin-top: 10px; margin-bottom: 20px;">📍 Demanda por Ponto de Embarque (Aprovados)</h3>
+        <div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
+            <div class="dash-card" style="border-top-color: #6f42c1; padding: 15px;">
+                <h3 style="font-size: 15px;">🏢 Sede</h3>
+                <div class="numero" id="emb-sede" style="color: #6f42c1; font-size: 28px;">0</div>
+            </div>
+            <div class="dash-card" style="border-top-color: #fd7e14; padding: 15px;">
+                <h3 style="font-size: 15px;">🔴 Barro Vermelho</h3>
+                <div class="numero" id="emb-barro" style="color: #fd7e14; font-size: 28px;">0</div>
+            </div>
+            <div class="dash-card" style="border-top-color: #20c997; padding: 15px;">
+                <h3 style="font-size: 15px;">⛪ Lapa</h3>
+                <div class="numero" id="emb-lapa" style="color: #20c997; font-size: 28px;">0</div>
+            </div>
+            <div class="dash-card" style="border-top-color: #e83e8c; padding: 15px;">
+                <h3 style="font-size: 15px;">🏘️ Vila</h3>
+                <div class="numero" id="emb-vila" style="color: #e83e8c; font-size: 28px;">0</div>
+            </div>
+        </div>
         <h3 style="color: var(--verde-escuro); margin-top: 10px; margin-bottom: 20px;">🚍 Ocupação por Ônibus e Turno</h3>
         <div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
             
@@ -109,7 +128,6 @@
     </div>
 
     <script>
-        // O SEU NOVO LINK AQUI
         const API_URL = "https://script.google.com/macros/s/AKfycbyQljrcnkEox6t6IKcBvYx2wSsSoLrA8NEMGvLjK4L5sVFmqo_hxP68iEiNdbUE5xg/exec"; 
         let dadosNuvem = [];
 
@@ -135,8 +153,24 @@
             const residentes = dadosNuvem.filter(a => a.sobral === 'Sim').length;
             document.getElementById('total-residentes').innerText = residentes;
 
-            // Filtra só os aprovados para calcular ocupação e instituições
+            // Filtra só os aprovados para calcular ocupação, instituições e embarques
             const aprovados = dadosNuvem.filter(a => a.status === 'Aprovado');
+
+            // --- CÁLCULO DE EMBARQUES ---
+            let countSede = 0, countBarro = 0, countLapa = 0, countVila = 0;
+            
+            aprovados.forEach(a => {
+                let embarque = a.embarque ? a.embarque.toUpperCase().trim() : "";
+                if (embarque === "SEDE") countSede++;
+                else if (embarque === "BARRO VERMELHO") countBarro++;
+                else if (embarque === "LAPA") countLapa++;
+                else if (embarque === "VILA") countVila++;
+            });
+
+            document.getElementById('emb-sede').innerText = countSede;
+            document.getElementById('emb-barro').innerText = countBarro;
+            document.getElementById('emb-lapa').innerText = countLapa;
+            document.getElementById('emb-vila').innerText = countVila;
 
             // --- CÁLCULO DE INSTITUIÇÕES ---
             const contagemInst = {};
