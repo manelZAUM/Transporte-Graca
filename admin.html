@@ -121,6 +121,7 @@
                         </div>
                     </div>
                 </div>
+                
                 <div style="display: flex; gap: 15px; flex-wrap: wrap;">
                     <div style="flex: 1; min-width: 200px;">
                         <label>Ponto de Embarque</label>
@@ -129,18 +130,25 @@
                             <option value="LAPA">LAPA</option><option value="VILA">VILA</option>
                         </select>
                     </div>
-                    <div style="flex: 1; min-width: 180px;">
+                    <div style="flex: 1; min-width: 150px;">
                         <label>Mora em Sobral?</label>
                         <div style="display: flex; gap: 15px; padding: 10px 0;">
                             <label><input type="radio" name="sobral" value="Sim" required> Sim</label>
                             <label><input type="radio" name="sobral" value="Não"> Não</label>
                         </div>
                     </div>
-                    <div style="flex: 1; min-width: 200px;">
-                        <label style="color: var(--amarelo);">Possui Comorbidade (Prioridade)?</label>
+                    <div style="flex: 1; min-width: 150px;">
+                        <label style="color: var(--amarelo);">Possui Comorbidade?</label>
                         <div style="display: flex; gap: 15px; padding: 10px 0;">
                             <label><input type="radio" name="comorbidade" value="Sim" required> Sim</label>
                             <label><input type="radio" name="comorbidade" value="Não"> Não</label>
+                        </div>
+                    </div>
+                    <div style="flex: 1; min-width: 150px;">
+                        <label style="color: var(--verde-principal); font-weight: bold;">Aluno Novato?</label>
+                        <div style="display: flex; gap: 15px; padding: 10px 0;">
+                            <label><input type="radio" name="novato" value="Sim" required> Sim</label>
+                            <label><input type="radio" name="novato" value="Não"> Não</label>
                         </div>
                     </div>
                 </div>
@@ -154,9 +162,9 @@
         
         <div class="table-responsive">
             <table>
-                <thead><tr><th>Protocolo</th><th>Nome</th><th>Instituição</th><th>Embarque</th><th>Prioridade</th><th>Status</th><th>Ações</th></tr></thead>
+                <thead><tr><th>Protocolo</th><th>Nome</th><th>Instituição</th><th>Embarque</th><th>Novato</th><th>Prioridade</th><th>Status</th><th>Ações</th></tr></thead>
                 <tbody id="lista">
-                    <tr><td colspan="7" style="text-align:center; padding: 30px;">⏳ Carregando...</td></tr>
+                    <tr><td colspan="8" style="text-align:center; padding: 30px;">⏳ Carregando...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -246,6 +254,7 @@
                 document.getElementById('embarque').value = aluno.embarque;
                 if(aluno.sobral) document.querySelector(`input[name="sobral"][value="${aluno.sobral}"]`).checked = true;
                 if(aluno.comorbidade) document.querySelector(`input[name="comorbidade"][value="${aluno.comorbidade}"]`).checked = true;
+                if(aluno.novato) document.querySelector(`input[name="novato"][value="${aluno.novato}"]`).checked = true;
 
                 // Restaura os horários
                 document.getElementById('turno').value = aluno.turno;
@@ -325,10 +334,11 @@
                 telefone: document.getElementById('telefone').value,
                 instituicao: instFinal,
                 turno: turnoPrin,
-                dias: diasFinais.join(', '), // Salva a combinação mágica
+                dias: diasFinais.join(', '), 
                 embarque: document.getElementById('embarque').value,
                 sobral: document.querySelector('input[name="sobral"]:checked').value,
                 comorbidade: document.querySelector('input[name="comorbidade"]:checked').value,
+                novato: document.querySelector('input[name="novato"]:checked').value, // <-- SALVA O NOVATO AQUI
                 status: 'Aprovado' 
             };
             
@@ -344,7 +354,7 @@
 
         function buscarDadosNuvem() {
             fetch(API_URL).then(res => res.json()).then(data => { dadosNuvem = data.reverse(); renderizar(); })
-            .catch(err => { document.getElementById('lista').innerHTML = '<tr><td colspan="7">❌ Erro na conexão.</td></tr>'; });
+            .catch(err => { document.getElementById('lista').innerHTML = '<tr><td colspan="8">❌ Erro na conexão.</td></tr>'; });
         }
 
         function renderizar() {
@@ -358,11 +368,16 @@
                     if (aluno.comorbidade === "Sim") {
                         textoPrioridade = `<span style="background:var(--amarelo); color:white; padding:4px 10px; border-radius:15px; font-size:12px; font-weight:bold;">Sim ♿</span>`;
                     }
+                    
+                    // Ajuste visual para novato na tabela do admin
+                    let textoNovato = aluno.novato === "Sim" ? `<span style="color:var(--verde-principal); font-weight:bold;">Sim</span>` : "Não";
+
                     tbody.innerHTML += `<tr>
                         <td><strong>${aluno.proto}</strong></td>
                         <td>${aluno.nome}</td>
                         <td>${aluno.instituicao}</td>
                         <td>${aluno.embarque}</td>
+                        <td>${textoNovato}</td>
                         <td>${textoPrioridade}</td>
                         <td style="color:${aluno.status=='Pendente'?'orange':'green'}"><strong>${aluno.status}</strong></td>
                         <td>
@@ -373,7 +388,7 @@
                     </tr>`;
                 }
             });
-            if (tbody.innerHTML === '') tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;">Nenhum cadastro.</td></tr>`;
+            if (tbody.innerHTML === '') tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;">Nenhum cadastro.</td></tr>`;
         }
 
         function aprovar(id) {
@@ -395,8 +410,8 @@
         }
 
         function exportar() {
-            let csv = "\uFEFFData;Protocolo;Nome;Nascimento;RG;CPF;Endereço;Telefone;Instituição;Turno;Dias;Embarque;Sobral;Comorbidade;Status\n";
-            dadosNuvem.forEach(a => csv += `${a.data};${a.proto};${a.nome};${a.nascimento};${a.rg};${a.cpf};${a.endereco};${a.telefone};${a.instituicao};${a.turno};${a.dias};${a.embarque};${a.sobral};${a.comorbidade};${a.status}\n`);
+            let csv = "\uFEFFData;Protocolo;Nome;Nascimento;RG;CPF;Endereço;Telefone;Instituição;Turno;Dias;Embarque;Sobral;Comorbidade;Novato;Status\n";
+            dadosNuvem.forEach(a => csv += `${a.data};${a.proto};${a.nome};${a.nascimento};${a.rg};${a.cpf};${a.endereco};${a.telefone};${a.instituicao};${a.turno};${a.dias};${a.embarque};${a.sobral};${a.comorbidade};${a.novato || 'Não'};${a.status}\n`);
             const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
             const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "transporte_completo.csv"; link.click();
         }
