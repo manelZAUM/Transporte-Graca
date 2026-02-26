@@ -164,7 +164,7 @@
 
     <script>
         const EMAILS_AUTORIZADOS = ["manoelfariaspr@gmail.com"]; 
-        const API_URL = "https://script.google.com/macros/s/AKfycbweGK2rXp93F1SscdG99Hc6FjZQrOo8DJp5pJVOEBSPn19HvhE8lz_RVQtfLch3E-Q/exec"; 
+        const API_URL = "https://script.google.com/macros/s/AKfycbyQljrcnkEox6t6IKcBvYx2wSsSoLrA8NEMGvLjK4L5sVFmqo_hxP68iEiNdbUE5xg/exec";
         
         let dadosNuvem = [];
         let idEdicaoAtual = null;
@@ -247,6 +247,7 @@
                 if(aluno.sobral) document.querySelector(`input[name="sobral"][value="${aluno.sobral}"]`).checked = true;
                 if(aluno.comorbidade) document.querySelector(`input[name="comorbidade"][value="${aluno.comorbidade}"]`).checked = true;
 
+                // Restaura os horários
                 document.getElementById('turno').value = aluno.turno;
                 diasSemana.forEach(dia => {
                     document.getElementById('chk_prin_' + dia).checked = false;
@@ -298,15 +299,11 @@
             let temOutro = document.querySelector('input[name="tem_outro"]:checked').value === 'Sim';
             let turnoOutro = document.getElementById('turno_outro').value;
 
-            // AQUI ESTÁ A CORREÇÃO:
             diasSemana.forEach(dia => {
-                // 1. Salva o turno principal primeiro
-                if (document.getElementById('chk_prin_' + dia).checked) {
-                    diasFinais.push(`${dia}-${turnoPrin}`);
-                }
-                // 2. Se a opção "Outro Horário" estiver ativa, ele ADICIONA o outro horário também, sem apagar o anterior!
                 if (temOutro && document.getElementById('chk_outro_' + dia).checked) {
                     diasFinais.push(`${dia}-${turnoOutro}`);
+                } else if (document.getElementById('chk_prin_' + dia).checked) {
+                    diasFinais.push(`${dia}-${turnoPrin}`);
                 }
             });
             
@@ -328,7 +325,7 @@
                 telefone: document.getElementById('telefone').value,
                 instituicao: instFinal,
                 turno: turnoPrin,
-                dias: diasFinais.join(', '), 
+                dias: diasFinais.join(', '), // Salva a combinação mágica
                 embarque: document.getElementById('embarque').value,
                 sobral: document.querySelector('input[name="sobral"]:checked').value,
                 comorbidade: document.querySelector('input[name="comorbidade"]:checked').value,
