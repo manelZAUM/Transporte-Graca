@@ -142,9 +142,7 @@
             const diaAtivo = document.querySelector('#filtro-dia .ativo-azul').innerText.toUpperCase();
             const painel = document.getElementById('conteudo-rota');
             
-            const instituicoesAmarelo = ["UNINTA", "FLF", "FACULDADE LUCIANO FEIJÃO", "LUCIANO FEIJÃO", "ANHANGUERA", "GRAU TÉCNICO", "GRAU TECNICO", "UVA-CCS", "UVA CCS"];
-
-            const alunosFiltrados = dadosNuvem.filter(aluno => {
+           const instituicoesAmarelo = ["UNINTA", "FLF", "ANHANGUERA", "GRAU TÉCNICO","UVA CCS", "UNINASSAU", "F5"];
                 if (aluno.status !== 'Aprovado') return false;
 
                 const diaTurnoCombo = diaAtivo + "-" + turnoAtivo; 
@@ -163,7 +161,7 @@
                 if (vaiNoAmarelo) return false;
 
                 return true; 
-            });
+            };
 
             alunosFiltrados.sort((a, b) => a.nome.localeCompare(b.nome));
 
@@ -185,7 +183,7 @@
             html += `</tbody></table></div>`;
             painel.innerHTML = html;
             painel.style.padding = "0"; painel.style.border = "none";
-        }
+        
     </script>
 </body>
 </html>
