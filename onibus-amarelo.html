@@ -141,7 +141,7 @@
             const diaAtivo = document.querySelector('#filtro-dia .ativo-amarelo').innerText.toUpperCase();
             const painel = document.getElementById('conteudo-rota');
             
-            const instituicoesAmarelo = ["UNINTA", "FLF", "FACULDADE LUCIANO FEIJÃO", "LUCIANO FEIJÃO", "ANHANGUERA", "GRAU TÉCNICO", "GRAU TECNICO", "UVA-CCS", "UVA CCS"];
+            const instituicoesAmarelo = ["UNINTA", "FLF", "ANHANGUERA", "GRAU TÉCNICO", "UVA-CCS", "UNINASSAU", "F5"];
 
             const alunosFiltrados = dadosNuvem.filter(aluno => {
                 if (aluno.status !== 'Aprovado') return false;
