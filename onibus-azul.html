@@ -143,25 +143,12 @@
             const painel = document.getElementById('conteudo-rota');
             
            const instituicoesAmarelo = ["UNINTA", "FLF", "ANHANGUERA", "GRAU TÉCNICO","UVA CCS", "UNINASSAU", "F5"];
+                const alunosFiltrados = dadosNuvem.filter(aluno => {
                 if (aluno.status !== 'Aprovado') return false;
 
-                const diaTurnoCombo = diaAtivo + "-" + turnoAtivo; 
-                let viajaNesseTurno = false;
-
-                if (aluno.dias && aluno.dias.includes(diaTurnoCombo)) {
-                    viajaNesseTurno = true;
-                } else if (aluno.dias && aluno.dias.includes(diaAtivo) && aluno.turno === turnoAtivo && !aluno.dias.includes("-")) {
-                    viajaNesseTurno = true;
-                }
-
-                if (!viajaNesseTurno) return false;
-
-                const instAluno = aluno.instituicao.toUpperCase().trim();
-                const vaiNoAmarelo = instituicoesAmarelo.some(inst => instAluno.includes(inst));
-                if (vaiNoAmarelo) return false;
-
+                const diaTurnoCombo = diaAtivo + "-" + turnoAtivo;
                 return true; 
-            };
+            });
 
             alunosFiltrados.sort((a, b) => a.nome.localeCompare(b.nome));
 
@@ -183,7 +170,7 @@
             html += `</tbody></table></div>`;
             painel.innerHTML = html;
             painel.style.padding = "0"; painel.style.border = "none";
-        
+        }
     </script>
 </body>
 </html>
