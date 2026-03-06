@@ -262,15 +262,9 @@
                 // Restaura os horários
                 document.getElementById('turno').value = aluno.turno;
                 diasSemana.forEach(dia => {
-                     // Registra o turno principal se estiver marcado
-                    if (document.getElementById('chk_prin_' + dia).checked) {
-                      diasFinais.push(`${dia}-${turnoPrin}`);
-                         }
-                     // Registra o turno alternativo se a opção de "outro horário" estiver ativa e marcada
-                    if (temOutro && document.getElementById('chk_outro_' + dia).checked) {
-                        diasFinais.push(`${dia}-${turnoOutro}`);
-                                }
-                                    });
+                    document.getElementById('chk_prin_' + dia).checked = false;
+                    document.getElementById('chk_outro_' + dia).checked = false;
+                });
                 document.querySelector('input[name="tem_outro"][value="Não"]').checked = true;
                 document.getElementById('div_outro_horario').style.display = 'none';
                 document.getElementById('turno_outro').value = '';
@@ -318,10 +312,13 @@
             let turnoOutro = document.getElementById('turno_outro').value;
 
             diasSemana.forEach(dia => {
+                // Registra o turno principal se estiver marcado
+                if (document.getElementById('chk_prin_' + dia).checked) {
+                    diasFinais.push(`${dia}-${turnoPrin}`);
+                }
+                // Registra o turno alternativo se a opção de "outro horário" estiver ativa e marcada
                 if (temOutro && document.getElementById('chk_outro_' + dia).checked) {
                     diasFinais.push(`${dia}-${turnoOutro}`);
-                } else if (document.getElementById('chk_prin_' + dia).checked) {
-                    diasFinais.push(`${dia}-${turnoPrin}`);
                 }
             });
             
