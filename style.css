@@ -205,3 +205,41 @@ footer {
         height: 300px;
     }
 }
+/* --- Dashboard Interativo Admin --- */
+.dashboard-grid-admin { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+    gap: 20px; 
+    padding: 20px; 
+    background: #f8f9fa; 
+    border-bottom: 1px solid #eee;
+}
+.dash-card-admin { 
+    background: white; 
+    padding: 20px; 
+    border-radius: 10px; 
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05); 
+    text-align: center; 
+    transition: transform 0.2s, box-shadow 0.2s;
+    border-top: 4px solid var(--verde-principal);
+}
+/* Efeito visual apenas nos cards clicáveis */
+.dash-card-admin.clicavel { cursor: pointer; }
+.dash-card-admin.clicavel:hover { 
+    transform: translateY(-5px); 
+    box-shadow: 0 8px 15px rgba(0,0,0,0.15); 
+}
+.dash-card-admin h3 { color: #555; font-size: 15px; margin-bottom: 10px; }
+.dash-card-admin .numero { font-size: 32px; font-weight: bold; color: var(--verde-escuro); }
+
+.inst-item { 
+    display: flex; justify-content: space-between; padding: 6px; 
+    border-bottom: 1px solid #eee; cursor: pointer; transition: background 0.2s;
+}
+.inst-item:hover { background: #f0f8ff; font-weight: bold; color: #0056b3; }
+
+#aviso-filtro {
+    display: none; background: #eef5fa; padding: 10px 20px; 
+    border-left: 4px solid #0056b3; margin: 0 20px 20px 20px; 
+    justify-content: space-between; align-items: center; border-radius: 4px;
+}
