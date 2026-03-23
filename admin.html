@@ -227,14 +227,12 @@
         let filtroGlobal = { tipo: null, valor: null };
 
         function atualizarDashboardAdmin() {
-            // Conta apenas os aprovados para o Dashboard
             const aprovados = dadosNuvem.filter(a => a.status === 'Aprovado');
 
             const total = aprovados.length;
             const novatos = aprovados.filter(a => a.novato === 'Sim').length;
             const residentes = aprovados.filter(a => a.sobral === 'Sim').length;
 
-            // Calcula as instituições
             const contagemInst = {};
             aprovados.forEach(a => {
                 let inst = a.instituicao.trim();
@@ -248,7 +246,6 @@
                 </div>`;
             });
 
-            // Monta os cards HTML
             const dashHtml = `
                 <div class="dash-card-admin clicavel" onclick="aplicarFiltro('todos', null, 'Todos os Aprovados')">
                     <h3>👥 Total (Aprovados)</h3>
@@ -277,8 +274,6 @@
             document.getElementById('texto-filtro').innerText = `👁️ Mostrando: ${descricao}`;
             document.getElementById('aviso-filtro').style.display = 'flex';
             renderizar();
-            
-            // Rola a tela suavemente para a barra de busca/tabela
             document.getElementById('busca').scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
@@ -364,12 +359,10 @@
 
                 document.getElementById('embarque').value = aluno.embarque;
                 
-                // Preenche os botões radio (incluindo o novato)
                 if(aluno.novato) document.querySelector(`input[name="novato"][value="${aluno.novato}"]`).checked = true;
                 if(aluno.sobral) document.querySelector(`input[name="sobral"][value="${aluno.sobral}"]`).checked = true;
                 if(aluno.comorbidade) document.querySelector(`input[name="comorbidade"][value="${aluno.comorbidade}"]`).checked = true;
 
-                // Restaura os horários
                 document.getElementById('turno').value = aluno.turno;
                 diasSemana.forEach(dia => {
                     document.getElementById('chk_prin_' + dia).checked = false;
@@ -380,15 +373,18 @@
                 document.getElementById('turno_outro').value = '';
 
                 if(aluno.dias) {
-                    let diasSalvos = aluno.dias.split(', ');
+                    let diasSalvos = aluno.dias.split(',');
                     let outroTurno = null;
 
                     diasSalvos.forEach(diaValor => {
-                        let partes = diaValor.split('-');
-                        let nomeDia = partes[0];
-                        let turnoDia = partes[1] || aluno.turno;
+                        diaValor = diaValor.trim(); 
+                        if(!diaValor) return; 
                         
-                        if(turnoDia === aluno.turno) {
+                        let partes = diaValor.split('-');
+                        let nomeDia = partes[0].trim();
+                        let turnoDia = partes[1] ? partes[1].trim() : aluno.turno.trim();
+                        
+                        if(turnoDia === aluno.turno.trim()) {
                             let cbPrin = document.getElementById('chk_prin_' + nomeDia);
                             if(cbPrin) cbPrin.checked = true;
                         } else {
@@ -420,7 +416,14 @@
             let temOutro = document.querySelector('input[name="tem_outro"]:checked').value === 'Sim';
             let turnoOutro = document.getElementById('turno_outro').value;
 
-            // CORREÇÃO: Utilizando dois IFs independentes para capturar ambos os horários se estiverem marcados no mesmo dia
+            // Trava de segurança para impedir o salvamento se o segundo turno não for informado
+            if (temOutro && !turnoOutro) {
+                alert("⚠️ Por favor, selecione qual é o outro turno antes de salvar.");
+                btn.innerText = idEdicaoAtual ? "🔄 Atualizar Cadastro" : "💾 Salvar Cadastro"; 
+                btn.disabled = false;
+                return; 
+            }
+
             diasSemana.forEach(dia => {
                 if (document.getElementById('chk_prin_' + dia).checked) {
                     diasFinais.push(`${dia}-${turnoPrin}`);
@@ -480,7 +483,6 @@
             const tbody = document.getElementById('lista');
             tbody.innerHTML = '';
             
-            // 1. Aplica o filtro do Dashboard (se houver)
             let dadosFiltrados = dadosNuvem;
             if (filtroGlobal.tipo) {
                 if (filtroGlobal.tipo === 'todos') {
@@ -496,7 +498,6 @@
 
             let encontrados = 0;
 
-            // 2. Aplica a barra de busca normal em cima dos dados filtrados
             dadosFiltrados.forEach((aluno) => {
                 if(aluno.nome.toLowerCase().includes(busca) || aluno.proto.toLowerCase().includes(busca)) {
                     encontrados++;
