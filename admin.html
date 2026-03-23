@@ -420,11 +420,13 @@
             let temOutro = document.querySelector('input[name="tem_outro"]:checked').value === 'Sim';
             let turnoOutro = document.getElementById('turno_outro').value;
 
+            // CORREÇÃO: Utilizando dois IFs independentes para capturar ambos os horários se estiverem marcados no mesmo dia
             diasSemana.forEach(dia => {
+                if (document.getElementById('chk_prin_' + dia).checked) {
+                    diasFinais.push(`${dia}-${turnoPrin}`);
+                }
                 if (temOutro && document.getElementById('chk_outro_' + dia).checked) {
                     diasFinais.push(`${dia}-${turnoOutro}`);
-                } else if (document.getElementById('chk_prin_' + dia).checked) {
-                    diasFinais.push(`${dia}-${turnoPrin}`);
                 }
             });
             
@@ -448,7 +450,7 @@
                 turno: turnoPrin,
                 dias: diasFinais.join(', '), 
                 embarque: document.getElementById('embarque').value,
-                novato: document.querySelector('input[name="novato"]:checked').value, // <--- CAMPO ADICIONADO AQUI
+                novato: document.querySelector('input[name="novato"]:checked').value,
                 sobral: document.querySelector('input[name="sobral"]:checked').value,
                 comorbidade: document.querySelector('input[name="comorbidade"]:checked').value,
                 status: 'Aprovado' 
