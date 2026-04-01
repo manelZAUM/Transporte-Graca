@@ -10,77 +10,75 @@
     <div id="login-screen" style="position:fixed; top:0; left:0; width:100%; height:100%; background:var(--fundo); z-index:9999; display:flex; align-items:center; justify-content:center;">
         <div class="card" style="padding:40px; text-align:center; max-width: 400px;">
             <h2 style="color:var(--verde-principal); margin-bottom:20px;">Acesso Restrito</h2>
+            <p style="margin-bottom: 20px; color: #666;">Portal de Gestão - Secretaria de Educação</p>
             <div id="g_id_onload" data-client_id="902660911703-a0g6tp2fg4uajfl0mo22aodmf827aod7.apps.googleusercontent.com" data-callback="handleGoogleLogin" data-auto_prompt="false"></div>
-            <div class="g_id_signin" data-type="standard" data-theme="outline" data-size="large"></div>
+            <div class="g_id_signin" data-type="standard" data-theme="outline" data-size="large" style="display: flex; justify-content: center;"></div>
             <p id="erro-login" style="color:red; display:none; margin-top:15px; font-weight:bold;"></p>
             <br><br><a href="index.html" style="color:var(--verde-escuro); text-decoration:none;">⬅ Voltar ao Início</a>
         </div>
     </div>
 
-    <div id="painel-conteudo"></div>
+    <div id="painel-autorizado"></div>
 
-    <template id="tpl-admin">
+    <template id="template-admin">
         <header><img src="Captura de tela 2026-02-23 080257.png" alt="Prefeitura de Graça" class="logo-prefeitura"></header>
 
         <div class="admin-table-container">
             <div class="card-header"><h2>📊 Gestão de Cadastros</h2></div>
             
-            <div id="dashboard-admin" class="dashboard-grid-admin" style="display: flex; gap: 20px; padding: 20px; background: #f8f9fa;"></div>
+            <div id="dashboard-admin" class="dashboard-grid-admin" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; padding: 20px; background: #f8f9fa;"></div>
 
-            <div style="padding:20px; display:flex; gap:10px; background: #f8f9fa; border-bottom: 1px solid #eee;">
-                <input type="text" id="busca" placeholder="Buscar por nome..." onkeyup="renderizar()" style="padding:10px; flex:1; border-radius:5px; border:1px solid #ccc;">
-                <button onclick="abrirCadastro()" class="btn btn-aluno" style="width:auto; padding:10px 20px; margin:0;">➕ Novo</button>
+            <div style="padding:20px; display:flex; gap:10px; flex-wrap: wrap; align-items: center; background: #f8f9fa; border-bottom: 1px solid #eee;">
+                <input type="text" id="busca" placeholder="Buscar por nome ou protocolo..." onkeyup="renderizar()" style="padding:10px; flex:1; min-width: 200px; border-radius:5px; border:1px solid #ccc;">
+                <button onclick="abrirCadastro()" class="btn btn-aluno" style="width:auto; padding:10px 20px; margin:0;">➕ Novo Cadastro</button>
                 <button onclick="sairPainel()" class="btn" style="background:#555; color:white; width:auto; padding:10px 20px;">🚪 Sair</button>
             </div>
 
             <div id="area-cadastro" style="display:none; background: white; border-bottom: 3px solid var(--verde-principal); padding: 30px;">
-                <h3 id="titulo-form" style="color: var(--verde-principal); margin-bottom: 20px;">📝 Ficha do Aluno</h3>
-                <form id="formCadastro">
-                    <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom:15px;">
-                        <div style="flex: 2;"><label>Nome Completo</label><input type="text" id="nome" required></div>
-                        <div style="flex: 1;"><label>CPF</label><input type="text" id="cpf" oninput="mCPF(this)" required></div>
+                <h3 id="titulo-form" style="color: var(--verde-principal); margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px;">📝 Ficha do Aluno</h3>
+                
+                <form id="formCadastro" style="display: flex; flex-direction: column; gap: 15px;">
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                        <div style="flex: 2; min-width: 200px;"><label>Nome Completo</label><input type="text" id="nome" required style="width: 100%; padding: 10px; border: 1px solid #ccc;"></div>
+                        <div style="flex: 1; min-width: 150px;"><label>CPF</label><input type="text" id="cpf" oninput="mCPF(this)" placeholder="000.000.000-00" required style="width: 100%; padding: 10px; border: 1px solid #ccc;"></div>
                     </div>
                     
-                    <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom:15px;">
-                        <div style="flex: 1;"><label>WhatsApp</label><input type="text" id="telefone" oninput="mTel(this)" required></div>
-                        <div style="flex: 1;">
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                        <div style="flex: 1; min-width: 150px;"><label>RG</label><input type="text" id="rg" oninput="mRG(this)" required style="width: 100%; padding: 10px; border: 1px solid #ccc;"></div>
+                        <div style="flex: 1; min-width: 150px;"><label>WhatsApp</label><input type="text" id="telefone" oninput="mTel(this)" placeholder="(88) 9XXXX-XXXX" required style="width: 100%; padding: 10px; border: 1px solid #ccc;"></div>
+                        <div style="flex: 1; min-width: 200px;">
                             <label>Instituição</label>
-                            <select id="instituicao" required onchange="verificarOutra()">
+                            <select id="instituicao" required onchange="verificarOutra()" style="width: 100%; padding: 10px; border: 1px solid #ccc;">
                                 <option value="UVA-Campus CIDAO">UVA-Campus CIDAO</option>
                                 <option value="UVA-Campus CCS">UVA-Campus CCS</option>
                                 <option value="UVA-Campus BETÂNIA">UVA-Campus BETÂNIA</option>
-                                <option value="UFC">UFC</option><option value="IFCE">IFCE</option><option value="UNINTA">UNINTA</option><option value="OUTRA">OUTRA</option>
+                                <option value="UVA-Campus CCH">UVA-Campus CCH</option>    
+                                <option value="IFCE">IFCE</option><option value="UNINTA">UNINTA</option><option value="UFC">UFC</option><option value="FLF">FLF</option><option value="OUTRA">OUTRA</option>
                             </select>
-                            <input type="text" id="inst_outra" style="display:none; margin-top:5px;">
+                            <input type="text" id="inst_outra" placeholder="Qual instituição?" style="display:none; width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc;">
                         </div>
                     </div>
 
-                    <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom:15px;">
-                        <div style="flex: 1;">
-                            <label>Turno</label>
-                            <select id="turno" required>
-                                <option value="MANHÃ">MANHÃ</option><option value="TARDE">TARDE</option><option value="NOITE">NOITE</option>
-                            </select>
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap; background: #f9f9f9; padding: 15px; border-radius: 5px;">
+                        <div style="flex: 1;"><label>Turno</label>
+                            <select id="turno" required style="width: 100%; padding: 10px;"><option value="MANHÃ">MANHÃ</option><option value="TARDE">TARDE</option><option value="NOITE">NOITE</option></select>
                         </div>
-                        <div style="flex: 1;">
-                            <label>Embarque</label>
-                            <select id="embarque" required>
-                                <option value="SEDE">SEDE</option><option value="BARRO VERMELHO">BARRO VERMELHO</option><option value="LAPA">LAPA</option><option value="VILA">VILA</option>
-                            </select>
+                        <div style="flex: 1;"><label>Embarque</label>
+                            <select id="embarque" required style="width: 100%; padding: 10px;"><option value="SEDE">SEDE</option><option value="BARRO VERMELHO">BARRO VERMELHO</option><option value="LAPA">LAPA</option><option value="VILA">VILA</option></select>
                         </div>
                     </div>
 
-                    <div style="display: flex; gap: 10px;">
-                        <button type="submit" id="btnSubmit" class="btn btn-aluno" style="padding: 12px 25px;">💾 Salvar Alterações</button>
-                        <button type="button" onclick="fecharCadastro()" class="btn" style="background:#ccc;">Cancelar</button>
+                    <div style="display: flex; gap: 10px; margin-top: 15px;">
+                        <button type="submit" id="btnSubmit" class="btn btn-aluno" style="padding: 12px 30px;">💾 Salvar Alterações</button>
+                        <button type="button" onclick="fecharCadastro()" class="btn" style="padding: 12px 30px; background: #ccc; color: #333;">Cancelar</button>
                     </div>
                 </form>
             </div>
-
+            
             <div class="table-responsive">
                 <table>
-                    <thead><tr><th>Nome</th><th>Instituição</th><th>Turno</th><th>Status</th><th>Ações</th></tr></thead>
-                    <tbody id="lista"></tbody>
+                    <thead><tr><th>#</th><th>Protocolo</th><th>Nome</th><th>Instituição</th><th>Embarque</th><th>Status</th><th>Ações</th></tr></thead>
+                    <tbody id="lista"><tr><td colspan="7" style="text-align:center; padding: 30px;">⏳ Carregando banco de dados...</td></tr></tbody>
                 </table>
             </div>
         </div>
@@ -89,104 +87,62 @@
     <script>
         const EMAILS_AUTORIZADOS = ["manoelfariaspr@gmail.com"]; 
         const API_URL = "https://script.google.com/macros/s/AKfycbyQljrcnkEox6t6IKcBvYx2wSsSoLrA8NEMGvLjK4L5sVFmqo_hxP68iEiNdbUE5xg/exec";
+        
         let dadosNuvem = [];
         let idEdicaoAtual = null;
 
-        // Máscaras
+        // --- MÁSCARAS DE DADOS ---
         function mCPF(i){ i.value=i.value.replace(/\D/g,"").replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d{1,2})$/,"$1-$2").substring(0,14); }
         function mTel(i){ i.value=i.value.replace(/\D/g,"").replace(/^(\d{2})(\d)/g,"($1) $2").replace(/(\d{5})(\d)/,"$1-$2").substring(0,15); }
+        function mRG(i){ i.value=i.value.replace(/\D/g,"").substring(0,12); }
 
+        // --- SEGURANÇA E LOGIN ---
         function handleGoogleLogin(response) {
             const payload = JSON.parse(atob(response.credential.split('.')[1]));
             if (EMAILS_AUTORIZADOS.includes(payload.email)) {
                 sessionStorage.setItem('sec_logado', 'sim');
-                ativarPainel();
-            } else { alert("Acesso negado."); }
+                ativarInterface();
+            } else {
+                alert("Acesso negado para este e-mail.");
+            }
         }
 
-        function ativarPainel() {
+        function ativarInterface() {
             document.getElementById('login-screen').style.display = 'none';
-            const tpl = document.getElementById('tpl-admin');
-            document.getElementById('painel-conteudo').innerHTML = "";
-            document.getElementById('painel-conteudo').appendChild(tpl.content.cloneNode(true));
-            document.getElementById('formCadastro').addEventListener('submit', salvar);
+            const template = document.getElementById('template-admin');
+            const container = document.getElementById('painel-autorizado');
+            container.innerHTML = "";
+            container.appendChild(template.content.cloneNode(true));
+            
+            // Reatribui o listener do formulário injetado
+            document.getElementById('formCadastro').addEventListener('submit', salvarDados);
             buscarDadosNuvem();
         }
 
         function buscarDadosNuvem() {
             fetch(API_URL).then(res => res.json()).then(data => {
-                dadosNuvem = data.reverse();
+                // MANTÉM A ORDEM ORIGINAL: Último da planilha = Último da lista
+                dadosNuvem = data; 
                 renderizar();
+                atualizarDashboardAdmin();
             });
         }
 
-        // FUNÇÃO DE EDIÇÃO: Preenche o formulário com dados existentes
-        function editar(id) {
-            const aluno = dadosNuvem.find(a => a.id == id);
-            if(aluno) {
-                idEdicaoAtual = id;
-                document.getElementById('titulo-form').innerText = "✏️ Alterar Cadastro: " + aluno.nome;
-                document.getElementById('nome').value = aluno.nome;
-                document.getElementById('cpf').value = aluno.cpf || "";
-                document.getElementById('telefone').value = aluno.telefone || "";
-                document.getElementById('turno').value = aluno.turno || "MANHÃ";
-                document.getElementById('embarque').value = aluno.embarque || "SEDE";
-                
-                // Trata Instituição (se for OUTRA)
-                const instSelect = document.getElementById('instituicao');
-                const opcoes = Array.from(instSelect.options).map(o => o.value);
-                if(opcoes.includes(aluno.instituicao)) {
-                    instSelect.value = aluno.instituicao;
-                    document.getElementById('inst_outra').style.display = 'none';
-                } else {
-                    instSelect.value = 'OUTRA';
-                    document.getElementById('inst_outra').style.display = 'block';
-                    document.getElementById('inst_outra').value = aluno.instituicao;
-                }
-                
-                document.getElementById('area-cadastro').style.display = 'block';
-                window.scrollTo(0,0);
-            }
-        }
-
-        function salvar(e) {
-            e.preventDefault();
-            const btn = document.getElementById('btnSubmit');
-            btn.disabled = true; btn.innerText = "Processando...";
-
-            let instFinal = document.getElementById('instituicao').value;
-            if(instFinal === 'OUTRA') instFinal = document.getElementById('inst_outra').value;
-
-            const dados = {
-                action: idEdicaoAtual ? "edit" : "add",
-                id: idEdicaoAtual || Date.now().toString(),
-                nome: document.getElementById('nome').value,
-                cpf: document.getElementById('cpf').value,
-                telefone: document.getElementById('telefone').value,
-                instituicao: instFinal,
-                turno: document.getElementById('turno').value,
-                embarque: document.getElementById('embarque').value,
-                status: 'Aprovado'
-            };
-
-            fetch(API_URL, { method: 'POST', body: JSON.stringify(dados) })
-            .then(() => { alert("Dados atualizados!"); fecharCadastro(); buscarDadosNuvem(); })
-            .finally(() => { btn.disabled = false; btn.innerText = "💾 Salvar Alterações"; });
-        }
-
+        // --- RENDERIZAÇÃO COM NUMERAÇÃO SEQUENCIAL [#] ---
         function renderizar() {
             const busca = document.getElementById('busca').value.toLowerCase();
             const tbody = document.getElementById('lista');
             if(!tbody) return;
             tbody.innerHTML = '';
             
-            dadosNuvem.forEach(aluno => {
-                if(aluno.nome.toLowerCase().includes(busca)) {
+            dadosNuvem.forEach((aluno, index) => {
+                if(aluno.nome.toLowerCase().includes(busca) || (aluno.proto && aluno.proto.toLowerCase().includes(busca))) {
                     tbody.innerHTML += `<tr>
-                        <td><strong>${aluno.nome}</strong></td>
+                        <td><strong>${index + 1}</strong></td> <td><strong>${aluno.proto || '---'}</strong></td>
+                        <td>${aluno.nome}</td>
                         <td>${aluno.instituicao}</td>
-                        <td>${aluno.turno}</td>
-                        <td style="color:green">Aprovado</td>
+                        <td>${aluno.embarque}</td>
+                        <td style="color:green"><strong>${aluno.status}</strong></td>
                         <td>
                             <button onclick="editar('${aluno.id}')" title="Editar">✏️</button>
                             <button onclick="remover('${aluno.id}', this)" title="Excluir">❌</button>
@@ -196,20 +152,87 @@
             });
         }
 
+        // --- LOGÍSTICA DE EDIÇÃO E SALVAMENTO ---
+        function editar(id) {
+            const aluno = dadosNuvem.find(a => a.id == id);
+            if(aluno) {
+                idEdicaoAtual = id;
+                document.getElementById('titulo-form').innerText = "✏️ Editando: " + aluno.nome;
+                document.getElementById('nome').value = aluno.nome;
+                document.getElementById('cpf').value = aluno.cpf || "";
+                document.getElementById('rg').value = aluno.rg || "";
+                document.getElementById('telefone').value = aluno.telefone || "";
+                document.getElementById('turno').value = aluno.turno || "MANHÃ";
+                document.getElementById('embarque').value = aluno.embarque || "SEDE";
+                
+                const instSelect = document.getElementById('instituicao');
+                const opcoesValidas = Array.from(instSelect.options).map(o => o.value);
+                if(opcoesValidas.includes(aluno.instituicao)) {
+                    instSelect.value = aluno.instituicao;
+                    document.getElementById('inst_outra').style.display = 'none';
+                } else {
+                    instSelect.value = 'OUTRA';
+                    document.getElementById('inst_outra').style.display = 'block';
+                    document.getElementById('inst_outra').value = aluno.instituicao;
+                }
+                
+                document.getElementById('area-cadastro').style.display = 'block';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function salvarDados(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnSubmit');
+            // PREVENÇÃO DE MÚLTIPLOS CLIQUES
+            btn.disabled = true; btn.innerText = "⏳ Processando...";
+
+            let instFinal = document.getElementById('instituicao').value;
+            if(instFinal === 'OUTRA') instFinal = document.getElementById('inst_outra').value;
+
+            const payload = {
+                action: idEdicaoAtual ? "edit" : "add",
+                id: idEdicaoAtual || Date.now().toString(),
+                nome: document.getElementById('nome').value,
+                cpf: document.getElementById('cpf').value,
+                rg: document.getElementById('rg').value,
+                telefone: document.getElementById('telefone').value,
+                instituicao: instFinal,
+                turno: document.getElementById('turno').value,
+                embarque: document.getElementById('embarque').value,
+                status: 'Aprovado'
+            };
+
+            fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) })
+            .then(() => { alert("Cadastro atualizado com sucesso!"); fecharCadastro(); buscarDadosNuvem(); })
+            .catch(() => alert("Erro ao conectar com o servidor."))
+            .finally(() => { btn.disabled = false; btn.innerText = "💾 Salvar Alterações"; });
+        }
+
         function remover(id, btn) {
-            if(confirm("Deseja realmente excluir este cadastro?")) {
-                btn.disabled = true;
+            if(confirm("Tem certeza que deseja excluir permanentemente este aluno?")) {
+                btn.disabled = true; btn.innerText = "⏳";
                 fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "delete", id: id }) })
                 .then(() => buscarDadosNuvem());
             }
         }
 
-        function abrirCadastro() { idEdicaoAtual = null; document.getElementById('titulo-form').innerText = "📝 Novo Cadastro"; document.getElementById('area-cadastro').style.display = 'block'; }
-        function fecharCadastro() { document.getElementById('area-cadastro').style.display = 'none'; idEdicaoAtual = null; document.getElementById('formCadastro').reset(); }
+        function atualizarDashboardAdmin() {
+            const dash = document.getElementById('dashboard-admin');
+            if(dash) {
+                dash.innerHTML = `<div class="dash-card-admin" style="background:white; padding:20px; border-radius:10px; border-top:4px solid var(--verde-principal); text-align:center; flex:1;">
+                    <h3>👥 Total de Alunos (Aprovados)</h3>
+                    <div style="font-size:32px; font-weight:bold; color:var(--verde-escuro);">${dadosNuvem.length}</div>
+                </div>`;
+            }
+        }
+
+        function abrirCadastro() { idEdicaoAtual = null; document.getElementById('titulo-form').innerText = "📝 Novo Cadastro"; document.getElementById('formCadastro').reset(); document.getElementById('area-cadastro').style.display = 'block'; }
+        function fecharCadastro() { document.getElementById('area-cadastro').style.display = 'none'; idEdicaoAtual = null; }
         function verificarOutra() { document.getElementById('inst_outra').style.display = (document.getElementById('instituicao').value === 'OUTRA' ? 'block' : 'none'); }
         function sairPainel() { sessionStorage.removeItem('sec_logado'); window.location.reload(); }
 
-        window.onload = () => { if(sessionStorage.getItem('sec_logado') === 'sim') ativarPainel(); };
+        window.onload = () => { if(sessionStorage.getItem('sec_logado') === 'sim') ativarInterface(); };
     </script>
 </body>
 </html>
