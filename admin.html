@@ -5,6 +5,24 @@
     <title>Painel Secretaria - Graça</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+        /* Mantendo seus estilos originais do Dashboard */
+        .dashboard-grid-admin { 
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+            gap: 20px; padding: 20px; background: #f8f9fa; border-bottom: 1px solid #eee;
+        }
+        .dash-card-admin { 
+            background: white; padding: 20px; border-radius: 10px; 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05); text-align: center; 
+            transition: transform 0.2s; border-top: 4px solid var(--verde-principal);
+        }
+        .dash-card-admin.clicavel { cursor: pointer; }
+        .dash-card-admin.clicavel:hover { transform: translateY(-5px); }
+        .dash-card-admin h3 { color: #555; font-size: 15px; margin-bottom: 10px; }
+        .dash-card-admin .numero { font-size: 32px; font-weight: bold; color: var(--verde-escuro); }
+        .inst-item { display: flex; justify-content: space-between; padding: 6px; border-bottom: 1px solid #eee; cursor: pointer; }
+        #aviso-filtro { display: none; background: #eef5fa; padding: 10px 20px; border-left: 4px solid #0056b3; margin: 20px; align-items: center; justify-content: space-between; border-radius: 4px; }
+    </style>
 </head>
 <body>
     <div id="login-screen" style="position:fixed; top:0; left:0; width:100%; height:100%; background:var(--fundo); z-index:9999; display:flex; align-items:center; justify-content:center;">
@@ -12,15 +30,15 @@
             <h2 style="color:var(--verde-principal); margin-bottom:20px;">Acesso Restrito</h2>
             <p style="margin-bottom: 20px; color: #666;">Faça login com uma conta autorizada da Secretaria</p>
             <div id="g_id_onload" data-client_id="902660911703-a0g6tp2fg4uajfl0mo22aodmf827aod7.apps.googleusercontent.com" data-callback="handleGoogleLogin" data-auto_prompt="false"></div>
-            <div class="g_id_signin" data-type="standard" data-theme="outline" data-size="large" style="display: flex; justify-content: center; margin-bottom: 20px;"></div>
+            <div class="g_id_signin" data-type="standard" data-theme="outline" data-size="large" style="display: flex; justify-content: center;"></div>
             <p id="erro-login" style="color:red; display:none; margin-top:15px; font-weight:bold;"></p>
             <br><br><a href="index.html" style="color:var(--verde-escuro); text-decoration:none;">⬅ Voltar ao Início</a>
         </div>
     </div>
 
-    <div id="painel-autorizado"></div>
+    <div id="painel-conteudo"></div>
 
-    <template id="template-admin">
+    <template id="tpl-admin">
         <header><img src="Captura de tela 2026-02-23 080257.png" alt="Governo Municipal de Graça" class="logo-prefeitura"></header>
 
         <div class="admin-table-container">
@@ -41,28 +59,23 @@
             </div>
 
             <div id="area-cadastro" style="display:none; background: white; border-bottom: 3px solid var(--verde-principal); padding: 30px;">
-                <h3 id="titulo-form" style="color: var(--verde-principal); margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px;">📝 Preencher Ficha do Aluno</h3>
-                
-                <form id="formCadastro" style="display: flex; flex-direction: column; gap: 15px;">
-                    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-                        <div style="flex: 2; min-width: 200px;"><label>Nome Completo</label><input type="text" id="nome" required style="width: 100%; padding: 10px; border: 1px solid #ccc;"></div>
-                        <div style="flex: 1; min-width: 150px;"><label>Nascimento</label><input type="text" id="nascimento" placeholder="DD/MM/AAAA" required style="width: 100%; padding: 10px; border: 1px solid #ccc;"></div>
+                <h3 id="titulo-form" style="color: var(--verde-principal); margin-bottom: 20px;">📝 Ficha do Aluno</h3>
+                <form id="formCadastro">
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom:15px;">
+                        <div style="flex: 2;"><label>Nome Completo</label><input type="text" id="nome" required></div>
+                        <div style="flex: 1;"><label>Nascimento</label><input type="text" id="nascimento" placeholder="DD/MM/AAAA" required></div>
                     </div>
-                    
-                    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-                        <div style="flex: 1; min-width: 150px;"><label>RG</label><input type="text" id="rg" oninput="mascaraRG(this)" required style="width: 100%; padding: 10px; border: 1px solid #ccc;"></div>
-                        <div style="flex: 1; min-width: 150px;"><label>CPF</label><input type="text" id="cpf" oninput="mascaraCPF(this)" placeholder="000.000.000-00" required style="width: 100%; padding: 10px; border: 1px solid #ccc;"></div>
-                        <div style="flex: 1; min-width: 150px;"><label>WhatsApp</label><input type="text" id="telefone" oninput="mascaraTelefone(this)" placeholder="(88) 9XXXX-XXXX" required style="width: 100%; padding: 10px; border: 1px solid #ccc;"></div>
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom:15px;">
+                        <div style="flex: 1;"><label>RG</label><input type="text" id="rg" oninput="mRG(this)" required></div>
+                        <div style="flex: 1;"><label>CPF</label><input type="text" id="cpf" oninput="mCPF(this)" placeholder="000.000.000-00" required></div>
+                        <div style="flex: 1;"><label>WhatsApp</label><input type="text" id="telefone" oninput="mTel(this)" placeholder="(88) 9XXXX-XXXX" required></div>
                     </div>
+                    <div style="margin-bottom:15px;"><label>Endereço Completo</label><input type="text" id="endereco" required></div>
                     
-                    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-                        <div style="flex: 1; min-width: 100%;"><label>Endereço Completo</label><input type="text" id="endereco" required style="width: 100%; padding: 10px; border: 1px solid #ccc;"></div>
-                    </div>
-                    
-                    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-                        <div style="flex: 1; min-width: 200px;">
-                            <label>Instituição de Ensino</label>
-                            <select id="instituicao" required onchange="verificarOutra()" style="width: 100%; padding: 10px; border: 1px solid #ccc;">
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom:15px;">
+                        <div style="flex: 1;">
+                            <label>Instituição</label>
+                            <select id="instituicao" required onchange="verificarOutra()">
                                 <option value="">Selecione...</option>
                                 <option value="UVA-Campus CIDAO">UVA-Campus CIDAO</option>
                                 <option value="UVA-Campus CCS">UVA-Campus CCS</option>
@@ -70,43 +83,42 @@
                                 <option value="UVA-Campus CCH">UVA-Campus CCH</option>    
                                 <option value="IFCE">IFCE</option><option value="UNINTA">UNINTA</option><option value="UFC">UFC</option><option value="FLF">FLF</option><option value="OUTRA">OUTRA</option>
                             </select>
-                            <input type="text" id="inst_outra" placeholder="Digite a instituição..." style="display:none; width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc;">
+                            <input type="text" id="inst_outra" style="display:none; margin-top:5px;">
                         </div>
-                    </div>
-
-                    <div style="display: flex; gap: 15px; flex-wrap: wrap; background: #f9f9f9; padding: 15px; border: 1px solid #ccc; border-radius: 5px;">
-                        <div style="flex: 1; min-width: 200px;">
-                            <label>Turno Predominante</label>
-                            <select id="turno" required style="width: 100%; padding: 10px; border: 1px solid #ccc;">
-                                <option value="">Selecione...</option>
-                                <option value="MANHÃ">MANHÃ</option><option value="TARDE">TARDE</option><option value="NOITE">NOITE</option>
+                        <div style="flex: 1;">
+                            <label>Ponto de Embarque</label>
+                            <select id="embarque" required>
+                                <option value="">Selecione...</option><option value="SEDE">SEDE</option><option value="BARRO VERMELHO">BARRO VERMELHO</option>
+                                <option value="LAPA">LAPA</option><option value="VILA">VILA</option>
                             </select>
                         </div>
-                        <div style="flex: 2; min-width: 250px;">
-                            <label>Dias da semana neste turno:</label>
-                            <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 10px;">
-                                <label><input type="checkbox" id="chk_prin_SEGUNDA" value="SEGUNDA"> SEG</label>
-                                <label><input type="checkbox" id="chk_prin_TERÇA" value="TERÇA"> TER</label>
-                                <label><input type="checkbox" id="chk_prin_QUARTA" value="QUARTA"> QUA</label>
-                                <label><input type="checkbox" id="chk_prin_QUINTA" value="QUINTA"> QUI</label>
-                                <label><input type="checkbox" id="chk_prin_SEXTA" value="SEXTA"> SEX</label>
-                            </div>
+                    </div>
+
+                    <div style="background: #f9f9f9; padding: 15px; border-radius: 5px; margin-bottom:15px;">
+                        <label>Turno Principal</label>
+                        <select id="turno" required style="margin-bottom:10px;">
+                            <option value="">Selecione...</option><option value="MANHÃ">MANHÃ</option><option value="TARDE">TARDE</option><option value="NOITE">NOITE</option>
+                        </select>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <label><input type="checkbox" id="chk_prin_SEGUNDA" value="SEGUNDA"> SEG</label>
+                            <label><input type="checkbox" id="chk_prin_TERÇA" value="TERÇA"> TER</label>
+                            <label><input type="checkbox" id="chk_prin_QUARTA" value="QUARTA"> QUA</label>
+                            <label><input type="checkbox" id="chk_prin_QUINTA" value="QUINTA"> QUI</label>
+                            <label><input type="checkbox" id="chk_prin_SEXTA" value="SEXTA"> SEX</label>
                         </div>
                     </div>
 
-                    <div style="display: flex; gap: 10px; margin-top: 15px;">
-                        <button type="submit" id="btnSubmit" class="btn btn-aluno" style="padding: 12px 30px;">💾 Salvar Cadastro</button>
-                        <button type="button" onclick="fecharCadastro()" class="btn" style="padding: 12px 30px; background: #ccc; color: #333;">Cancelar</button>
+                    <div style="display: flex; gap: 10px;">
+                        <button type="submit" id="btnSubmit" class="btn btn-aluno" style="padding: 12px 25px;">💾 Salvar</button>
+                        <button type="button" onclick="fecharCadastro()" class="btn" style="background:#ccc;">Cancelar</button>
                     </div>
                 </form>
             </div>
-            
+
             <div class="table-responsive">
                 <table>
                     <thead><tr><th>Protocolo</th><th>Nome</th><th>Instituição</th><th>Embarque</th><th>Prioridade</th><th>Status</th><th>Ações</th></tr></thead>
-                    <tbody id="lista">
-                        <tr><td colspan="7" style="text-align:center; padding: 30px;">⏳ Carregando...</td></tr>
-                    </tbody>
+                    <tbody id="lista"><tr><td colspan="7" style="text-align:center; padding: 30px;">⏳ Carregando...</td></tr></tbody>
                 </table>
             </div>
         </div>
@@ -115,133 +127,95 @@
     <script>
         const EMAILS_AUTORIZADOS = ["manoelfariaspr@gmail.com"]; 
         const API_URL = "https://script.google.com/macros/s/AKfycbyQljrcnkEox6t6IKcBvYx2wSsSoLrA8NEMGvLjK4L5sVFmqo_hxP68iEiNdbUE5xg/exec";
-        
         let dadosNuvem = [];
         let idEdicaoAtual = null;
-        const diasSemana = ['SEGUNDA', 'TERÇA', 'QUARTA', 'QUINTA', 'SEXTA'];
         let filtroGlobal = { tipo: null, valor: null };
 
-        // --- 1. MÁSCARAS DE FORMATAÇÃO ---
-        function mascaraCPF(i) {
-            let v = i.value.replace(/\D/g, "");
-            v = v.replace(/(\d{3})(\d)/, "$1.$2");
-            v = v.replace(/(\d{3})(\d)/, "$1.$2");
-            v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-            i.value = v.substring(0, 14);
-        }
-
-        function mascaraTelefone(i) {
-            let v = i.value.replace(/\D/g, "");
-            v = v.replace(/^(\d{2})(\d)/g, "($1) $2");
-            v = v.replace(/(\d{5})(\d)/, "$1-$2");
-            i.value = v.substring(0, 15);
-        }
-
-        function mascaraRG(i) {
-            i.value = i.value.replace(/\D/g, "").substring(0, 12);
-        }
-
-        // --- 2. SEGURANÇA: INJEÇÃO DE CONTEÚDO ---
-        function injetarConteudoAdmin() {
-            const template = document.getElementById('template-admin');
-            const clone = template.content.cloneNode(true);
-            const container = document.getElementById('painel-autorizado');
-            container.innerHTML = ""; 
-            container.appendChild(clone);
-            
-            // Reatribui o listener do formulário que agora existe no DOM
-            document.getElementById('formCadastro').addEventListener('submit', salvarCadastro);
-        }
+        // --- MÁSCARAS ---
+        function mCPF(i){ i.value=i.value.replace(/\D/g,"").replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d{1,2})$/,"$1-$2").substring(0,14); }
+        function mTel(i){ i.value=i.value.replace(/\D/g,"").replace(/^(\d{2})(\d)/g,"($1) $2").replace(/(\d{5})(\d)/,"$1-$2").substring(0,15); }
+        function mRG(i){ i.value=i.value.replace(/\D/g,"").substring(0,12); }
 
         function handleGoogleLogin(response) {
-            const payload = decodeJwt(response.credential);
+            const payload = JSON.parse(atob(response.credential.split('.')[1]));
             if (EMAILS_AUTORIZADOS.includes(payload.email)) {
                 sessionStorage.setItem('sec_logado', 'sim');
-                document.getElementById('login-screen').style.display = 'none';
-                injetarConteudoAdmin();
-                buscarDadosNuvem();
+                ativarPainel();
             } else {
-                document.getElementById('erro-login').innerText = "❌ Acesso negado.";
-                document.getElementById('erro-login').style.display = 'block';
+                alert("Acesso negado para: " + payload.email);
             }
         }
 
-        function decodeJwt(token) {
-            const base64Url = token.split('.')[1];
-            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-            return JSON.parse(decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')));
+        function ativarPainel() {
+            document.getElementById('login-screen').style.display = 'none';
+            const tpl = document.getElementById('tpl-admin');
+            document.getElementById('painel-conteudo').appendChild(tpl.content.cloneNode(true));
+            
+            // Re-vincula o evento do formulário que acabou de ser criado
+            document.getElementById('formCadastro').addEventListener('submit', salvar);
+            buscarDadosNuvem();
         }
 
-        // --- 3. PREVENÇÃO DE MÚLTIPLOS CLIQUES ---
-        function aprovar(id, btn) {
-            if(confirm("Aprovar aluno?")) {
-                btn.disabled = true; btn.innerText = "⏳";
-                fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: "approve", id: id }) })
-                .then(() => buscarDadosNuvem());
-            }
+        function buscarDadosNuvem() {
+            fetch(API_URL).then(res => res.json()).then(data => {
+                dadosNuvem = data.reverse();
+                atualizarDashboardAdmin();
+                renderizar();
+            }).catch(() => { if(document.getElementById('lista')) document.getElementById('lista').innerHTML = '<tr><td colspan="7">Erro de conexão.</td></tr>'; });
         }
 
-        function remover(id, btn) {
-            if(confirm("Excluir cadastro?")) {
-                btn.disabled = true; btn.style.opacity = "0.5";
-                fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: "delete", id: id }) })
-                .then(() => buscarDadosNuvem());
-            }
-        }
-
-        function salvarCadastro(e) {
+        function salvar(e) {
             e.preventDefault();
             const btn = document.getElementById('btnSubmit');
-            const originalText = btn.innerText;
-            btn.innerText = "⏳ Enviando..."; btn.disabled = true;
+            btn.disabled = true; btn.innerText = "Enviando...";
 
-            // ... (Lógica de coleta de dados do formulário permanece a mesma)
             let diasFinais = [];
             let turnoPrin = document.getElementById('turno').value;
-            // (Simplificando para o exemplo, use sua lógica completa de dias aqui)
-            
+            ['SEGUNDA', 'TERÇA', 'QUARTA', 'QUINTA', 'SEXTA'].forEach(dia => {
+                if(document.getElementById('chk_prin_'+dia).checked) diasFinais.push(dia + "-" + turnoPrin);
+            });
+
             let instFinal = document.getElementById('instituicao').value;
             if(instFinal === 'OUTRA') instFinal = document.getElementById('inst_outra').value;
 
             const dados = {
-                action: idEdicaoAtual ? "edit" : "add", 
-                id: idEdicaoAtual || Date.now().toString(), 
+                action: idEdicaoAtual ? "edit" : "add",
+                id: idEdicaoAtual || Date.now().toString(),
+                proto: "GR-" + Math.floor(Math.random() * 90000 + 10000),
                 nome: document.getElementById('nome').value,
+                nascimento: document.getElementById('nascimento').value,
                 rg: document.getElementById('rg').value,
                 cpf: document.getElementById('cpf').value,
+                endereco: document.getElementById('endereco').value,
                 telefone: document.getElementById('telefone').value,
                 instituicao: instFinal,
-                status: 'Aprovado' 
+                turno: turnoPrin,
+                dias: diasFinais.join(', '),
+                embarque: document.getElementById('embarque').value,
+                status: 'Aprovado'
             };
 
-            fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(dados) })
-            .then(() => {
-                alert("Operação realizada com sucesso!");
-                fecharCadastro();
-                buscarDadosNuvem();
-            })
-            .catch(() => alert("Erro ao salvar."))
-            .finally(() => { btn.disabled = false; btn.innerText = originalText; });
+            fetch(API_URL, { method: 'POST', body: JSON.stringify(dados) })
+            .then(() => { alert("Sucesso!"); fecharCadastro(); buscarDadosNuvem(); })
+            .finally(() => { btn.disabled = false; btn.innerText = "💾 Salvar"; });
         }
 
-        // --- FUNÇÕES DE RENDERIZAÇÃO E LOGÍSTICA ---
         function renderizar() {
             const busca = document.getElementById('busca').value.toLowerCase();
             const tbody = document.getElementById('lista');
+            if(!tbody) return;
             tbody.innerHTML = '';
             
-            dadosNuvem.forEach((aluno) => {
-                if(aluno.nome.toLowerCase().includes(busca) || aluno.proto.toLowerCase().includes(busca)) {
+            dadosNuvem.forEach(aluno => {
+                if(aluno.nome.toLowerCase().includes(busca)) {
                     tbody.innerHTML += `<tr>
-                        <td><strong>${aluno.proto}</strong></td>
+                        <td>${aluno.proto}</td>
                         <td>${aluno.nome}</td>
                         <td>${aluno.instituicao}</td>
                         <td>${aluno.embarque}</td>
                         <td>${aluno.comorbidade === 'Sim' ? '♿' : 'Não'}</td>
-                        <td style="color:${aluno.status=='Pendente'?'orange':'green'}"><strong>${aluno.status}</strong></td>
+                        <td style="color:green"><strong>${aluno.status}</strong></td>
                         <td>
-                            ${aluno.status === 'Pendente' ? `<button onclick="aprovar('${aluno.id}', this)">✅</button>` : ''}
-                            <button onclick="editar('${aluno.id}')">✏️</button>
                             <button onclick="remover('${aluno.id}', this)">❌</button>
                         </td>
                     </tr>`;
@@ -249,26 +223,26 @@
             });
         }
 
-        function buscarDadosNuvem() {
-            fetch(API_URL).then(res => res.json()).then(data => { 
-                dadosNuvem = data.reverse(); 
-                if(document.getElementById('dashboard-admin')) atualizarDashboardAdmin(); 
-                renderizar(); 
-            });
+        function remover(id, btn) {
+            if(confirm("Excluir?")) {
+                btn.disabled = true;
+                fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "delete", id: id }) })
+                .then(() => buscarDadosNuvem());
+            }
         }
 
-        // Funções auxiliares (abrirCadastro, fecharCadastro, sairPainel, etc) permanecem as mesmas
-        function sairPainel() { sessionStorage.removeItem('sec_logado'); window.location.reload(); }
-        function abrirCadastro() { document.getElementById('area-cadastro').style.display = 'block'; }
-        function fecharCadastro() { document.getElementById('area-cadastro').style.display = 'none'; idEdicaoAtual = null; }
+        function atualizarDashboardAdmin() {
+            const total = dadosNuvem.filter(a => a.status === 'Aprovado').length;
+            const dash = document.getElementById('dashboard-admin');
+            if(dash) dash.innerHTML = `<div class="dash-card-admin"><h3>👥 Total Aprovados</h3><div class="numero">${total}</div></div>`;
+        }
 
-        window.onload = () => { 
-            if(sessionStorage.getItem('sec_logado') === 'sim') { 
-                document.getElementById('login-screen').style.display = 'none'; 
-                injetarConteudoAdmin();
-                buscarDadosNuvem(); 
-            } 
-        };
+        function abrirCadastro() { document.getElementById('area-cadastro').style.display = 'block'; }
+        function fecharCadastro() { document.getElementById('area-cadastro').style.display = 'none'; idEdicaoAtual = null; document.getElementById('formCadastro').reset(); }
+        function verificarOutra() { document.getElementById('inst_outra').style.display = (document.getElementById('instituicao').value === 'OUTRA' ? 'block' : 'none'); }
+        function sairPainel() { sessionStorage.removeItem('sec_logado'); window.location.reload(); }
+
+        window.onload = () => { if(sessionStorage.getItem('sec_logado') === 'sim') ativarPainel(); };
     </script>
 </body>
 </html>
