@@ -6,8 +6,8 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
-        /* --- ESTILOS DOS BOTÕES DE SELEÇÃO MÚLTIPLA (TURNOS E DIAS) --- */
-        .checkbox-oculto { display: none; } /* Oculta a caixinha padrão do checkbox */
+        /* --- ESTILOS DOS BOTÕES DE SELEÇÃO (CHECK-IN) --- */
+        .checkbox-oculto { display: none; } 
         
         .label-botao {
             padding: 6px 12px; 
@@ -19,9 +19,10 @@
             transition: 0.3s;
             font-weight: 500;
             font-size: 14px;
+            display: inline-block;
         }
         
-        /* Cor quando o botão está selecionado */
+        /* Cor quando o botão está selecionado (efeito check-in) */
         .checkbox-oculto:checked + .label-botao {
             background: var(--verde-principal, #28a745); 
             color: white; 
@@ -115,46 +116,43 @@
                     </div>
 
                     <div style="background: #f9f9f9; padding: 15px; border-radius: 5px; margin-top: 5px;">
-                        <label style="display: block; margin-bottom: 15px; font-weight: bold; color: #333;">Dias de Transporte por Turno</label>
-                        <div style="background: #f9f9f9; padding: 15px; border-radius: 5px; margin-top: 5px;">
-    <label style="display: block; margin-bottom: 15px; font-weight: bold; color: #333;">Dias de Transporte por Turno</label>
-    
-    <div class="linha-turno">
-        <div class="titulo-turno">Manhã:</div>
-        <div style="display: flex; gap: 5px; flex-wrap: wrap;">
-            <label><input type="checkbox" value="Seg" class="checkbox-oculto js-dia-manha"><span class="label-botao">Seg</span></label>
-            <label><input type="checkbox" value="Ter" class="checkbox-oculto js-dia-manha"><span class="label-botao">Ter</span></label>
-            <label><input type="checkbox" value="Qua" class="checkbox-oculto js-dia-manha"><span class="label-botao">Qua</span></label>
-            <label><input type="checkbox" value="Qui" class="checkbox-oculto js-dia-manha"><span class="label-botao">Qui</span></label>
-            <label><input type="checkbox" value="Sex" class="checkbox-oculto js-dia-manha"><span class="label-botao">Sex</span></label>
-            <label><input type="checkbox" value="Sáb" class="checkbox-oculto js-dia-manha"><span class="label-botao">Sáb</span></label>
-        </div>
-    </div>
+                        <label style="display: block; margin-bottom: 15px; font-weight: bold; color: #333;">Dias de Transporte por Turno (Check-in)</label>
+                        
+                        <div class="linha-turno">
+                            <div class="titulo-turno">Manhã:</div>
+                            <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                                <label><input type="checkbox" value="Seg" class="checkbox-oculto js-dia-manha"><span class="label-botao">Seg</span></label>
+                                <label><input type="checkbox" value="Ter" class="checkbox-oculto js-dia-manha"><span class="label-botao">Ter</span></label>
+                                <label><input type="checkbox" value="Qua" class="checkbox-oculto js-dia-manha"><span class="label-botao">Qua</span></label>
+                                <label><input type="checkbox" value="Qui" class="checkbox-oculto js-dia-manha"><span class="label-botao">Qui</span></label>
+                                <label><input type="checkbox" value="Sex" class="checkbox-oculto js-dia-manha"><span class="label-botao">Sex</span></label>
+                                <label><input type="checkbox" value="Sáb" class="checkbox-oculto js-dia-manha"><span class="label-botao">Sáb</span></label>
+                            </div>
+                        </div>
 
-    <div class="linha-turno">
-        <div class="titulo-turno">Tarde:</div>
-        <div style="display: flex; gap: 5px; flex-wrap: wrap;">
-            <label><input type="checkbox" value="Seg" class="checkbox-oculto js-dia-tarde"><span class="label-botao">Seg</span></label>
-            <label><input type="checkbox" value="Ter" class="checkbox-oculto js-dia-tarde"><span class="label-botao">Ter</span></label>
-            <label><input type="checkbox" value="Qua" class="checkbox-oculto js-dia-tarde"><span class="label-botao">Qua</span></label>
-            <label><input type="checkbox" value="Qui" class="checkbox-oculto js-dia-tarde"><span class="label-botao">Qui</span></label>
-            <label><input type="checkbox" value="Sex" class="checkbox-oculto js-dia-tarde"><span class="label-botao">Sex</span></label>
-            <label><input type="checkbox" value="Sáb" class="checkbox-oculto js-dia-tarde"><span class="label-botao">Sáb</span></label>
-        </div>
-    </div>
+                        <div class="linha-turno">
+                            <div class="titulo-turno">Tarde:</div>
+                            <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                                <label><input type="checkbox" value="Seg" class="checkbox-oculto js-dia-tarde"><span class="label-botao">Seg</span></label>
+                                <label><input type="checkbox" value="Ter" class="checkbox-oculto js-dia-tarde"><span class="label-botao">Ter</span></label>
+                                <label><input type="checkbox" value="Qua" class="checkbox-oculto js-dia-tarde"><span class="label-botao">Qua</span></label>
+                                <label><input type="checkbox" value="Qui" class="checkbox-oculto js-dia-tarde"><span class="label-botao">Qui</span></label>
+                                <label><input type="checkbox" value="Sex" class="checkbox-oculto js-dia-tarde"><span class="label-botao">Sex</span></label>
+                                <label><input type="checkbox" value="Sáb" class="checkbox-oculto js-dia-tarde"><span class="label-botao">Sáb</span></label>
+                            </div>
+                        </div>
 
-    <div class="linha-turno" style="margin-bottom: 0;">
-        <div class="titulo-turno">Noite:</div>
-        <div style="display: flex; gap: 5px; flex-wrap: wrap;">
-            <label><input type="checkbox" value="Seg" class="checkbox-oculto js-dia-noite"><span class="label-botao">Seg</span></label>
-            <label><input type="checkbox" value="Ter" class="checkbox-oculto js-dia-noite"><span class="label-botao">Ter</span></label>
-            <label><input type="checkbox" value="Qua" class="checkbox-oculto js-dia-noite"><span class="label-botao">Qua</span></label>
-            <label><input type="checkbox" value="Qui" class="checkbox-oculto js-dia-noite"><span class="label-botao">Qui</span></label>
-            <label><input type="checkbox" value="Sex" class="checkbox-oculto js-dia-noite"><span class="label-botao">Sex</span></label>
-            <label><input type="checkbox" value="Sáb" class="checkbox-oculto js-dia-noite"><span class="label-botao">Sáb</span></label>
-        </div>
-    </div>
-</div>
+                        <div class="linha-turno" style="margin-bottom: 0;">
+                            <div class="titulo-turno">Noite:</div>
+                            <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                                <label><input type="checkbox" value="Seg" class="checkbox-oculto js-dia-noite"><span class="label-botao">Seg</span></label>
+                                <label><input type="checkbox" value="Ter" class="checkbox-oculto js-dia-noite"><span class="label-botao">Ter</span></label>
+                                <label><input type="checkbox" value="Qua" class="checkbox-oculto js-dia-noite"><span class="label-botao">Qua</span></label>
+                                <label><input type="checkbox" value="Qui" class="checkbox-oculto js-dia-noite"><span class="label-botao">Qui</span></label>
+                                <label><input type="checkbox" value="Sex" class="checkbox-oculto js-dia-noite"><span class="label-botao">Sex</span></label>
+                                <label><input type="checkbox" value="Sáb" class="checkbox-oculto js-dia-noite"><span class="label-botao">Sáb</span></label>
+                            </div>
+                        </div>
                     </div>
 
                     <div style="display: flex; gap: 10px; margin-top: 15px;">
@@ -175,7 +173,7 @@
 
     <script>
         const EMAILS_AUTORIZADOS = ["manoelfariaspr@gmail.com"]; 
-        const API_URL = "https://script.google.com/macros/s/AKfycbyQljrcnkEox6t6IKcBvYx2wSsSoLrA8NEMGvLjK4L5sVFmqo_hxP68iEiNdbUE5xg/exec";
+        const API_URL = "https://script.google.com/macros/s/AKfycbzUUCw1mEu6XzkZ9aPrQrHb5MTiYXgNxcCuzbKXixYwKfYtD78PA6sPh6oYymQSpd0/exec";
         
         let dadosNuvem = [];
         let idEdicaoAtual = null;
@@ -264,7 +262,7 @@
                     document.getElementById('inst_outra').value = aluno.instituicao;
                 }
 
-                // Desmarca todos os botões de dias primeiro
+                // Desmarca todos os check-ins de dias primeiro
                 document.querySelectorAll('.js-dia-manha, .js-dia-tarde, .js-dia-noite').forEach(cb => cb.checked = false);
                 
                 // Marca os dias da Manhã salvos
@@ -305,7 +303,7 @@
                 protocoloFinal = "GRA-" + Math.floor(100000 + Math.random() * 900000).toString();
             }
 
-            // Coleta os Dias selecionados em cada turno
+            // Coleta os check-ins selecionados em cada turno
             const diasManha = Array.from(document.querySelectorAll('.js-dia-manha:checked')).map(cb => cb.value).join(', ');
             const diasTarde = Array.from(document.querySelectorAll('.js-dia-tarde:checked')).map(cb => cb.value).join(', ');
             const diasNoite = Array.from(document.querySelectorAll('.js-dia-noite:checked')).map(cb => cb.value).join(', ');
@@ -322,9 +320,9 @@
                 embarque: document.getElementById('embarque').value,
                 mora_sobral: document.getElementById('mora_sobral').value,
                 novato: document.getElementById('novato').value,
-                dias_manha: diasManha,  // Envia ex: "Seg, Qua"
-                dias_tarde: diasTarde,  // Envia ex: ""
-                dias_noite: diasNoite,  // Envia ex: "Ter, Qui, Sex"
+                dias_manha: diasManha,  
+                dias_tarde: diasTarde,  
+                dias_noite: diasNoite,  
                 status: 'Aprovado'
             };
 
@@ -357,7 +355,7 @@
             document.getElementById('titulo-form').innerText = "📝 Novo Cadastro"; 
             document.getElementById('formCadastro').reset(); 
             
-            // Limpa todos os botões de dias
+            // Limpa todos os check-ins
             document.querySelectorAll('.js-dia-manha, .js-dia-tarde, .js-dia-noite').forEach(cb => cb.checked = false);
             
             document.getElementById('area-cadastro').style.display = 'block'; 
