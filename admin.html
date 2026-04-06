@@ -5,6 +5,29 @@
     <title>Painel Secretaria - Graça</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+        /* --- ESTILOS DOS BOTÕES DE DIAS DA SEMANA --- */
+        .checkbox-dia { display: none; } /* Oculta a caixinha padrão do checkbox */
+        
+        .label-dia {
+            padding: 8px 15px; 
+            border: 1px solid #ccc; 
+            border-radius: 5px;
+            background: #fff; 
+            cursor: pointer; 
+            user-select: none; 
+            transition: 0.3s;
+            font-weight: 500;
+        }
+        
+        /* Cor quando o dia está selecionado (usando a cor verde principal do seu sistema) */
+        .checkbox-dia:checked + .label-dia {
+            background: var(--verde-principal, #28a745); 
+            color: white; 
+            border-color: var(--verde-principal, #28a745); 
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
     <div id="login-screen" style="position:fixed; top:0; left:0; width:100%; height:100%; background:var(--fundo); z-index:9999; display:flex; align-items:center; justify-content:center;">
@@ -61,16 +84,39 @@
 
                     <div style="display: flex; gap: 15px; flex-wrap: wrap; background: #f9f9f9; padding: 15px; border-radius: 5px;">
                         <div style="flex: 1;"><label>Turno</label>
-                            <select id="turno" required style="width: 100%; padding: 10px;"><option value="MANHÃ">MANHÃ</option><option value="TARDE">TARDE</option><option value="NOITE">NOITE</option></select>
+                            <select id="turno" required style="width: 100%; padding: 10px; border: 1px solid #ccc;"><option value="MANHÃ">MANHÃ</option><option value="TARDE">TARDE</option><option value="NOITE">NOITE</option></select>
                         </div>
                         <div style="flex: 1;"><label>Embarque</label>
-                            <select id="embarque" required style="width: 100%; padding: 10px;"><option value="SEDE">SEDE</option><option value="BARRO VERMELHO">BARRO VERMELHO</option><option value="LAPA">LAPA</option><option value="VILA">VILA</option></select>
+                            <select id="embarque" required style="width: 100%; padding: 10px; border: 1px solid #ccc;"><option value="SEDE">SEDE</option><option value="BARRO VERMELHO">BARRO VERMELHO</option><option value="LAPA">LAPA</option><option value="VILA">VILA</option></select>
                         </div>
                         <div style="flex: 1;"><label>Mora em Sobral?</label>
-                        <select id="mora_sobral" required style="width: 100%; padding: 10px; border: 1px solid #ccc;">
-                             <option value="NÃO">NÃO</option>
+                            <select id="mora_sobral" required style="width: 100%; padding: 10px; border: 1px solid #ccc;">
+                                <option value="NÃO">NÃO</option>
                                 <option value="SIM">SIM</option>
-                                </select>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="background: #f9f9f9; padding: 15px; border-radius: 5px; margin-top: 5px;">
+                        <label style="display: block; margin-bottom: 10px; font-weight: bold; color: #333;">Dias da Semana</label>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <input type="checkbox" id="dia_seg" value="Segunda" class="checkbox-dia">
+                            <label for="dia_seg" class="label-dia">Seg</label>
+
+                            <input type="checkbox" id="dia_ter" value="Terça" class="checkbox-dia">
+                            <label for="dia_ter" class="label-dia">Ter</label>
+
+                            <input type="checkbox" id="dia_qua" value="Quarta" class="checkbox-dia">
+                            <label for="dia_qua" class="label-dia">Qua</label>
+
+                            <input type="checkbox" id="dia_qui" value="Quinta" class="checkbox-dia">
+                            <label for="dia_qui" class="label-dia">Qui</label>
+
+                            <input type="checkbox" id="dia_sex" value="Sexta" class="checkbox-dia">
+                            <label for="dia_sex" class="label-dia">Sex</label>
+
+                            <input type="checkbox" id="dia_sab" value="Sábado" class="checkbox-dia">
+                            <label for="dia_sab" class="label-dia">Sáb</label>
                         </div>
                     </div>
 
@@ -120,21 +166,19 @@
             container.innerHTML = "";
             container.appendChild(template.content.cloneNode(true));
             
-            // Reatribui o listener do formulário injetado
             document.getElementById('formCadastro').addEventListener('submit', salvarDados);
             buscarDadosNuvem();
         }
 
         function buscarDadosNuvem() {
             fetch(API_URL).then(res => res.json()).then(data => {
-                // MANTÉM A ORDEM ORIGINAL: Último da planilha = Último da lista
                 dadosNuvem = data; 
                 renderizar();
                 atualizarDashboardAdmin();
             });
         }
 
-        // --- RENDERIZAÇÃO COM NUMERAÇÃO SEQUENCIAL [#] ---
+        // --- RENDERIZAÇÃO ---
         function renderizar() {
             const busca = document.getElementById('busca').value.toLowerCase();
             const tbody = document.getElementById('lista');
@@ -158,22 +202,20 @@
             });
         }
 
-        // --- LOGÍSTICA DE EDIÇÃO E SALVAMENTO ---
+        // --- LÓGICA DE EDIÇÃO E SALVAMENTO ---
         function editar(id) {
             const aluno = dadosNuvem.find(a => a.id == id);
-    if(aluno) {
-        idEdicaoAtual = id;
-        document.getElementById('titulo-form').innerText = "✏️ Editando: " + aluno.nome;
-        document.getElementById('nome').value = aluno.nome;
-        document.getElementById('cpf').value = aluno.cpf || "";
-        document.getElementById('rg').value = aluno.rg || "";
-        document.getElementById('telefone').value = aluno.telefone || "";
-        document.getElementById('turno').value = aluno.turno || "MANHÃ";
-        document.getElementById('embarque').value = aluno.embarque || "SEDE";
-        
-        // NOVA LINHA ADICIONADA AQUI
-        document.getElementById('mora_sobral').value = aluno.mora_sobral || "NÃO";
-        
+            if(aluno) {
+                idEdicaoAtual = id;
+                document.getElementById('titulo-form').innerText = "✏️ Editando: " + aluno.nome;
+                document.getElementById('nome').value = aluno.nome;
+                document.getElementById('cpf').value = aluno.cpf || "";
+                document.getElementById('rg').value = aluno.rg || "";
+                document.getElementById('telefone').value = aluno.telefone || "";
+                document.getElementById('turno').value = aluno.turno || "MANHÃ";
+                document.getElementById('embarque').value = aluno.embarque || "SEDE";
+                document.getElementById('mora_sobral').value = aluno.mora_sobral || "NÃO";
+                
                 const instSelect = document.getElementById('instituicao');
                 const opcoesValidas = Array.from(instSelect.options).map(o => o.value);
                 if(opcoesValidas.includes(aluno.instituicao)) {
@@ -184,55 +226,67 @@
                     document.getElementById('inst_outra').style.display = 'block';
                     document.getElementById('inst_outra').value = aluno.instituicao;
                 }
+
+                // Desmarca todos os dias primeiro
+                document.querySelectorAll('.checkbox-dia').forEach(cb => cb.checked = false);
+                
+                // Marca os dias que vieram do banco de dados
+                if(aluno.dias_semana) {
+                    const diasSalvos = aluno.dias_semana.split(', ');
+                    document.querySelectorAll('.checkbox-dia').forEach(cb => {
+                        if(diasSalvos.includes(cb.value)) {
+                            cb.checked = true;
+                        }
+                    });
+                }
                 
                 document.getElementById('area-cadastro').style.display = 'block';
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         }
 
-       function salvarDados(e) {
-    e.preventDefault();
-    const btn = document.getElementById('btnSubmit');
-    // PREVENÇÃO DE MÚLTIPLOS CLIQUES
-    btn.disabled = true; btn.innerText = "⏳ Processando...";
+        function salvarDados(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnSubmit');
+            btn.disabled = true; btn.innerText = "⏳ Processando...";
 
-    let instFinal = document.getElementById('instituicao').value;
-    if(instFinal === 'OUTRA') instFinal = document.getElementById('inst_outra').value;
+            let instFinal = document.getElementById('instituicao').value;
+            if(instFinal === 'OUTRA') instFinal = document.getElementById('inst_outra').value;
 
-    // --- NOVA LÓGICA DO PROTOCOLO IMUTÁVEL ---
-    let protocoloFinal = "";
-    if (idEdicaoAtual) {
-        // Se for edição, busca o aluno na memória e reaproveita o protocolo que já existe
-        const alunoEditado = dadosNuvem.find(a => a.id == idEdicaoAtual);
-        protocoloFinal = (alunoEditado && alunoEditado.proto) ? alunoEditado.proto : "";
-    } else {
-        // Se for um novo cadastro, gera um protocolo único (Ex: GRA-159482)
-        protocoloFinal = "GRA-" + Math.floor(100000 + Math.random() * 900000).toString();
-    }
+            // Lógica do protocolo imutável
+            let protocoloFinal = "";
+            if (idEdicaoAtual) {
+                const alunoEditado = dadosNuvem.find(a => a.id == idEdicaoAtual);
+                protocoloFinal = (alunoEditado && alunoEditado.proto) ? alunoEditado.proto : "";
+            } else {
+                protocoloFinal = "GRA-" + Math.floor(100000 + Math.random() * 900000).toString();
+            }
 
-const payload = {
-        action: idEdicaoAtual ? "edit" : "add",
-        id: idEdicaoAtual || Date.now().toString(),
-        proto: protocoloFinal,
-        nome: document.getElementById('nome').value,
-        cpf: document.getElementById('cpf').value,
-        rg: document.getElementById('rg').value,
-        telefone: document.getElementById('telefone').value,
-        instituicao: instFinal,
-        turno: document.getElementById('turno').value,
-        embarque: document.getElementById('embarque').value,
-        
-        // NOVA LINHA ADICIONADA AQUI
-        mora_sobral: document.getElementById('mora_sobral').value,
-        
-        status: 'Aprovado'
-    };
-   
-    fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) })
-    .then(() => { alert("Cadastro atualizado com sucesso!"); fecharCadastro(); buscarDadosNuvem(); })
-    .catch(() => alert("Erro ao conectar com o servidor."))
-    .finally(() => { btn.disabled = false; btn.innerText = "💾 Salvar Alterações"; });
-}
+            // Coleta os dias da semana selecionados
+            const diasSelecionados = Array.from(document.querySelectorAll('.checkbox-dia:checked'))
+                                          .map(cb => cb.value).join(', ');
+
+            const payload = {
+                action: idEdicaoAtual ? "edit" : "add",
+                id: idEdicaoAtual || Date.now().toString(),
+                proto: protocoloFinal,
+                nome: document.getElementById('nome').value,
+                cpf: document.getElementById('cpf').value,
+                rg: document.getElementById('rg').value,
+                telefone: document.getElementById('telefone').value,
+                instituicao: instFinal,
+                turno: document.getElementById('turno').value,
+                embarque: document.getElementById('embarque').value,
+                mora_sobral: document.getElementById('mora_sobral').value,
+                dias_semana: diasSelecionados,
+                status: 'Aprovado'
+            };
+
+            fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) })
+            .then(() => { alert("Cadastro atualizado com sucesso!"); fecharCadastro(); buscarDadosNuvem(); })
+            .catch(() => alert("Erro ao conectar com o servidor."))
+            .finally(() => { btn.disabled = false; btn.innerText = "💾 Salvar Alterações"; });
+        }
 
         function remover(id, btn) {
             if(confirm("Tem certeza que deseja excluir permanentemente este aluno?")) {
@@ -252,7 +306,17 @@ const payload = {
             }
         }
 
-        function abrirCadastro() { idEdicaoAtual = null; document.getElementById('titulo-form').innerText = "📝 Novo Cadastro"; document.getElementById('formCadastro').reset(); document.getElementById('area-cadastro').style.display = 'block'; }
+        function abrirCadastro() { 
+            idEdicaoAtual = null; 
+            document.getElementById('titulo-form').innerText = "📝 Novo Cadastro"; 
+            document.getElementById('formCadastro').reset(); 
+            
+            // Limpa os botões de dias da semana
+            document.querySelectorAll('.checkbox-dia').forEach(cb => cb.checked = false);
+            
+            document.getElementById('area-cadastro').style.display = 'block'; 
+        }
+        
         function fecharCadastro() { document.getElementById('area-cadastro').style.display = 'none'; idEdicaoAtual = null; }
         function verificarOutra() { document.getElementById('inst_outra').style.display = (document.getElementById('instituicao').value === 'OUTRA' ? 'block' : 'none'); }
         function sairPainel() { sessionStorage.removeItem('sec_logado'); window.location.reload(); }

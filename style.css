@@ -243,3 +243,26 @@ footer {
     border-left: 4px solid #0056b3; margin: 0 20px 20px 20px; 
     justify-content: space-between; align-items: center; border-radius: 4px;
 }
+
+/* Oculta a caixinha padrão do checkbox */
+    .checkbox-dia { display: none; }
+    
+    /* Estilo do botão apagado */
+    .label-dia {
+        padding: 8px 15px; 
+        border: 1px solid #ccc; 
+        border-radius: 5px;
+        background: #fff; 
+        cursor: pointer; 
+        user-select: none; 
+        transition: 0.3s;
+        font-weight: 500;
+    }
+    
+    /* Estilo do botão quando o checkbox está marcado */
+    .checkbox-dia:checked + .label-dia {
+        background: var(--verde-principal, #28a745); 
+        color: white; 
+        border-color: var(--verde-principal, #28a745); 
+        font-weight: bold;
+    }
