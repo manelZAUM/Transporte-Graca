@@ -6,10 +6,10 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
-        /* --- ESTILOS DOS BOTÕES DE DIAS DA SEMANA --- */
-        .checkbox-dia { display: none; } /* Oculta a caixinha padrão do checkbox */
+        /* --- ESTILOS DOS BOTÕES DE SELEÇÃO MÚLTIPLA (TURNOS E DIAS) --- */
+        .checkbox-oculto { display: none; } /* Oculta a caixinha padrão do checkbox */
         
-        .label-dia {
+        .label-botao {
             padding: 8px 15px; 
             border: 1px solid #ccc; 
             border-radius: 5px;
@@ -20,8 +20,8 @@
             font-weight: 500;
         }
         
-        /* Cor quando o dia está selecionado (usando a cor verde principal do seu sistema) */
-        .checkbox-dia:checked + .label-dia {
+        /* Cor quando o botão está selecionado */
+        .checkbox-oculto:checked + .label-botao {
             background: var(--verde-principal, #28a745); 
             color: white; 
             border-color: var(--verde-principal, #28a745); 
@@ -83,10 +83,7 @@
                     </div>
 
                     <div style="display: flex; gap: 15px; flex-wrap: wrap; background: #f9f9f9; padding: 15px; border-radius: 5px;">
-                        <div style="flex: 1;"><label>Turno</label>
-                            <select id="turno" required style="width: 100%; padding: 10px; border: 1px solid #ccc;"><option value="MANHÃ">MANHÃ</option><option value="TARDE">TARDE</option><option value="NOITE">NOITE</option></select>
-                        </div>
-                        <div style="flex: 1;"><label>Embarque</label>
+                        <div style="flex: 1;"><label>Local de Embarque</label>
                             <select id="embarque" required style="width: 100%; padding: 10px; border: 1px solid #ccc;"><option value="SEDE">SEDE</option><option value="BARRO VERMELHO">BARRO VERMELHO</option><option value="LAPA">LAPA</option><option value="VILA">VILA</option></select>
                         </div>
                         <div style="flex: 1;"><label>Mora em Sobral?</label>
@@ -95,28 +92,48 @@
                                 <option value="SIM">SIM</option>
                             </select>
                         </div>
+                        <div style="flex: 1;"><label>É Novato?</label>
+                            <select id="novato" required style="width: 100%; padding: 10px; border: 1px solid #ccc;">
+                                <option value="SIM">SIM</option>
+                                <option value="NÃO">NÃO</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="background: #f9f9f9; padding: 15px; border-radius: 5px; margin-top: 5px;">
+                        <label style="display: block; margin-bottom: 10px; font-weight: bold; color: #333;">Turno(s) - Pode marcar mais de um</label>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <input type="checkbox" id="turno_manha" value="MANHÃ" class="checkbox-oculto js-turno">
+                            <label for="turno_manha" class="label-botao">Manhã</label>
+
+                            <input type="checkbox" id="turno_tarde" value="TARDE" class="checkbox-oculto js-turno">
+                            <label for="turno_tarde" class="label-botao">Tarde</label>
+
+                            <input type="checkbox" id="turno_noite" value="NOITE" class="checkbox-oculto js-turno">
+                            <label for="turno_noite" class="label-botao">Noite</label>
+                        </div>
                     </div>
 
                     <div style="background: #f9f9f9; padding: 15px; border-radius: 5px; margin-top: 5px;">
                         <label style="display: block; margin-bottom: 10px; font-weight: bold; color: #333;">Dias da Semana</label>
                         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                            <input type="checkbox" id="dia_seg" value="Segunda" class="checkbox-dia">
-                            <label for="dia_seg" class="label-dia">Seg</label>
+                            <input type="checkbox" id="dia_seg" value="Segunda" class="checkbox-oculto js-dia">
+                            <label for="dia_seg" class="label-botao">Seg</label>
 
-                            <input type="checkbox" id="dia_ter" value="Terça" class="checkbox-dia">
-                            <label for="dia_ter" class="label-dia">Ter</label>
+                            <input type="checkbox" id="dia_ter" value="Terça" class="checkbox-oculto js-dia">
+                            <label for="dia_ter" class="label-botao">Ter</label>
 
-                            <input type="checkbox" id="dia_qua" value="Quarta" class="checkbox-dia">
-                            <label for="dia_qua" class="label-dia">Qua</label>
+                            <input type="checkbox" id="dia_qua" value="Quarta" class="checkbox-oculto js-dia">
+                            <label for="dia_qua" class="label-botao">Qua</label>
 
-                            <input type="checkbox" id="dia_qui" value="Quinta" class="checkbox-dia">
-                            <label for="dia_qui" class="label-dia">Qui</label>
+                            <input type="checkbox" id="dia_qui" value="Quinta" class="checkbox-oculto js-dia">
+                            <label for="dia_qui" class="label-botao">Qui</label>
 
-                            <input type="checkbox" id="dia_sex" value="Sexta" class="checkbox-dia">
-                            <label for="dia_sex" class="label-dia">Sex</label>
+                            <input type="checkbox" id="dia_sex" value="Sexta" class="checkbox-oculto js-dia">
+                            <label for="dia_sex" class="label-botao">Sex</label>
 
-                            <input type="checkbox" id="dia_sab" value="Sábado" class="checkbox-dia">
-                            <label for="dia_sab" class="label-dia">Sáb</label>
+                            <input type="checkbox" id="dia_sab" value="Sábado" class="checkbox-oculto js-dia">
+                            <label for="dia_sab" class="label-botao">Sáb</label>
                         </div>
                     </div>
 
@@ -212,9 +229,9 @@
                 document.getElementById('cpf').value = aluno.cpf || "";
                 document.getElementById('rg').value = aluno.rg || "";
                 document.getElementById('telefone').value = aluno.telefone || "";
-                document.getElementById('turno').value = aluno.turno || "MANHÃ";
                 document.getElementById('embarque').value = aluno.embarque || "SEDE";
                 document.getElementById('mora_sobral').value = aluno.mora_sobral || "NÃO";
+                document.getElementById('novato').value = aluno.novato || "SIM";
                 
                 const instSelect = document.getElementById('instituicao');
                 const opcoesValidas = Array.from(instSelect.options).map(o => o.value);
@@ -227,16 +244,23 @@
                     document.getElementById('inst_outra').value = aluno.instituicao;
                 }
 
-                // Desmarca todos os dias primeiro
-                document.querySelectorAll('.checkbox-dia').forEach(cb => cb.checked = false);
+                // Desmarca todos os botões primeiro
+                document.querySelectorAll('.js-turno').forEach(cb => cb.checked = false);
+                document.querySelectorAll('.js-dia').forEach(cb => cb.checked = false);
                 
-                // Marca os dias que vieram do banco de dados
+                // Marca os Turnos salvos
+                if(aluno.turno) {
+                    const turnosSalvos = aluno.turno.split(', ');
+                    document.querySelectorAll('.js-turno').forEach(cb => {
+                        if(turnosSalvos.includes(cb.value)) cb.checked = true;
+                    });
+                }
+
+                // Marca os Dias salvos
                 if(aluno.dias_semana) {
                     const diasSalvos = aluno.dias_semana.split(', ');
-                    document.querySelectorAll('.checkbox-dia').forEach(cb => {
-                        if(diasSalvos.includes(cb.value)) {
-                            cb.checked = true;
-                        }
+                    document.querySelectorAll('.js-dia').forEach(cb => {
+                        if(diasSalvos.includes(cb.value)) cb.checked = true;
                     });
                 }
                 
@@ -262,8 +286,10 @@
                 protocoloFinal = "GRA-" + Math.floor(100000 + Math.random() * 900000).toString();
             }
 
-            // Coleta os dias da semana selecionados
-            const diasSelecionados = Array.from(document.querySelectorAll('.checkbox-dia:checked'))
+            // Coleta os Turnos e Dias selecionados
+            const turnosSelecionados = Array.from(document.querySelectorAll('.js-turno:checked'))
+                                            .map(cb => cb.value).join(', ');
+            const diasSelecionados = Array.from(document.querySelectorAll('.js-dia:checked'))
                                           .map(cb => cb.value).join(', ');
 
             const payload = {
@@ -275,9 +301,10 @@
                 rg: document.getElementById('rg').value,
                 telefone: document.getElementById('telefone').value,
                 instituicao: instFinal,
-                turno: document.getElementById('turno').value,
                 embarque: document.getElementById('embarque').value,
                 mora_sobral: document.getElementById('mora_sobral').value,
+                novato: document.getElementById('novato').value,
+                turno: turnosSelecionados, // Agora envia uma string como "MANHÃ, NOITE"
                 dias_semana: diasSelecionados,
                 status: 'Aprovado'
             };
@@ -311,8 +338,9 @@
             document.getElementById('titulo-form').innerText = "📝 Novo Cadastro"; 
             document.getElementById('formCadastro').reset(); 
             
-            // Limpa os botões de dias da semana
-            document.querySelectorAll('.checkbox-dia').forEach(cb => cb.checked = false);
+            // Limpa os botões de turno e dias
+            document.querySelectorAll('.js-turno').forEach(cb => cb.checked = false);
+            document.querySelectorAll('.js-dia').forEach(cb => cb.checked = false);
             
             document.getElementById('area-cadastro').style.display = 'block'; 
         }
