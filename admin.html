@@ -181,33 +181,45 @@
             }
         }
 
-        function salvarDados(e) {
-            e.preventDefault();
-            const btn = document.getElementById('btnSubmit');
-            // PREVENÇÃO DE MÚLTIPLOS CLIQUES
-            btn.disabled = true; btn.innerText = "⏳ Processando...";
+       function salvarDados(e) {
+    e.preventDefault();
+    const btn = document.getElementById('btnSubmit');
+    // PREVENÇÃO DE MÚLTIPLOS CLIQUES
+    btn.disabled = true; btn.innerText = "⏳ Processando...";
 
-            let instFinal = document.getElementById('instituicao').value;
-            if(instFinal === 'OUTRA') instFinal = document.getElementById('inst_outra').value;
+    let instFinal = document.getElementById('instituicao').value;
+    if(instFinal === 'OUTRA') instFinal = document.getElementById('inst_outra').value;
 
-            const payload = {
-                action: idEdicaoAtual ? "edit" : "add",
-                id: idEdicaoAtual || Date.now().toString(),
-                nome: document.getElementById('nome').value,
-                cpf: document.getElementById('cpf').value,
-                rg: document.getElementById('rg').value,
-                telefone: document.getElementById('telefone').value,
-                instituicao: instFinal,
-                turno: document.getElementById('turno').value,
-                embarque: document.getElementById('embarque').value,
-                status: 'Aprovado'
-            };
+    // --- NOVA LÓGICA DO PROTOCOLO IMUTÁVEL ---
+    let protocoloFinal = "";
+    if (idEdicaoAtual) {
+        // Se for edição, busca o aluno na memória e reaproveita o protocolo que já existe
+        const alunoEditado = dadosNuvem.find(a => a.id == idEdicaoAtual);
+        protocoloFinal = (alunoEditado && alunoEditado.proto) ? alunoEditado.proto : "";
+    } else {
+        // Se for um novo cadastro, gera um protocolo único (Ex: GRA-159482)
+        protocoloFinal = "GRA-" + Math.floor(100000 + Math.random() * 900000).toString();
+    }
 
-            fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) })
-            .then(() => { alert("Cadastro atualizado com sucesso!"); fecharCadastro(); buscarDadosNuvem(); })
-            .catch(() => alert("Erro ao conectar com o servidor."))
-            .finally(() => { btn.disabled = false; btn.innerText = "💾 Salvar Alterações"; });
-        }
+    const payload = {
+        action: idEdicaoAtual ? "edit" : "add",
+        id: idEdicaoAtual || Date.now().toString(),
+        proto: protocoloFinal, // Envia o protocolo (novo ou mantido) para o servidor
+        nome: document.getElementById('nome').value,
+        cpf: document.getElementById('cpf').value,
+        rg: document.getElementById('rg').value,
+        telefone: document.getElementById('telefone').value,
+        instituicao: instFinal,
+        turno: document.getElementById('turno').value,
+        embarque: document.getElementById('embarque').value,
+        status: 'Aprovado'
+    };
+
+    fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) })
+    .then(() => { alert("Cadastro atualizado com sucesso!"); fecharCadastro(); buscarDadosNuvem(); })
+    .catch(() => alert("Erro ao conectar com o servidor."))
+    .finally(() => { btn.disabled = false; btn.innerText = "💾 Salvar Alterações"; });
+}
 
         function remover(id, btn) {
             if(confirm("Tem certeza que deseja excluir permanentemente este aluno?")) {
