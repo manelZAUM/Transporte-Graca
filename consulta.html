@@ -14,6 +14,10 @@
         .inst-list { text-align: left; font-size: 14px; margin-top: 15px; max-height: 150px; overflow-y: auto; padding-right: 5px; }
         .inst-list div { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #eee; }
         
+        /* Efeito de Clique para os Cards de Embarque */
+        .card-clicavel { cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+        .card-clicavel:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
+
         /* Cards dos Ônibus Clicáveis */
         .bus-card { text-decoration: none; color: inherit; display: block; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); transition: transform 0.2s, box-shadow 0.2s; }
         .bus-card:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
@@ -67,21 +71,25 @@
 
         <h3 style="color: var(--verde-escuro); margin-top: 10px; margin-bottom: 20px;">📍 Pontos de Embarque (Aprovados)</h3>
         <div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
-            <div class="dash-card" style="border-top-color: #6f42c1;">
+            <div class="dash-card card-clicavel" style="border-top-color: #6f42c1;" onclick="filtrarPorEmbarque('SEDE')">
                 <h3>🏢 Sede</h3>
                 <div class="numero" id="emb-sede">0</div>
+                <p style="font-size: 11px; color: #888; margin-top: 5px;">Clique para ver os nomes</p>
             </div>
-            <div class="dash-card" style="border-top-color: #fd7e14;">
+            <div class="dash-card card-clicavel" style="border-top-color: #fd7e14;" onclick="filtrarPorEmbarque('BARRO VERMELHO')">
                 <h3>🔴 Barro Vermelho</h3>
                 <div class="numero" id="emb-barro">0</div>
+                <p style="font-size: 11px; color: #888; margin-top: 5px;">Clique para ver os nomes</p>
             </div>
-            <div class="dash-card" style="border-top-color: #20c997;">
+            <div class="dash-card card-clicavel" style="border-top-color: #20c997;" onclick="filtrarPorEmbarque('LAPA')">
                 <h3>⛪ Lapa</h3>
                 <div class="numero" id="emb-lapa">0</div>
+                <p style="font-size: 11px; color: #888; margin-top: 5px;">Clique para ver os nomes</p>
             </div>
-            <div class="dash-card" style="border-top-color: #e83e8c;">
+            <div class="dash-card card-clicavel" style="border-top-color: #e83e8c;" onclick="filtrarPorEmbarque('VILA')">
                 <h3>🏘️ Vila</h3>
                 <div class="numero" id="emb-vila">0</div>
+                <p style="font-size: 11px; color: #888; margin-top: 5px;">Clique para ver os nomes</p>
             </div>
         </div>
 
@@ -108,21 +116,29 @@
             
         </div>
         
-        <div class="card-header" style="background-color: var(--verde-escuro); margin-top: 40px; border-radius: 8px 8px 0 0;">
+        <div class="card-header" style="background-color: var(--verde-escuro); margin-top: 40px; border-radius: 8px 8px 0 0;" id="area-consulta">
             <h2>🔍 Consulta Avançada de Alunos</h2>
         </div>
 
         <div class="filtros-container">
-            <input type="text" id="buscaGeral" class="input-filtro" placeholder="Buscar por nome do aluno..." onkeyup="renderizarTabela()" style="flex:2; min-width: 250px;">
+            <input type="text" id="buscaGeral" class="input-filtro" placeholder="Buscar por nome do aluno..." onkeyup="renderizarTabela()" style="flex:2; min-width: 200px;">
             
-            <select id="filtroStatus" class="input-filtro" onchange="renderizarTabela()" style="flex:1; min-width: 150px;">
+            <select id="filtroStatus" class="input-filtro" onchange="renderizarTabela()" style="flex:1; min-width: 130px;">
                 <option value="">Status: Todos</option>
                 <option value="Aprovado">Status: Aprovado</option>
                 <option value="Pendente">Status: Em Análise</option>
             </select>
 
-            <select id="filtroInstituicao" class="input-filtro" onchange="renderizarTabela()" style="flex:1; min-width: 150px;">
+            <select id="filtroInstituicao" class="input-filtro" onchange="renderizarTabela()" style="flex:1; min-width: 130px;">
                 <option value="">Instituição: Todas</option>
+            </select>
+
+            <select id="filtroEmbarque" class="input-filtro" onchange="renderizarTabela()" style="flex:1; min-width: 130px;">
+                <option value="">Embarque: Todos</option>
+                <option value="SEDE">SEDE</option>
+                <option value="BARRO VERMELHO">BARRO VERMELHO</option>
+                <option value="LAPA">LAPA</option>
+                <option value="VILA">VILA</option>
             </select>
 
             <a href="index.html" class="btn btn-aluno" style="width:auto; padding:10px 20px; margin: 0;">⬅ Início</a>
@@ -132,7 +148,7 @@
         <div class="table-responsive">
             <table>
                 <thead>
-                    <tr><th>Nº</th><th>Protocolo</th><th>Nome do Aluno (A-Z)</th><th>Instituição</th><th>Novato</th><th>Prioridade</th><th>Status</th></tr>
+                    <tr><th>Nº</th><th>Protocolo</th><th>Nome do Aluno (A-Z)</th><th>Instituição</th><th>Embarque</th><th>Novato</th><th>Status</th></tr>
                 </thead>
                 <tbody id="lista">
                     <tr><td colspan="7" style="text-align:center; padding: 30px;">⏳ Buscando dados na nuvem...</td></tr>
@@ -191,6 +207,18 @@
                 opt.innerText = inst;
                 selectInst.appendChild(opt);
             });
+        }
+
+        // Função que é ativada ao clicar nos cards de embarque
+        function filtrarPorEmbarque(ponto) {
+            // Define o valor no dropdown (combo box)
+            document.getElementById('filtroEmbarque').value = ponto;
+            // Garante que o status seja Aprovado (pois os cards mostram aprovados)
+            document.getElementById('filtroStatus').value = 'Aprovado';
+            // Chama a função que desenha a tabela
+            renderizarTabela();
+            // Faz a tela descer suavemente até a tabela
+            document.getElementById('area-consulta').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         function gerarDashboard() {
@@ -260,6 +288,7 @@
             const buscaStr = document.getElementById('buscaGeral').value.toLowerCase();
             const statusFiltro = document.getElementById('filtroStatus').value;
             const instFiltro = document.getElementById('filtroInstituicao').value;
+            const embarqueFiltro = document.getElementById('filtroEmbarque').value; // Novo Filtro
             
             const tbody = document.getElementById('lista');
             tbody.innerHTML = '';
@@ -271,19 +300,22 @@
                 const passaBuscaTexto = aluno.nome.toLowerCase().includes(buscaStr);
                 const passaStatus = statusFiltro === "" || aluno.status === statusFiltro;
                 const passaInst = instFiltro === "" || aluno.instituicao.trim() === instFiltro;
+                const passaEmbarque = embarqueFiltro === "" || aluno.embarque.toUpperCase().trim() === embarqueFiltro;
 
-                if(passaBuscaTexto && passaStatus && passaInst) {
+                // Verifica se passou em TODOS os filtros
+                if(passaBuscaTexto && passaStatus && passaInst && passaEmbarque) {
                     contadorFiltrados++;
                     let textoPrioridade = aluno.comorbidade === "Sim" ? `<span style="background:var(--amarelo); color:white; padding:4px 10px; border-radius:15px; font-size:12px; font-weight:bold;">Sim ♿</span>` : "Não";
                     let textoNovato = aluno.novato === "Sim" ? `<span style="color:var(--verde-principal); font-weight:bold;">Sim</span>` : "Não";
 
+                    // Adicionei a coluna de Embarque na tabela para ficar mais claro
                     tbody.innerHTML += `<tr>
                         <td>${contadorFiltrados}</td>
                         <td><strong>${aluno.proto}</strong></td>
                         <td>${aluno.nome}</td>
                         <td>${aluno.instituicao}</td>
+                        <td><strong>${aluno.embarque}</strong></td>
                         <td>${textoNovato}</td>
-                        <td>${textoPrioridade}</td>
                         <td style="color:${aluno.status === 'Pendente' ? 'orange' : 'green'}">
                             <strong>${aluno.status === 'Pendente' ? 'Em Análise' : aluno.status}</strong>
                         </td>
