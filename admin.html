@@ -91,7 +91,7 @@
         </div>
 
         <div class="filtros-container">
-            <input type="text" id="buscaGeral" class="input-filtro" placeholder="Buscar por qualquer informação (nome, rg, cpf, endereço, telefone)..." onkeyup="renderizarTabela()" style="flex:2; min-width: 250px;">
+            <input type="text" id="buscaGeral" class="input-filtro" placeholder="Buscar por nome do aluno..." onkeyup="renderizarTabela()" style="flex:2; min-width: 250px;">
             
             <select id="filtroStatus" class="input-filtro" onchange="renderizarTabela()" style="flex:1; min-width: 150px;">
                 <option value="">Status: Todos</option>
@@ -215,10 +215,9 @@
             let contadorFiltrados = 0;
 
             dadosOrdenados.forEach((aluno) => {
-                // Junta todas as propriedades do aluno em uma única string para a busca universal
-                const dadosCompletosStr = Object.values(aluno).join(' ').toLowerCase();
+                // A busca de texto agora olha apenas para o nome do aluno
+                const passaBuscaTexto = aluno.nome.toLowerCase().includes(buscaStr);
                 
-                const passaBuscaTexto = dadosCompletosStr.includes(buscaStr);
                 const passaStatus = statusFiltro === "" || aluno.status === statusFiltro;
                 const passaInst = instFiltro === "" || aluno.instituicao.trim() === instFiltro;
 

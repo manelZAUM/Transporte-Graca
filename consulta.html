@@ -2,94 +2,6 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-<<<<<<< Updated upstream
-    <title>Consulta de Logística - Graça/CE</title>
-    <link rel="stylesheet" href="style.css">
-    <style>
-        .login-box { 
-            max-width: 450px; margin: 80px auto; padding: 40px; 
-            background: white; border-radius: 15px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; 
-        }
-        /* Dashboard adaptável para caber os 8 cards de forma organizada */
-        .dashboard-grid { 
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); 
-            gap: 15px; margin-bottom: 30px; 
-        }
-        .dash-card { 
-            background: white; padding: 15px; border-radius: 10px; 
-            box-shadow: 0 4px 8px rgba(0,0,0,0.05); border-top: 4px solid var(--verde-principal); 
-            text-align: center; 
-        }
-        .dash-card h3 { font-size: 14px; color: #555; margin-bottom: 5px; }
-        .dash-card .numero { font-size: 26px; font-weight: bold; color: var(--verde-escuro); }
-        .inst-list { text-align: left; font-size: 13px; margin-top: 10px; max-height: 120px; overflow-y: auto; padding: 8px; background: #f9f9f9; border-radius: 5px; }
-        .inst-list div { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid #eee; }
-    </style>
-</head>
-<body style="background-color: var(--fundo);">
-    <header>
-        <img src="Captura de tela 2026-02-23 080257.png" alt="Prefeitura de Graça" class="logo-prefeitura">
-    </header>
-
-    <main class="main-content">
-        <div id="validacao-acesso" class="login-box">
-            <h2 style="color: var(--verde-escuro); margin-bottom: 15px;">Acesso ao Painel</h2>
-            <p style="color: #666; margin-bottom: 25px;">Informe o seu CPF cadastrado no transporte para visualizar a logística e a lista de alunos.</p>
-            
-            <input type="text" id="chave-cpf" oninput="mCPF(this)" placeholder="000.000.000-00" 
-                   style="width: 100%; padding: 15px; font-size: 18px; text-align: center; border-radius: 10px; border: 2px solid #ddd; margin-bottom: 20px;">
-            
-            <button onclick="validarAcesso()" id="btn-entrar" class="btn btn-aluno" style="width: 100%; padding: 15px;" disabled>⏳ Conectando ao sistema...</button>
-            
-            <div id="erro-chave" style="display:none; color: #d9534f; margin-top: 15px; font-weight: bold;">❌ CPF não encontrado nos registros.</div>
-            <br><br>
-            <a href="index.html" style="color: #888; text-decoration: none; font-size: 13px;">⬅ Voltar ao Início</a>
-        </div>
-
-        <div id="conteudo-painel" style="display: none; width: 100%; max-width: 1100px; margin: 0 auto;"></div>
-    </main>
-
-    <template id="tpl-dashboard">
-        <div class="admin-table-container" style="padding: 20px;">
-            <h2 style="color: var(--verde-escuro); margin-bottom: 25px; text-align: center;">📊 Painel de Logística - Transporte Universitário</h2>
-            
-            <div class="dashboard-grid">
-                <div class="dash-card"><h3>👥 Total</h3><div class="numero" id="total-alunos">0</div></div>
-                <div class="dash-card" style="border-top-color: #28a745;"><h3>🆕 Novatos</h3><div class="numero" id="total-novatos" style="color: #28a745;">0</div></div>
-                <div class="dash-card" style="border-top-color: #17a2b8;"><h3>🏠 Residentes</h3><div class="numero" id="total-residentes" style="color: #17a2b8;">0</div></div>
-                <div class="dash-card" style="border-top-color: #6f42c1;"><h3>🏢 Sede</h3><div class="numero" id="emb-sede">0</div></div>
-                <div class="dash-card" style="border-top-color: #fd7e14;"><h3>🔴 Barro Vermelho</h3><div class="numero" id="emb-barro">0</div></div>
-                <div class="dash-card" style="border-top-color: #20c997;"><h3>⛪ Lapa</h3><div class="numero" id="emb-lapa">0</div></div>
-                <div class="dash-card" style="border-top-color: #e83e8c;"><h3>🏘️ Vila</h3><div class="numero" id="emb-vila">0</div></div>
-                <div class="dash-card"><h3>🏫 Instituições</h3><div class="inst-list" id="lista-instituicoes"></div></div>
-            </div>
-
-            <div class="card-header" style="background-color: var(--verde-escuro); border-radius: 8px 8px 0 0;">
-                <h2 style="font-size: 16px;">🔍 Lista de Passageiros (Ordem Alfabética)</h2>
-            </div>
-            <div style="padding:15px; background: white; border-bottom: 1px solid #eee;">
-                <input type="text" id="busca" placeholder="Filtrar por nome ou faculdade..." onkeyup="renderizarTabela()" 
-                       style="padding:10px; width: 100%; border-radius:5px; border:1px solid #ccc;">
-            </div>
-            <div class="table-responsive">
-                <table>
-                    <thead>
-                        <tr><th>#</th><th>Nome do Aluno</th><th>Instituição</th><th>Embarque</th><th>Turno</th></tr>
-                    </thead>
-                    <tbody id="tabela-corpo"></tbody>
-                </table>
-            </div>
-            <div style="text-align: center; padding: 20px;">
-                <button onclick="window.location.reload()" class="btn" style="background: #555; color: white; width: auto;">Sair do Painel</button>
-            </div>
-        </div>
-    </template>
-
-    <script>
-        // A API solicitada está configurada exatamente aqui:
-        const API_URL = "https://script.google.com/macros/s/AKfycbzTR1SVXsEcb0fLwpBWlM3DmKuvt8QkcKatHJuK0O9J7MW1KWFPZ0xVV2YFS52zNnA/exec";
-=======
     <title>Consulta e Dashboard - Graça/CE</title>
     <link rel="stylesheet" href="style.css">
     <style>
@@ -108,7 +20,6 @@
         .bus-amarelo { border-top: 5px solid #e6b800; }
         .bus-azul { border-top: 5px solid #0056b3; }
         
-        /* Forçando a cor preta em todos os cabeçalhos (th) para resolver a leitura */
         th, .bus-table th { color: #000 !important; font-weight: bold; }
 
         .bus-table { width: 100%; margin-top: 15px; border-collapse: collapse; font-size: 13px; text-align: center; }
@@ -116,6 +27,9 @@
         .bus-table td { padding: 5px; border: 1px solid #ddd; }
         .bus-amarelo .bus-table th { background: #fff8cc; }
         .bus-azul .bus-table th { background: #e6f0ff; }
+        
+        .filtros-container { padding:20px; display:flex; gap:10px; flex-wrap: wrap; background: white; align-items: center; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 10px; border-bottom: 3px solid var(--verde-principal); }
+        .input-filtro { padding:10px; border-radius:5px; border:1px solid #ccc; font-size: 14px; }
     </style>
 </head>
 <body style="background-color: var(--fundo);">
@@ -146,8 +60,7 @@
 
             <div class="dash-card">
                 <h3>🏫 Por Instituição (Aprovados)</h3>
-                <div class="inst-list" id="lista-instituicoes">
-                    </div>
+                <div class="inst-list" id="lista-instituicoes"></div>
             </div>
         </div>
 
@@ -159,8 +72,7 @@
                 <p style="font-size: 12px; color: #666; margin-top: 5px;">Clique para abrir a lista completa</p>
                 <table class="bus-table">
                     <thead><tr><th>Dia</th><th>Manhã</th><th>Noite</th></tr></thead>
-                    <tbody id="tb-amarelo">
-                        </tbody>
+                    <tbody id="tb-amarelo"></tbody>
                 </table>
             </a>
 
@@ -169,136 +81,86 @@
                 <p style="font-size: 12px; color: #666; margin-top: 5px;">Clique para abrir a lista completa</p>
                 <table class="bus-table">
                     <thead><tr><th>Dia</th><th>Manhã</th><th>Noite</th></tr></thead>
-                    <tbody id="tb-azul">
-                        </tbody>
+                    <tbody id="tb-azul"></tbody>
                 </table>
             </a>
             
         </div>
         <div class="card-header" style="background-color: var(--verde-escuro); margin-top: 40px; border-radius: 8px 8px 0 0;">
-            <h2>🔍 Consulta de Alunos Cadastrados</h2>
+            <h2>🔍 Consulta Avançada de Alunos</h2>
         </div>
 
-        <div style="padding:20px; display:flex; gap:10px; flex-wrap: wrap; background: white;">
-            <input type="text" id="busca" placeholder="Filtrar por nome ou protocolo..." onkeyup="renderizarTabela()" style="padding:10px; flex:1; min-width: 200px; border-radius:5px; border:1px solid #ccc;">
-            <a href="index.html" class="btn btn-aluno" style="width:auto; padding:10px 20px; margin: 0;">⬅ Voltar ao Início</a>
+        <div class="filtros-container">
+            <input type="text" id="buscaGeral" class="input-filtro" placeholder="Buscar por nome do aluno..." onkeyup="renderizarTabela()" style="flex:2; min-width: 250px;">
+            
+            <select id="filtroStatus" class="input-filtro" onchange="renderizarTabela()" style="flex:1; min-width: 150px;">
+                <option value="">Status: Todos</option>
+                <option value="Aprovado">Status: Aprovado</option>
+                <option value="Pendente">Status: Em Análise</option>
+            </select>
+
+            <select id="filtroInstituicao" class="input-filtro" onchange="renderizarTabela()" style="flex:1; min-width: 150px;">
+                <option value="">Instituição: Todas</option>
+            </select>
+
+            <a href="index.html" class="btn btn-aluno" style="width:auto; padding:10px 20px; margin: 0;">⬅ Início</a>
         </div>
+        <div id="resultado-count" style="margin-bottom: 10px; font-weight: bold; color: #555;"></div>
         
         <div class="table-responsive">
             <table>
                 <thead>
-                    <tr><th>Protocolo</th><th>Nome do Aluno (A-Z)</th><th>Instituição</th><th>Novato</th><th>Prioridade</th><th>Status</th></tr>
+                    <tr><th>Nº</th><th>Protocolo</th><th>Nome do Aluno (A-Z)</th><th>Instituição</th><th>Novato</th><th>Prioridade</th><th>Status</th></tr>
                 </thead>
                 <tbody id="lista">
-                    <tr><td colspan="6" style="text-align:center; padding: 30px;">⏳ Buscando dados na nuvem...</td></tr>
+                    <tr><td colspan="7" style="text-align:center; padding: 30px;">⏳ Buscando dados na nuvem...</td></tr>
                 </tbody>
             </table>
         </div>
     </div>
 
     <script>
-        // O SEU NOVO LINK AQUI
-        const API_URL = "https://script.google.com/macros/s/AKfycbyQljrcnkEox6t6IKcBvYx2wSsSoLrA8NEMGvLjK4L5sVFmqo_hxP68iEiNdbUE5xg/exec"; 
->>>>>>> Stashed changes
+        const API_URL = "https://script.google.com/macros/s/AKfycbxTJxTJ5MTgAjnJ146S82FHfqBCevupuSAsMa-qsDAx7yOxTwGvraE83CxfbfaqbWo/exec"; 
         let dadosNuvem = [];
 
-        function mCPF(i){ i.value=i.value.replace(/\D/g,"").replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d{1,2})$/,"$1-$2").substring(0,14); }
-
-        // Carrega o banco de dados invisivelmente
-        window.onload = () => {
+        function buscarDadosNuvem() {
             fetch(API_URL).then(res => res.json()).then(data => {
-<<<<<<< Updated upstream
-                // Deixa os dados em ordem alfabética A-Z
-                dadosNuvem = data.sort((a, b) => a.nome.localeCompare(b.nome)); 
-                
-                // Libera o botão para o usuário entrar
-                const btn = document.getElementById('btn-entrar');
-                btn.disabled = false;
-                btn.innerText = "Acessar Logística";
-            }).catch(() => {
-                document.getElementById('btn-entrar').innerText = "❌ Erro ao conectar. Atualize a página.";
-=======
                 dadosNuvem = data; 
                 gerarDashboard();
+                popularFiltrosDropdown();
                 renderizarTabela();
             }).catch(err => {
-                document.getElementById('lista').innerHTML = '<tr><td colspan="6" style="text-align:center; color:red;">❌ Não foi possível carregar as informações.</td></tr>';
->>>>>>> Stashed changes
+                document.getElementById('lista').innerHTML = '<tr><td colspan="7" style="text-align:center; color:red;">❌ Não foi possível carregar as informações.</td></tr>';
             });
-        };
-
-        function validarAcesso() {
-            const inputCpf = document.getElementById('chave-cpf').value;
-            const erro = document.getElementById('erro-chave');
-
-            if (inputCpf.length < 14) {
-                alert("Por favor, digite o CPF completo.");
-                return;
-            }
-
-            // Verifica se o CPF digitado existe em algum cadastro
-            const alunoCadastrado = dadosNuvem.some(aluno => aluno.cpf === inputCpf);
-
-            if (alunoCadastrado) {
-                document.getElementById('validacao-acesso').style.display = 'none';
-                const painel = document.getElementById('conteudo-painel');
-                painel.appendChild(document.getElementById('tpl-dashboard').content.cloneNode(true));
-                painel.style.display = 'block';
-                
-                atualizarResumo();
-                renderizarTabela();
-            } else {
-                erro.style.display = 'block';
-            }
         }
 
-<<<<<<< Updated upstream
-        function atualizarResumo() {
-            const aprovados = dadosNuvem.filter(a => a.status === 'Aprovado');
+        function popularFiltrosDropdown() {
+            const selectInst = document.getElementById('filtroInstituicao');
+            const instUnicas = [...new Set(dadosNuvem.map(a => a.instituicao.trim()))].sort();
             
-            // Popula todos os 8 cards
-            document.getElementById('total-alunos').innerText = aprovados.length;
-            document.getElementById('total-novatos').innerText = aprovados.filter(a => a.novato === 'Sim').length;
-            document.getElementById('total-residentes').innerText = aprovados.filter(a => a.sobral === 'Sim').length;
-            document.getElementById('emb-sede').innerText = aprovados.filter(a => a.embarque === 'SEDE').length;
-            document.getElementById('emb-barro').innerText = aprovados.filter(a => a.embarque === 'BARRO VERMELHO').length;
-            document.getElementById('emb-lapa').innerText = aprovados.filter(a => a.embarque === 'LAPA').length;
-            document.getElementById('emb-vila').innerText = aprovados.filter(a => a.embarque === 'VILA').length;
-
-            const insts = {};
-            aprovados.forEach(a => { insts[a.instituicao] = (insts[a.instituicao] || 0) + 1; });
-            const ordenadas = Object.keys(insts).sort((a,b) => insts[b] - insts[a]);
-            document.getElementById('lista-instituicoes').innerHTML = ordenadas.map(i => `<div><strong>${i}</strong> <span>${insts[i]}</span></div>`).join('');
+            instUnicas.forEach(inst => {
+                if (inst) {
+                    const opt = document.createElement('option');
+                    opt.value = inst;
+                    opt.innerText = inst;
+                    selectInst.appendChild(opt);
+                }
+            });
         }
 
-        function renderizarTabela() {
-            const busca = document.getElementById('busca')?.value.toLowerCase() || "";
-            const tbody = document.getElementById('tabela-corpo');
-            if(!tbody) return;
-=======
         function gerarDashboard() {
-            // Totais Básicos
             document.getElementById('total-alunos').innerText = dadosNuvem.length;
-            
-            // Novatos
-            const novatos = dadosNuvem.filter(a => a.novato === 'Sim').length;
-            document.getElementById('total-novatos').innerText = novatos;
+            document.getElementById('total-novatos').innerText = dadosNuvem.filter(a => a.novato === 'Sim').length;
+            document.getElementById('total-residentes').innerText = dadosNuvem.filter(a => a.sobral === 'Sim').length;
 
-            // Residentes
-            const residentes = dadosNuvem.filter(a => a.sobral === 'Sim').length;
-            document.getElementById('total-residentes').innerText = residentes;
-
-            // Filtra só os aprovados para calcular ocupação e instituições
             const aprovados = dadosNuvem.filter(a => a.status === 'Aprovado');
 
-            // --- CÁLCULO DE INSTITUIÇÕES ---
             const contagemInst = {};
             aprovados.forEach(a => {
                 let inst = a.instituicao.trim();
                 contagemInst[inst] = (contagemInst[inst] || 0) + 1;
             });
             
-            // Ordena instituições da maior quantidade para a menor
             const instOrdenadas = Object.keys(contagemInst).sort((a, b) => contagemInst[b] - contagemInst[a]);
             let htmlInst = '';
             instOrdenadas.forEach(inst => {
@@ -306,29 +168,24 @@
             });
             document.getElementById('lista-instituicoes').innerHTML = htmlInst || '<div style="color:#888;">Nenhum aluno aprovado.</div>';
 
-            // --- CÁLCULO DE ÔNIBUS, DIAS E TURNOS ---
             const instituicoesAmarelo = ["UNINTA", "FLF", "FACULDADE LUCIANO FEIJÃO", "LUCIANO FEIJÃO", "ANHANGUERA", "GRAU TÉCNICO", "GRAU TECNICO", "UVA-CCS", "UVA CCS"];
             const diasSemana = ['SEGUNDA', 'TERÇA', 'QUARTA', 'QUINTA', 'SEXTA'];
             
-            // Estrutura para guardar os números [Ônibus][Dia][Turno]
             const contagemOnibus = {
                 AMARELO: { SEGUNDA: {M:0, N:0}, TERÇA: {M:0, N:0}, QUARTA: {M:0, N:0}, QUINTA: {M:0, N:0}, SEXTA: {M:0, N:0} },
                 AZUL: { SEGUNDA: {M:0, N:0}, TERÇA: {M:0, N:0}, QUARTA: {M:0, N:0}, QUINTA: {M:0, N:0}, SEXTA: {M:0, N:0} }
             };
 
             aprovados.forEach(aluno => {
-                // Descobre qual ônibus o aluno pega
                 const instAluno = aluno.instituicao.toUpperCase().trim();
                 const vaiNoAmarelo = instituicoesAmarelo.some(inst => instAluno.includes(inst));
                 const onibus = vaiNoAmarelo ? 'AMARELO' : 'AZUL';
 
                 if(aluno.dias) {
                     diasSemana.forEach(dia => {
-                        // Verifica se ele viaja de Manhã
                         if(aluno.dias.includes(`${dia}-MANHÃ`) || (aluno.dias.includes(dia) && aluno.turno === 'MANHÃ' && !aluno.dias.includes("-"))) {
                             contagemOnibus[onibus][dia].M++;
                         }
-                        // Verifica se ele viaja a Noite
                         if(aluno.dias.includes(`${dia}-NOITE`) || (aluno.dias.includes(dia) && aluno.turno === 'NOITE' && !aluno.dias.includes("-"))) {
                             contagemOnibus[onibus][dia].N++;
                         }
@@ -336,10 +193,9 @@
                 }
             });
 
-            // --- RENDERIZA AS TABELAS DOS CARDS ---
             let htmlAmarelo = ''; let htmlAzul = '';
             diasSemana.forEach(dia => {
-                let sigla = dia.substring(0, 3); // Deixa "SEG", "TER"...
+                let sigla = dia.substring(0, 3);
                 htmlAmarelo += `<tr><td><strong>${sigla}</strong></td><td>${contagemOnibus.AMARELO[dia].M}</td><td>${contagemOnibus.AMARELO[dia].N}</td></tr>`;
                 htmlAzul += `<tr><td><strong>${sigla}</strong></td><td>${contagemOnibus.AZUL[dia].M}</td><td>${contagemOnibus.AZUL[dia].N}</td></tr>`;
             });
@@ -348,48 +204,50 @@
         }
 
         function renderizarTabela() {
-            const busca = document.getElementById('busca').value.toLowerCase();
+            const buscaStr = document.getElementById('buscaGeral').value.toLowerCase();
+            const statusFiltro = document.getElementById('filtroStatus').value;
+            const instFiltro = document.getElementById('filtroInstituicao').value;
+            
             const tbody = document.getElementById('lista');
->>>>>>> Stashed changes
             tbody.innerHTML = '';
             
-            // Cria uma cópia para não bagunçar o dashboard e ordena A-Z
             let dadosOrdenados = [...dadosNuvem].sort((a, b) => a.nome.localeCompare(b.nome));
+            let contadorFiltrados = 0;
 
-<<<<<<< Updated upstream
-            dadosNuvem.forEach((aluno, idx) => {
-                if(aluno.nome.toLowerCase().includes(busca) || aluno.instituicao.toLowerCase().includes(busca)) {
-=======
             dadosOrdenados.forEach((aluno) => {
-                if(aluno.nome.toLowerCase().includes(busca) || aluno.proto.toLowerCase().includes(busca)) {
-                    
+                // A busca de texto agora olha apenas para o nome do aluno
+                const passaBuscaTexto = aluno.nome.toLowerCase().includes(buscaStr);
+                
+                const passaStatus = statusFiltro === "" || aluno.status === statusFiltro;
+                const passaInst = instFiltro === "" || aluno.instituicao.trim() === instFiltro;
+
+                if(passaBuscaTexto && passaStatus && passaInst) {
+                    contadorFiltrados++;
                     let textoPrioridade = aluno.comorbidade === "Sim" ? `<span style="background:var(--amarelo); color:white; padding:4px 10px; border-radius:15px; font-size:12px; font-weight:bold;">Sim ♿</span>` : "Não";
                     let textoNovato = aluno.novato === "Sim" ? `<span style="color:var(--verde-principal); font-weight:bold;">Sim</span>` : "Não";
 
->>>>>>> Stashed changes
                     tbody.innerHTML += `<tr>
-                        <td>${idx + 1}</td>
-                        <td><strong>${aluno.nome}</strong></td>
+                        <td>${contadorFiltrados}</td>
+                        <td><strong>${aluno.proto}</strong></td>
+                        <td>${aluno.nome}</td>
                         <td>${aluno.instituicao}</td>
-<<<<<<< Updated upstream
-                        <td>${aluno.embarque}</td>
-                        <td>${aluno.turno}</td>
-=======
                         <td>${textoNovato}</td>
                         <td>${textoPrioridade}</td>
                         <td style="color:${aluno.status === 'Pendente' ? 'orange' : 'green'}">
                             <strong>${aluno.status === 'Pendente' ? 'Em Análise' : aluno.status}</strong>
                         </td>
->>>>>>> Stashed changes
                     </tr>`;
                 }
             });
+
+            document.getElementById('resultado-count').innerText = `Exibindo ${contadorFiltrados} cadastro(s)`;
+
+            if (tbody.innerHTML === '') {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 20px;">Nenhum cadastro encontrado com esses filtros.</td></tr>`;
+            }
         }
-<<<<<<< Updated upstream
-=======
         
         window.onload = buscarDadosNuvem;
->>>>>>> Stashed changes
     </script>
 </body>
 </html>
