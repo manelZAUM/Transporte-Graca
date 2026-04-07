@@ -121,11 +121,12 @@
     </div>
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbyQljrcnkEox6t6IKcBvYx2wSsSoLrA8NEMGvLjK4L5sVFmqo_hxP68iEiNdbUE5xg/exec"; 
+        // O seu novo link de API já está configurado aqui:
+        const API_URL = "https://script.google.com/macros/s/AKfycbzZYPsOeH_-kDCht7FNfWGE09NHes1B3pod3Mzjkg_7aT4NnbNEMgHUwBpSk7xjmmI/exec"; 
         let dadosNuvem = [];
 
         function buscarDadosNuvem() {
-            // Usa script para contornar bloqueios do Google (JSONP)
+            // Abordagem JSONP: Funciona em qualquer navegador sem erro de CORS
             const script = document.createElement('script');
             script.src = API_URL + "?callback=processarDadosRecebidos";
             document.body.appendChild(script);
@@ -137,6 +138,7 @@
             }, 10000);
         }
 
+        // Esta função recebe os dados do JSONP e alimenta o site
         function processarDadosRecebidos(dados) {
             dadosNuvem = dados; 
             gerarDashboard();
@@ -255,6 +257,7 @@
             }
         }
         
+        // Inicia a busca assim que a página carrega
         window.onload = buscarDadosNuvem;
     </script>
 </body>
