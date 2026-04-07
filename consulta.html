@@ -121,42 +121,45 @@
     </div>
 
     <script>
-        // O seu novo link de API já está configurado aqui:
+        // O link exato que você criou!
         const API_URL = "https://script.google.com/macros/s/AKfycbzZYPsOeH_-kDCht7FNfWGE09NHes1B3pod3Mzjkg_7aT4NnbNEMgHUwBpSk7xjmmI/exec"; 
         let dadosNuvem = [];
 
-        function buscarDadosNuvem() {
-            // Abordagem JSONP: Funciona em qualquer navegador sem erro de CORS
-            const script = document.createElement('script');
-            script.src = API_URL + "?callback=processarDadosRecebidos";
-            document.body.appendChild(script);
+        async function buscarDadosNuvem() {
+            try {
+                // Modo rápido de requisição (Fetch)
+                const response = await fetch(API_URL);
+                const data = await response.json();
+                
+                // TRAVA DE SEGURANÇA: Transforma TUDO o que vier da planilha em Texto (String).
+                // Isso evita que o JavaScript "quebre" se tiver alguma célula vazia ou estranha.
+                dadosNuvem = data.map(aluno => {
+                    let seguro = {};
+                    for(let chave in aluno) {
+                        seguro[chave] = String(aluno[chave] || "");
+                    }
+                    return seguro;
+                });
 
-            setTimeout(() => {
-                if(dadosNuvem.length === 0) {
-                     document.getElementById('lista').innerHTML = '<tr><td colspan="7" style="text-align:center; color:red;">❌ Não foi possível carregar as informações. Verifique sua conexão.</td></tr>';
-                }
-            }, 10000);
-        }
+                gerarDashboard();
+                popularFiltrosDropdown();
+                renderizarTabela();
 
-        // Esta função recebe os dados do JSONP e alimenta o site
-        function processarDadosRecebidos(dados) {
-            dadosNuvem = dados; 
-            gerarDashboard();
-            popularFiltrosDropdown();
-            renderizarTabela();
+            } catch (erro) {
+                console.error("Erro ao carregar dados:", erro);
+                document.getElementById('lista').innerHTML = '<tr><td colspan="7" style="text-align:center; color:red; padding: 20px;">❌ Ocorreu um erro de conexão com o banco de dados. Atualize a página.</td></tr>';
+            }
         }
 
         function popularFiltrosDropdown() {
             const selectInst = document.getElementById('filtroInstituicao');
-            const instUnicas = [...new Set(dadosNuvem.map(a => a.instituicao.trim()))].sort();
+            const instUnicas = [...new Set(dadosNuvem.map(a => a.instituicao.trim()))].filter(i => i !== "").sort();
             
             instUnicas.forEach(inst => {
-                if (inst) {
-                    const opt = document.createElement('option');
-                    opt.value = inst;
-                    opt.innerText = inst;
-                    selectInst.appendChild(opt);
-                }
+                const opt = document.createElement('option');
+                opt.value = inst;
+                opt.innerText = inst;
+                selectInst.appendChild(opt);
             });
         }
 
@@ -170,7 +173,7 @@
             const contagemInst = {};
             aprovados.forEach(a => {
                 let inst = a.instituicao.trim();
-                contagemInst[inst] = (contagemInst[inst] || 0) + 1;
+                if(inst) contagemInst[inst] = (contagemInst[inst] || 0) + 1;
             });
             
             const instOrdenadas = Object.keys(contagemInst).sort((a, b) => contagemInst[b] - contagemInst[a]);
@@ -257,7 +260,7 @@
             }
         }
         
-        // Inicia a busca assim que a página carrega
+        // Dispara a busca assim que a tela abre
         window.onload = buscarDadosNuvem;
     </script>
 </body>
