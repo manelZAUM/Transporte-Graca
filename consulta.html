@@ -65,6 +65,26 @@
             </div>
         </div>
 
+        <h3 style="color: var(--verde-escuro); margin-top: 10px; margin-bottom: 20px;">📍 Pontos de Embarque (Aprovados)</h3>
+        <div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+            <div class="dash-card" style="border-top-color: #6f42c1;">
+                <h3>🏢 Sede</h3>
+                <div class="numero" id="emb-sede">0</div>
+            </div>
+            <div class="dash-card" style="border-top-color: #fd7e14;">
+                <h3>🔴 Barro Vermelho</h3>
+                <div class="numero" id="emb-barro">0</div>
+            </div>
+            <div class="dash-card" style="border-top-color: #20c997;">
+                <h3>⛪ Lapa</h3>
+                <div class="numero" id="emb-lapa">0</div>
+            </div>
+            <div class="dash-card" style="border-top-color: #e83e8c;">
+                <h3>🏘️ Vila</h3>
+                <div class="numero" id="emb-vila">0</div>
+            </div>
+        </div>
+
         <h3 style="color: var(--verde-escuro); margin-top: 10px; margin-bottom: 20px;">🚍 Ocupação por Ônibus e Turno</h3>
         <div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
             
@@ -87,6 +107,7 @@
             </a>
             
         </div>
+        
         <div class="card-header" style="background-color: var(--verde-escuro); margin-top: 40px; border-radius: 8px 8px 0 0;">
             <h2>🔍 Consulta Avançada de Alunos</h2>
         </div>
@@ -121,23 +142,32 @@
     </div>
 
     <script>
-        // O link exato que você criou!
         const API_URL = "https://script.google.com/macros/s/AKfycbzZYPsOeH_-kDCht7FNfWGE09NHes1B3pod3Mzjkg_7aT4NnbNEMgHUwBpSk7xjmmI/exec"; 
         let dadosNuvem = [];
 
         async function buscarDadosNuvem() {
             try {
-                // Modo rápido de requisição (Fetch)
                 const response = await fetch(API_URL);
                 const data = await response.json();
                 
-                // TRAVA DE SEGURANÇA: Transforma TUDO o que vier da planilha em Texto (String).
-                // Isso evita que o JavaScript "quebre" se tiver alguma célula vazia ou estranha.
                 dadosNuvem = data.map(aluno => {
                     let seguro = {};
                     for(let chave in aluno) {
-                        seguro[chave] = String(aluno[chave] || "");
+                        let chaveNormalizada = chave.normalize('NFD').replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+                        seguro[chaveNormalizada] = String(aluno[chave] || "");
                     }
+                    
+                    seguro.nome = seguro.nome || "";
+                    seguro.proto = seguro.proto || seguro.protocolo || "";
+                    seguro.instituicao = seguro.instituicao || "";
+                    seguro.embarque = seguro.embarque || "";
+                    seguro.dias = seguro.dias || "";
+                    seguro.turno = seguro.turno || "";
+                    seguro.novato = seguro.novato || "";
+                    seguro.sobral = seguro.sobral || "";
+                    seguro.comorbidade = seguro.comorbidade || "";
+                    seguro.status = seguro.status || "";
+                    
                     return seguro;
                 });
 
@@ -170,6 +200,13 @@
 
             const aprovados = dadosNuvem.filter(a => a.status === 'Aprovado');
 
+            // --- Contagem por Embarque ---
+            document.getElementById('emb-sede').innerText = aprovados.filter(a => a.embarque.toUpperCase().trim() === 'SEDE').length;
+            document.getElementById('emb-barro').innerText = aprovados.filter(a => a.embarque.toUpperCase().trim() === 'BARRO VERMELHO').length;
+            document.getElementById('emb-lapa').innerText = aprovados.filter(a => a.embarque.toUpperCase().trim() === 'LAPA').length;
+            document.getElementById('emb-vila').innerText = aprovados.filter(a => a.embarque.toUpperCase().trim() === 'VILA').length;
+
+            // --- Contagem de Instituições ---
             const contagemInst = {};
             aprovados.forEach(a => {
                 let inst = a.instituicao.trim();
@@ -183,6 +220,7 @@
             });
             document.getElementById('lista-instituicoes').innerHTML = htmlInst || '<div style="color:#888;">Nenhum aluno aprovado.</div>';
 
+            // --- Logística de Ônibus ---
             const instituicoesAmarelo = ["UNINTA", "FLF", "FACULDADE LUCIANO FEIJÃO", "LUCIANO FEIJÃO", "ANHANGUERA", "GRAU TÉCNICO", "GRAU TECNICO", "UVA-CCS", "UVA CCS"];
             const diasSemana = ['SEGUNDA', 'TERÇA', 'QUARTA', 'QUINTA', 'SEXTA'];
             
@@ -260,7 +298,6 @@
             }
         }
         
-        // Dispara a busca assim que a tela abre
         window.onload = buscarDadosNuvem;
     </script>
 </body>
