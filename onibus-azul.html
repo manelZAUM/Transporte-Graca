@@ -117,9 +117,7 @@
             </div>
         </div>
     </main>
-
-  <script>
-        // LINK DA API CORRETO RESTAURADO:
+<script>
         const API_URL ="https://script.google.com/macros/s/AKfycbyAnZE7XRAGVogS81Z52nNi4Y3PvEUwiY0cGATxWP2n0LYEQ52K4iRAMxCHIqdCTNs/exec";
         let dadosNuvem = [];
         let mapaCarregado = false;
@@ -132,7 +130,6 @@
             e.target.value = value;
         });
 
-        // 1. Libera o botão assim que a tela carrega
         window.onload = () => {
             let btn = document.getElementById('btnEntrar');
             btn.innerText = 'Acessar Ônibus';
@@ -150,7 +147,6 @@
             box.classList.add('show');
         }
 
-        // 2. O botão faz a consulta real no servidor ao clicar
         async function verificarAcesso() {
             const cpfDigitado = limparCPF(document.getElementById('cpfInput').value);
             const btn = document.getElementById('btnEntrar');
@@ -164,7 +160,6 @@
             btn.disabled = true;
 
             try {
-                // Manda o CPF para o servidor aprovar
                 const response = await fetch(`${API_URL}?cpf=${cpfDigitado}`);
                 const data = await response.json();
 
@@ -199,11 +194,11 @@
                     corOnibusAluno = onibusDefinido;
                 } else {
                     const instAluno = (aluno.instituicao || "").toUpperCase().trim();
-                    const eDoAzul = ["UFC", "CIDAO", "IFCE", "JUNCO", "BETÂNIA", "BETANIA"].some(inst => instAluno.includes(inst));
+                    // LISTA ATUALIZADA COM "UVA" AQUI:
+                    const eDoAzul = ["UFC", "CIDAO", "IFCE", "JUNCO", "BETÂNIA", "BETANIA", "UVA"].some(inst => instAluno.includes(inst));
                     corOnibusAluno = eDoAzul ? "AZUL" : "AMARELO";
                 }
 
-                // 3. Verifica se é Azul. Se for Amarelo, bloqueia e indica o caminho:
                 if (corOnibusAluno !== "AZUL") {
                     mostrarMensagem(`Acesso negado. O seu ônibus é o <strong>AMARELO</strong>.<br><br><a href="onibus-amarelo.html" style="color:#b38f00; font-weight:bold;">Ir para o Ônibus Amarelo ➡</a>`, '#fffcf2', '#b38f00');
                     btn.innerText = 'Acessar Ônibus';
@@ -211,7 +206,6 @@
                     return;
                 }
 
-                // Libera o sistema
                 document.getElementById('nomeAlunoLogado').innerText = aluno.nome;
                 document.getElementById('login-section').style.display = 'none';
                 document.getElementById('main-section').style.display = 'flex';
@@ -283,7 +277,8 @@
                 if (onibusDefinido) return onibusDefinido === "AZUL";
                 
                 const instAluno = (aluno.instituicao || "").toUpperCase().trim();
-                return ["UFC", "CIDAO", "IFCE", "JUNCO", "BETÂNIA", "BETANIA"].some(inst => instAluno.includes(inst));
+                // LISTA ATUALIZADA COM "UVA" AQUI:
+                return ["UFC", "CIDAO", "IFCE", "JUNCO", "BETÂNIA", "BETANIA", "UVA"].some(inst => instAluno.includes(inst));
             });
 
             alunosFiltrados.sort((a, b) => a.nome.localeCompare(b.nome));
