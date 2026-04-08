@@ -395,18 +395,49 @@
             document.getElementById('emb-lapa').innerText = aprovados.filter(a => a.embarque.toUpperCase().trim() === 'LAPA').length;
             document.getElementById('emb-vila').innerText = aprovados.filter(a => a.embarque.toUpperCase().trim() === 'VILA').length;
 
+            // --- NOVA LÓGICA DE CONTAGEM DAS INSTITUIÇÕES (Agrupando a UVA) ---
             const contagemInst = {};
+            const uvaDetalhes = {};
+            let totalUva = 0;
+
             aprovados.forEach(a => {
                 let inst = a.instituicao.trim();
-                if(inst) contagemInst[inst] = (contagemInst[inst] || 0) + 1;
+                if(!inst) return;
+
+                if (inst.startsWith('UVA')) {
+                    totalUva++;
+                    uvaDetalhes[inst] = (uvaDetalhes[inst] || 0) + 1;
+                } else {
+                    contagemInst[inst] = (contagemInst[inst] || 0) + 1;
+                }
             });
             
             const instOrdenadas = Object.keys(contagemInst).sort((a, b) => contagemInst[b] - contagemInst[a]);
             let htmlInst = '';
+
+            // Bloco especial para a UVA
+            if (totalUva > 0) {
+                htmlInst += `<div style="flex-direction: column; align-items: flex-start; background: #f8f9fa; padding: 8px 10px; border-radius: 6px; margin-bottom: 8px; border-left: 3px solid var(--verde-escuro);">
+                    <div style="width: 100%; display: flex; justify-content: space-between; font-weight: bold; color: var(--verde-escuro); border-bottom: none; padding: 0;">
+                        <span>UVA (Total)</span> <strong>${totalUva}</strong>
+                    </div>`;
+                
+                const uvaOrdenada = Object.keys(uvaDetalhes).sort((a, b) => uvaDetalhes[b] - uvaDetalhes[a]);
+                uvaOrdenada.forEach(campus => {
+                    let nomeCampus = campus === 'UVA' ? 'Não especificado' : campus.replace('UVA-', '');
+                    htmlInst += `<div style="width: 100%; display: flex; justify-content: space-between; font-size: 12px; color: #555; padding: 4px 0 0 10px; border-bottom: none;">
+                        <span>↳ ${nomeCampus}</span> <strong>${uvaDetalhes[campus]}</strong>
+                    </div>`;
+                });
+                htmlInst += `</div>`;
+            }
+
             instOrdenadas.forEach(inst => {
                 htmlInst += `<div><strong>${inst}</strong> <span>${contagemInst[inst]}</span></div>`;
             });
+            
             document.getElementById('lista-instituicoes').innerHTML = htmlInst || '<div style="color:#888;">Nenhum aluno aprovado.</div>';
+            // --- FIM DA NOVA LÓGICA DE INSTITUIÇÕES ---
 
             const instituicoesAmarelo = ["UNINTA", "FLF", "FACULDADE LUCIANO FEIJÃO", "LUCIANO FEIJÃO", "ANHANGUERA", "GRAU TÉCNICO", "GRAU TECNICO", "UVA-CCS", "UVA CCS"];
             const diasSemana = ['SEGUNDA', 'TERÇA', 'QUARTA', 'QUINTA', 'SEXTA'];
