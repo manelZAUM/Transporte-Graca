@@ -119,7 +119,8 @@
     </main>
 
   <script>
-        const API_URL ="https://script.google.com/macros/s/AKfycbwzqPsb1m5cqOFc1cm7Prnqi_V5x42NBzuulTC4x9sEVNSRGrqo2XO0uQZumb5zN54/exec";
+        // LINK DA API CORRETO RESTAURADO:
+        const API_URL ="https://script.google.com/macros/s/AKfycbyAnZE7XRAGVogS81Z52nNi4Y3PvEUwiY0cGATxWP2n0LYEQ52K4iRAMxCHIqdCTNs/exec";
         let dadosNuvem = [];
         let mapaCarregado = false;
 
@@ -149,7 +150,7 @@
             box.classList.add('show');
         }
 
-        // 2. Consulta o servidor só após o clique
+        // 2. O botão faz a consulta real no servidor ao clicar
         async function verificarAcesso() {
             const cpfDigitado = limparCPF(document.getElementById('cpfInput').value);
             const btn = document.getElementById('btnEntrar');
@@ -163,6 +164,7 @@
             btn.disabled = true;
 
             try {
+                // Manda o CPF para o servidor aprovar
                 const response = await fetch(`${API_URL}?cpf=${cpfDigitado}`);
                 const data = await response.json();
 
@@ -201,7 +203,7 @@
                     corOnibusAluno = eDoAzul ? "AZUL" : "AMARELO";
                 }
 
-                // 3. Verifica se é Azul. Se for Amarelo, avisa e dá o link.
+                // 3. Verifica se é Azul. Se for Amarelo, bloqueia e indica o caminho:
                 if (corOnibusAluno !== "AZUL") {
                     mostrarMensagem(`Acesso negado. O seu ônibus é o <strong>AMARELO</strong>.<br><br><a href="onibus-amarelo.html" style="color:#b38f00; font-weight:bold;">Ir para o Ônibus Amarelo ➡</a>`, '#fffcf2', '#b38f00');
                     btn.innerText = 'Acessar Ônibus';
@@ -209,6 +211,7 @@
                     return;
                 }
 
+                // Libera o sistema
                 document.getElementById('nomeAlunoLogado').innerText = aluno.nome;
                 document.getElementById('login-section').style.display = 'none';
                 document.getElementById('main-section').style.display = 'flex';
@@ -220,7 +223,7 @@
                 atualizarPainel();
 
             } catch (erro) {
-                mostrarMensagem('❌ Erro de conexão com o servidor.', '#ffe6e6', '#cc0000');
+                mostrarMensagem('❌ Erro de conexão. Verifique a internet ou a permissão da API.', '#ffe6e6', '#cc0000');
                 btn.innerText = 'Acessar Ônibus';
                 btn.disabled = false;
             }

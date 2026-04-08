@@ -117,8 +117,9 @@
         </div>
     </main>
 
-    <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbwzqPsb1m5cqOFc1cm7Prnqi_V5x42NBzuulTC4x9sEVNSRGrqo2XO0uQZumb5zN54/exec"; 
+  <script>
+        // LINK DA API CORRETO RESTAURADO:
+        const API_URL = "https://script.google.com/macros/s/AKfycbyAnZE7XRAGVogS81Z52nNi4Y3PvEUwiY0cGATxWP2n0LYEQ52K4iRAMxCHIqdCTNs/exec"; 
         let dadosNuvem = [];
         let mapaCarregado = false;
 
@@ -148,13 +149,13 @@
             box.classList.add('show');
         }
 
-        // 2. Agora o botão faz a consulta real no servidor
+        // 2. O botão faz a consulta real no servidor ao clicar
         async function verificarAcesso() {
             const cpfDigitado = limparCPF(document.getElementById('cpfInput').value);
             const btn = document.getElementById('btnEntrar');
             
             if (cpfDigitado.length !== 11) {
-                mostrarMensagem('❌ Por favor, digite um CPF válido.', '#ffe6e6', '#cc0000'); 
+                mostrarMensagem('❌ Por favor, digite um CPF válido com 11 números.', '#ffe6e6', '#cc0000'); 
                 return;
             }
 
@@ -166,6 +167,7 @@
                 const response = await fetch(`${API_URL}?cpf=${cpfDigitado}`);
                 const data = await response.json();
 
+                // Se o servidor retornar erro de acesso (ex: CPF não cadastrado)
                 if (data.erro) {
                     mostrarMensagem(`❌ ${data.erro}`, '#ffe6e6', '#cc0000');
                     btn.innerText = 'Acessar Ônibus';
@@ -176,6 +178,7 @@
                 dadosNuvem = data; 
                 const aluno = dadosNuvem.find(a => limparCPF(a.cpf) === cpfDigitado);
 
+                // Caso o CPF passe pela API mas não seja achado na montagem
                 if (!aluno) {
                     mostrarMensagem('❌ CPF não encontrado no sistema.', '#ffe6e6', '#cc0000'); 
                     btn.innerText = 'Acessar Ônibus';
@@ -183,6 +186,7 @@
                     return;
                 }
                 
+                // Se o cadastro estiver pendente
                 if (aluno.status !== "Aprovado") {
                     mostrarMensagem(`⚠️ Seu cadastro consta como: <strong>${aluno.status || "Pendente"}</strong>.`, '#fff3cd', '#856404'); 
                     btn.innerText = 'Acessar Ônibus';
@@ -190,6 +194,7 @@
                     return;
                 }
 
+                // Identifica a cor do ônibus do aluno
                 let onibusDefinido = (aluno.onibus || aluno['ônibus'] || "").toUpperCase().trim();
                 let corOnibusAluno = "";
 
@@ -201,7 +206,7 @@
                     corOnibusAluno = eDoAzul ? "AZUL" : "AMARELO";
                 }
 
-                // 3. Verifica se é Amarelo. Se não for, avisa e dá o link pro Azul
+                // 3. Verifica se é Amarelo. Se for Azul, bloqueia e indica o caminho:
                 if (corOnibusAluno !== "AMARELO") {
                     mostrarMensagem(`Acesso negado. O seu ônibus é o <strong>AZUL</strong>.<br><br><a href="onibus-azul.html" style="color:var(--azul); font-weight:bold;">Ir para o Ônibus Azul ➡</a>`, '#e6f0fa', 'var(--azul)');
                     btn.innerText = 'Acessar Ônibus';
@@ -209,6 +214,7 @@
                     return;
                 }
 
+                // Libera o sistema
                 document.getElementById('nomeAlunoLogado').innerText = aluno.nome;
                 document.getElementById('login-section').style.display = 'none';
                 document.getElementById('main-section').style.display = 'flex';
@@ -220,13 +226,13 @@
                 atualizarPainel();
 
             } catch (erro) {
-                mostrarMensagem('❌ Erro de conexão com o servidor.', '#ffe6e6', '#cc0000');
+                mostrarMensagem('❌ Erro de conexão. Verifique a internet ou a permissão da API.', '#ffe6e6', '#cc0000');
                 btn.innerText = 'Acessar Ônibus';
                 btn.disabled = false;
             }
         }
 
-        // Permite logar com o botão "Enter" do teclado
+        // Permite logar com o botão "Enter"
         document.getElementById('cpfInput').addEventListener('keypress', function (e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
