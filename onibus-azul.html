@@ -9,37 +9,75 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <style>
-        /* Variáveis e Reset Padrão */
-        :root { --verde-escuro: #145523; --laranja: #fd7e14; --azul: #0056b3; }
-        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f4f7f6; margin: 0; color: #333; }
+        :root { --verde-escuro: #145523; --laranja: #fd7e14; --azul: #0056b3; --amarelo: #e6b800; }
         
-        /* Cabeçalho Padrão */
+        /* Modificação no Body para receber a imagem de fundo */
+        body { 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            margin: 0; 
+            color: #333; 
+            background-color: #f4f7f6;
+            background-image: url('Arco_de_Nossa_Senhora_de_Fátima,_Sobral,_CE.jpg');
+            background-size: cover;
+            background-position: center center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            transition: background-image 0.5s ease-in-out;
+        }
+        
         .cabecalho-oficial { background-color: var(--verde-escuro); border-bottom: 5px solid var(--laranja); padding: 20px 0; display: flex; justify-content: center; align-items: center; width: 100%; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .pill-logo { background-color: #ffffff; padding: 12px 60px; border-radius: 50px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); display: flex; justify-content: center; align-items: center; }
         .pill-logo img { max-width: 160px; display: block; margin: 0; }
 
-        /* Estilos da Rota */
+        .login-container { display: flex; justify-content: center; padding: 50px 20px; }
+        .card-login { background: white; max-width: 450px; width: 100%; border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); overflow: hidden; text-align: center; border-top: 5px solid var(--azul); }
+        .card-login-header { background-color: var(--azul); color: white; padding: 20px; text-shadow: 1px 1px 2px rgba(0,0,0,0.2); }
+        .card-login-body { padding: 30px; }
+        input.cpf-input { width: 80%; padding: 12px; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px; text-align: center; }
+        button.btn-login { background-color: var(--azul); color: white; border: none; padding: 12px 25px; font-size: 16px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 85%; transition: 0.3s; text-shadow: 1px 1px 2px rgba(0,0,0,0.2); }
+        button.btn-login:hover { background-color: #004494; }
+        button.btn-login:disabled { background-color: #ccc; cursor: not-allowed; }
+        .msg-erro { margin-top: 15px; padding: 15px; border-radius: 5px; display: none; font-size: 15px; }
+        .msg-erro.show { display: block; }
+
         .tabs-container { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
-        .btn-tab { padding: 10px 20px; border: 2px solid #ccc; background-color: transparent; color: #555; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; }
+        .btn-tab { padding: 10px 20px; border: 2px solid #ccc; background-color: rgba(255,255,255,0.8); color: #555; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; }
         .btn-tab:hover { background-color: #f0f0f0; }
         .btn-tab.ativo-azul { background-color: var(--azul); color: white; border-color: var(--azul); text-shadow: 1px 1px 2px rgba(0,0,0,0.2); }
         #mapa-rota { z-index: 1; }
     </style>
 </head>
 <body>
-    
 
     <header class="cabecalho-oficial">
         <div class="pill-logo">
-            <img src="Captura de tela 2026-02-23 080257.png" alt="Governo Municipal de Graça">
+            <img src="Captura de tela 2026-02-23 080257.png" alt="Governo Municipal de Graça" onerror="this.outerHTML='<h3 style=\'color:#145523; margin:0;\'>Transporte Graça</h3>'">
         </div>
     </header>
 
-    <main style="display: flex; justify-content: center; padding: 30px 20px;">
-        <div style="border-top: 5px solid var(--azul); max-width: 900px; width: 100%; background: white; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); overflow: hidden;">
+    <div id="login-section" class="login-container">
+        <div class="card-login">
+            <div class="card-login-header">
+                <h2 style="margin:0;">🚌 Ônibus Azul</h2>
+                <p style="margin-top:5px; margin-bottom:0; font-size: 14px;">Acesso restrito aos passageiros da rota</p>
+            </div>
+            <div class="card-login-body">
+                <p style="color: #666; margin-bottom: 20px;">Digite seu CPF para acessar o painel deste ônibus.</p>
+                <input type="text" id="cpfInput" class="cpf-input" placeholder="000.000.000-00" maxlength="14">
+                <button id="btnEntrar" class="btn-login" onclick="verificarAcesso()" disabled>⏳ Carregando sistema...</button>
+                <div id="msgBox" class="msg-erro"></div>
+                <div style="margin-top: 20px;">
+                    <a href="consulta.html" style="color: #555; font-size: 14px; text-decoration: none;">⬅ Voltar ao Início</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main id="main-section" style="display: none; justify-content: center; padding: 30px 20px;">
+        <div style="border-top: 5px solid var(--azul); max-width: 900px; width: 100%; background: white; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow: hidden;">
             <div style="background-color: var(--azul); color: white; padding: 20px; text-align: center;">
                 <h2 style="margin:0; text-shadow: 1px 1px 2px rgba(0,0,0,0.2);">🚌 Rota: Ônibus Azul</h2>
-                <p style="margin-top:10px; opacity:0.9;">Selecione o turno e o dia da semana</p>
+                <p style="margin-top:10px; opacity:0.9;">Bem-vindo(a), <strong id="nomeAlunoLogado"></strong>!</p>
             </div>
             
             <div style="padding: 30px; text-align: center;">
@@ -75,7 +113,7 @@
                 </div>
 
                 <div id="conteudo-rota" style="background: #f8f9fa; border-radius: 8px; border: 1px dashed #ccc; margin-top: 20px; min-height: 150px; display: flex; align-items: center; justify-content: center;"></div>
-                <a href="consulta.html" style="background-color: #555; color: white; display: inline-block; padding: 12px 25px; border-radius: 5px; text-decoration: none; margin-top: 30px;">⬅ Voltar ao Painel Geral</a>
+                <a href="consulta.html" style="background-color: #555; color: white; display: inline-block; padding: 12px 25px; border-radius: 5px; text-decoration: none; margin-top: 30px;">⬅ Sair / Voltar ao Início</a>
             </div>
         </div>
     </main>
@@ -83,13 +121,80 @@
     <script>
         const API_URL ="https://script.google.com/macros/s/AKfycbzZYPsOeH_-kDCht7FNfWGE09NHes1B3pod3Mzjkg_7aT4NnbNEMgHUwBpSk7xjmmI/exec";
         let dadosNuvem = [];
+        let mapaCarregado = false;
+
+        document.getElementById('cpfInput').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 3) value = value.replace(/^(\d{3})(\d)/, '$1.$2');
+            if (value.length > 6) value = value.replace(/^(\d{3})\.(\d{3})(\d)/, '$1.$2.$3');
+            if (value.length > 9) value = value.replace(/^(\d{3})\.(\d{3})\.(\d{3})(\d)/, '$1.$2.$3-$4');
+            e.target.value = value;
+        });
 
         window.onload = () => {
-            carregarMapa(); 
-            document.getElementById('conteudo-rota').innerHTML = '<p style="color: #666; font-size: 16px;">⏳ Buscando alunos na nuvem...</p>';
-            fetch(API_URL).then(res => res.json()).then(data => { dadosNuvem = data; atualizarPainel(); })
-            .catch(err => { document.getElementById('conteudo-rota').innerHTML = '<p style="color: red;">❌ Erro ao carregar os dados.</p>'; });
+            fetch(API_URL).then(res => res.json()).then(data => { 
+                dadosNuvem = data; 
+                let btn = document.getElementById('btnEntrar');
+                btn.innerText = 'Acessar Ônibus';
+                btn.disabled = false;
+            }).catch(err => {
+                mostrarMensagem('❌ Erro de conexão com o banco de dados.', '#ffe6e6', '#cc0000');
+            });
         };
+
+        function limparCPF(cpf) { return (cpf || "").toString().replace(/\D/g, ''); }
+
+        function mostrarMensagem(texto, bg, cor) {
+            const box = document.getElementById('msgBox');
+            box.innerHTML = texto;
+            box.style.backgroundColor = bg;
+            box.style.border = `1px solid ${cor}`;
+            box.style.color = cor;
+            box.classList.add('show');
+        }
+
+        function verificarAcesso() {
+            const cpfDigitado = limparCPF(document.getElementById('cpfInput').value);
+            
+            if (cpfDigitado.length !== 11) {
+                mostrarMensagem('❌ Por favor, digite um CPF válido.', '#ffe6e6', '#cc0000'); return;
+            }
+
+            const aluno = dadosNuvem.find(a => limparCPF(a.cpf) === cpfDigitado);
+
+            if (!aluno) {
+                mostrarMensagem('❌ CPF não encontrado no sistema.', '#ffe6e6', '#cc0000'); return;
+            }
+            if (aluno.status !== "Aprovado") {
+                mostrarMensagem(`⚠️ Seu cadastro consta como: <strong>${aluno.status || "Pendente"}</strong>.`, '#fff3cd', '#856404'); return;
+            }
+
+            let onibusDefinido = (aluno.onibus || aluno['ônibus'] || "").toUpperCase().trim();
+            let corOnibusAluno = "";
+
+            if (onibusDefinido === "AZUL" || onibusDefinido === "AMARELO") {
+                corOnibusAluno = onibusDefinido;
+            } else {
+                const instAluno = (aluno.instituicao || "").toUpperCase().trim();
+                const eDoAzul = ["UFC", "CIDAO", "IFCE", "JUNCO", "BETÂNIA", "BETANIA"].some(inst => instAluno.includes(inst));
+                corOnibusAluno = eDoAzul ? "AZUL" : "AMARELO";
+            }
+
+            if (corOnibusAluno !== "AZUL") {
+                mostrarMensagem(`Acesso negado. Seu ônibus é o <strong>AMARELO</strong>.<br><br><a href="onibus-amarelo.html" style="color:#b38f00; font-weight:bold;">Ir para o Ônibus Amarelo ➡</a>`, '#fffcf2', '#b38f00');
+                return;
+            }
+
+            document.getElementById('nomeAlunoLogado').innerText = aluno.nome;
+            document.getElementById('login-section').style.display = 'none';
+            document.getElementById('main-section').style.display = 'flex';
+            
+            if (!mapaCarregado) {
+                carregarMapa();
+                mapaCarregado = true;
+            }
+            atualizarPainel();
+        }
 
         function carregarMapa() {
             const map = L.map('mapa-rota');
@@ -98,20 +203,8 @@
             const iconeEmbarque = L.icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/3448/3448339.png', iconSize: [38, 38], iconAnchor: [19, 38], popupAnchor: [0, -38] });
             const iconeDesembarque = L.icon({ iconUrl: 'universidade.png', iconSize: [40, 40], iconAnchor: [20, 40], popupAnchor: [0, -40] });
 
-            const pontosEmbarque = [
-                { nome: "Sede", lat: -4.045501, lng: -40.752197, desc: "Embarque" },
-                { nome: "Barro Vermelho", lat: -4.006092, lng: -40.744437, desc: "Embarque" },
-                { nome: "Lapa", lat: -4.083549, lng: -40.822543, desc: "Embarque" },
-                { nome: "Vila", lat: -4.046977, lng: -40.801735, desc: "Embarque" }
-            ];
-
-            const pontosDesembarque = [
-                { nome: "UFC", lat: -3.693388, lng: -40.355007, desc: "Desembarque" },
-                { nome: "IFCE", lat: -3.683037, lng: -40.341057, desc: "Desembarque" },
-                { nome: "UVA (Campus Betânia)", lat: -3.676747225955319, lng: -40.34018496245905, desc: "Desembarque" },
-                { nome: "UVA (Campus CIDAO)", lat: -3.683782, lng: -40.342115, desc: "Desembarque" },
-                { nome: "UVA (Campus do Junco)", lat: -3.680644, lng: -40.337560, desc: "Desembarque" }
-            ];
+            const pontosEmbarque = [ { nome: "Sede", lat: -4.045501, lng: -40.752197 }, { nome: "Barro Vermelho", lat: -4.006092, lng: -40.744437 }, { nome: "Lapa", lat: -4.083549, lng: -40.822543 }, { nome: "Vila", lat: -4.046977, lng: -40.801735 } ];
+            const pontosDesembarque = [ { nome: "UFC", lat: -3.693388, lng: -40.355007 }, { nome: "IFCE", lat: -3.683037, lng: -40.341057 }, { nome: "UVA (Campus Betânia)", lat: -3.676747225955319, lng: -40.34018496245905 }, { nome: "UVA (Campus CIDAO)", lat: -3.683782, lng: -40.342115 }, { nome: "UVA (Campus do Junco)", lat: -3.680644, lng: -40.337560 } ];
 
             const bounds = [];
             pontosEmbarque.forEach(ponto => { L.marker([ponto.lat, ponto.lng], { icon: iconeEmbarque }).addTo(map).bindPopup(`<strong>📍 ${ponto.nome}</strong>`); bounds.push([ponto.lat, ponto.lng]); });
@@ -128,6 +221,14 @@
         function atualizarPainel() {
             const turnoAtivo = document.querySelector('#filtro-turno .ativo-azul').innerText.toUpperCase();
             const diaAtivo = document.querySelector('#filtro-dia .ativo-azul').innerText.toUpperCase();
+            
+            // Lógica de alteração do Background
+            if (turnoAtivo === 'MANHÃ') {
+                document.body.style.backgroundImage = "url('Arco_de_Nossa_Senhora_de_Fátima,_Sobral,_CE.jpg')";
+            } else {
+                document.body.style.backgroundImage = "url('cidade-sobral-ceara (noite).jpg')";
+            }
+
             const painel = document.getElementById('conteudo-rota');
             
             const alunosFiltrados = dadosNuvem.filter(aluno => {
@@ -135,21 +236,15 @@
 
                 const diaTurnoCombo = diaAtivo + "-" + turnoAtivo; 
                 let viajaNesseTurno = false;
-
                 if (aluno.dias && aluno.dias.includes(diaTurnoCombo)) viajaNesseTurno = true;
                 else if (aluno.dias && aluno.dias.includes(diaAtivo) && aluno.turno === turnoAtivo && !aluno.dias.includes("-")) viajaNesseTurno = true;
-
                 if (!viajaNesseTurno) return false;
 
-                // LÓGICA DO ÔNIBUS
                 let onibusDefinido = (aluno.onibus || aluno['ônibus'] || "").toUpperCase().trim();
+                if (onibusDefinido) return onibusDefinido === "AZUL";
                 
-                if (onibusDefinido) {
-                    return onibusDefinido === "AZUL";
-                } else {
-                    const instAluno = (aluno.instituicao || "").toUpperCase().trim();
-                    return ["UFC", "CIDAO", "IFCE", "JUNCO", "BETÂNIA", "BETANIA"].some(inst => instAluno.includes(inst));
-                }
+                const instAluno = (aluno.instituicao || "").toUpperCase().trim();
+                return ["UFC", "CIDAO", "IFCE", "JUNCO", "BETÂNIA", "BETANIA"].some(inst => instAluno.includes(inst));
             });
 
             alunosFiltrados.sort((a, b) => a.nome.localeCompare(b.nome));
