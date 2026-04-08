@@ -118,7 +118,7 @@
     </main>
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbzZYPsOeH_-kDCht7FNfWGE09NHes1B3pod3Mzjkg_7aT4NnbNEMgHUwBpSk7xjmmI/exec"; 
+        const API_URL = "https://script.google.com/macros/s/AKfycbwzqPsb1m5cqOFc1cm7Prnqi_V5x42NBzuulTC4x9sEVNSRGrqo2XO0uQZumb5zN54/exec"; 
         let dadosNuvem = [];
         let mapaCarregado = false;
 
@@ -130,15 +130,11 @@
             e.target.value = value;
         });
 
+        // 1. Libera o botão assim que a tela carrega (sem baixar nada ainda)
         window.onload = () => {
-            fetch(API_URL).then(res => res.json()).then(data => { 
-                dadosNuvem = data; 
-                let btn = document.getElementById('btnEntrar');
-                btn.innerText = 'Acessar Ônibus';
-                btn.disabled = false;
-            }).catch(err => {
-                mostrarMensagem('❌ Erro de conexão com o banco de dados.', '#ffe6e6', '#cc0000');
-            });
+            let btn = document.getElementById('btnEntrar');
+            btn.innerText = 'Acessar Ônibus';
+            btn.disabled = false;
         };
 
         function limparCPF(cpf) { return (cpf || "").toString().replace(/\D/g, ''); }
@@ -152,48 +148,91 @@
             box.classList.add('show');
         }
 
-        function verificarAcesso() {
+        // 2. Agora o botão faz a consulta real no servidor
+        async function verificarAcesso() {
             const cpfDigitado = limparCPF(document.getElementById('cpfInput').value);
+            const btn = document.getElementById('btnEntrar');
             
             if (cpfDigitado.length !== 11) {
-                mostrarMensagem('❌ Por favor, digite um CPF válido.', '#ffe6e6', '#cc0000'); return;
-            }
-
-            const aluno = dadosNuvem.find(a => limparCPF(a.cpf) === cpfDigitado);
-
-            if (!aluno) {
-                mostrarMensagem('❌ CPF não encontrado no sistema.', '#ffe6e6', '#cc0000'); return;
-            }
-            if (aluno.status !== "Aprovado") {
-                mostrarMensagem(`⚠️ Seu cadastro consta como: <strong>${aluno.status || "Pendente"}</strong>.`, '#fff3cd', '#856404'); return;
-            }
-
-            let onibusDefinido = (aluno.onibus || aluno['ônibus'] || "").toUpperCase().trim();
-            let corOnibusAluno = "";
-
-            if (onibusDefinido === "AZUL" || onibusDefinido === "AMARELO") {
-                corOnibusAluno = onibusDefinido;
-            } else {
-                const instAluno = (aluno.instituicao || "").toUpperCase().trim();
-                const eDoAzul = ["UFC", "CIDAO", "IFCE", "JUNCO", "BETÂNIA", "BETANIA"].some(inst => instAluno.includes(inst));
-                corOnibusAluno = eDoAzul ? "AZUL" : "AMARELO";
-            }
-
-            if (corOnibusAluno !== "AMARELO") {
-                mostrarMensagem(`Acesso negado. Seu ônibus é o <strong>AZUL</strong>.<br><br><a href="onibus-azul.html" style="color:var(--azul); font-weight:bold;">Ir para o Ônibus Azul ➡</a>`, '#e6f0fa', 'var(--azul)');
+                mostrarMensagem('❌ Por favor, digite um CPF válido.', '#ffe6e6', '#cc0000'); 
                 return;
             }
 
-            document.getElementById('nomeAlunoLogado').innerText = aluno.nome;
-            document.getElementById('login-section').style.display = 'none';
-            document.getElementById('main-section').style.display = 'flex';
-            
-            if (!mapaCarregado) {
-                carregarMapa();
-                mapaCarregado = true;
+            btn.innerText = '⏳ Consultando sistema...';
+            btn.disabled = true;
+
+            try {
+                // Manda o CPF para o servidor aprovar
+                const response = await fetch(`${API_URL}?cpf=${cpfDigitado}`);
+                const data = await response.json();
+
+                if (data.erro) {
+                    mostrarMensagem(`❌ ${data.erro}`, '#ffe6e6', '#cc0000');
+                    btn.innerText = 'Acessar Ônibus';
+                    btn.disabled = false;
+                    return;
+                }
+
+                dadosNuvem = data; 
+                const aluno = dadosNuvem.find(a => limparCPF(a.cpf) === cpfDigitado);
+
+                if (!aluno) {
+                    mostrarMensagem('❌ CPF não encontrado no sistema.', '#ffe6e6', '#cc0000'); 
+                    btn.innerText = 'Acessar Ônibus';
+                    btn.disabled = false;
+                    return;
+                }
+                
+                if (aluno.status !== "Aprovado") {
+                    mostrarMensagem(`⚠️ Seu cadastro consta como: <strong>${aluno.status || "Pendente"}</strong>.`, '#fff3cd', '#856404'); 
+                    btn.innerText = 'Acessar Ônibus';
+                    btn.disabled = false;
+                    return;
+                }
+
+                let onibusDefinido = (aluno.onibus || aluno['ônibus'] || "").toUpperCase().trim();
+                let corOnibusAluno = "";
+
+                if (onibusDefinido === "AZUL" || onibusDefinido === "AMARELO") {
+                    corOnibusAluno = onibusDefinido;
+                } else {
+                    const instAluno = (aluno.instituicao || "").toUpperCase().trim();
+                    const eDoAzul = ["UFC", "CIDAO", "IFCE", "JUNCO", "BETÂNIA", "BETANIA"].some(inst => instAluno.includes(inst));
+                    corOnibusAluno = eDoAzul ? "AZUL" : "AMARELO";
+                }
+
+                // 3. Verifica se é Amarelo. Se não for, avisa e dá o link pro Azul
+                if (corOnibusAluno !== "AMARELO") {
+                    mostrarMensagem(`Acesso negado. O seu ônibus é o <strong>AZUL</strong>.<br><br><a href="onibus-azul.html" style="color:var(--azul); font-weight:bold;">Ir para o Ônibus Azul ➡</a>`, '#e6f0fa', 'var(--azul)');
+                    btn.innerText = 'Acessar Ônibus';
+                    btn.disabled = false;
+                    return;
+                }
+
+                document.getElementById('nomeAlunoLogado').innerText = aluno.nome;
+                document.getElementById('login-section').style.display = 'none';
+                document.getElementById('main-section').style.display = 'flex';
+                
+                if (!mapaCarregado) {
+                    carregarMapa();
+                    mapaCarregado = true;
+                }
+                atualizarPainel();
+
+            } catch (erro) {
+                mostrarMensagem('❌ Erro de conexão com o servidor.', '#ffe6e6', '#cc0000');
+                btn.innerText = 'Acessar Ônibus';
+                btn.disabled = false;
             }
-            atualizarPainel();
         }
+
+        // Permite logar com o botão "Enter" do teclado
+        document.getElementById('cpfInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                verificarAcesso();
+            }
+        });
 
         function carregarMapa() {
             const map = L.map('mapa-rota');
@@ -220,7 +259,6 @@
             const turnoAtivo = document.querySelector('#filtro-turno .ativo-amarelo').innerText.toUpperCase();
             const diaAtivo = document.querySelector('#filtro-dia .ativo-amarelo').innerText.toUpperCase();
             
-            // Lógica de alteração do Background
             if (turnoAtivo === 'MANHÃ') {
                 document.body.style.backgroundImage = "url('Arco_de_Nossa_Senhora_de_Fátima,_Sobral,_CE.jpg')";
             } else {
