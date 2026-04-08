@@ -228,7 +228,7 @@
 
         async function buscarDadosNuvem() {
             try {
-                const response = await fetch(API_URL);
+                const response = await fetch(`${API_URL}?admin=true`);
                 const data = await response.json();
                 
                 dadosNuvem = data.map(aluno => {
