@@ -6,7 +6,6 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
-        /* Estilos idênticos ao consulta.html para manter o padrão */
         .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 20px; }
         .dash-card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); border-top: 4px solid var(--verde-principal); text-align: center; transition: transform 0.2s; }
         .dash-card h3 { color: #555; font-size: 15px; margin-bottom: 10px; }
@@ -15,11 +14,9 @@
         .inst-list { text-align: left; font-size: 13px; margin-top: 10px; max-height: 120px; overflow-y: auto; padding-right: 5px; }
         .inst-list div { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #eee; }
 
-        /* Estilo da barra de controles */
         .controles-container { padding:20px; display:flex; gap:10px; flex-wrap: wrap; background: white; align-items: center; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 20px; border-bottom: 3px solid var(--verde-principal); }
         .input-filtro { padding:10px; border-radius:5px; border:1px solid #ccc; font-size: 14px; flex: 1; min-width: 200px; }
 
-        /* Estilos do formulário e botões de ação */
         .form-section { display: none; background: white; border-top: 4px solid var(--verde-escuro); border-radius: 10px; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 30px; }
         .form-group { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 15px; }
         .form-item { flex: 1; min-width: 150px; }
@@ -44,11 +41,10 @@
 
     <header><img src="Captura de tela 2026-02-23 080257.png" alt="Governo Municipal de Graça" class="logo-prefeitura"></header>
 
-    <div class="admin-table-container" style="max-width: 1100px;">
+    <div class="admin-table-container" style="max-width: 1200px;">
         <h2 style="color: var(--verde-escuro); margin-bottom: 20px; text-align: center;">⚙️ Gestão de Cadastros - Admin</h2>
         
-        <div class="dashboard-grid" id="dashboard-admin">
-            </div>
+        <div class="dashboard-grid" id="dashboard-admin"></div>
 
         <div class="controles-container">
             <input type="text" id="busca" class="input-filtro" placeholder="Buscar por nome ou protocolo..." onkeyup="renderizar()">
@@ -73,18 +69,18 @@
                 <div class="form-group">
                     <div class="form-item"><label>Endereço Completo</label><input type="text" id="endereco" required></div>
                 </div>
-                <div class="form-group">
+                
+                <div class="form-group" style="background: #f4f8fb; padding: 15px; border-radius: 8px; border: 1px solid #d0e3f0;">
                     <div class="form-item" style="flex: 2;">
                         <label>Instituição de Ensino</label>
                         <select id="instituicao" required onchange="verificarOutra()">
                             <option value="">Selecione...</option>
-                            <option value="UVA-Campus CIDAO">UVA-Campus CIDAO</option>
-                            <option value="UVA-Campus CCS">UVA-Campus CCS</option>
-                            <option value="UVA-Campus BETÂNIA">UVA-Campus BETÂNIA</option>
-                            <option value="UVA-Campus CCH">UVA-Campus CCH</option>    
-                            <option value="IFCE">IFCE</option>
-                            <option value="UNINTA">UNINTA</option>
                             <option value="UFC">UFC</option>
+                            <option value="UVA-Campus CIDAO">UVA-Campus CIDAO</option>
+                            <option value="IFCE">IFCE</option>
+                            <option value="UVA-Campus do Junco">UVA-Campus do Junco</option>
+                            <option value="UVA-Campus BETÂNIA">UVA-Campus BETÂNIA</option>
+                            <option value="UNINTA">UNINTA</option>
                             <option value="FLF">FLF</option>
                             <option value="OUTRA">OUTRA</option>
                         </select>
@@ -98,6 +94,14 @@
                             <option value="BARRO VERMELHO">BARRO VERMELHO</option>
                             <option value="LAPA">LAPA</option>
                             <option value="VILA">VILA</option>
+                        </select>
+                    </div>
+                    <div class="form-item">
+                        <label style="color: #0056b3;">🚌 Ônibus Fixo</label>
+                        <select id="onibus" required>
+                            <option value="">Selecione...</option>
+                            <option value="AZUL">Ônibus Azul</option>
+                            <option value="AMARELO">Ônibus Amarelo</option>
                         </select>
                     </div>
                 </div>
@@ -179,24 +183,22 @@
         <div class="table-responsive">
             <table>
                 <thead>
-                    <tr><th>Nº</th><th>Protocolo</th><th>Nome do Aluno</th><th>Instituição</th><th>Embarque</th><th>Prioridade</th><th>Status</th><th>Ações</th></tr>
+                    <tr><th>Nº</th><th>Protocolo</th><th>Nome do Aluno</th><th>Instituição</th><th>Ônibus</th><th>Embarque</th><th>Prioridade</th><th>Status</th><th>Ações</th></tr>
                 </thead>
                 <tbody id="lista">
-                    <tr><td colspan="8" style="text-align:center; padding: 30px;">⏳ Buscando dados seguros na nuvem...</td></tr>
+                    <tr><td colspan="9" style="text-align:center; padding: 30px;">⏳ Buscando dados seguros na nuvem...</td></tr>
                 </tbody>
             </table>
         </div>
     </div>
 
     <script>
-        // O MESMO LINK DA API QUE FUNCIONOU!
         const API_URL = "https://script.google.com/macros/s/AKfycbzZYPsOeH_-kDCht7FNfWGE09NHes1B3pod3Mzjkg_7aT4NnbNEMgHUwBpSk7xjmmI/exec";
         const EMAILS_AUTORIZADOS = ["manoelfariaspr@gmail.com"]; 
         let dadosNuvem = [];
         let idEdicaoAtual = null;
         const diasSemana = ['SEGUNDA', 'TERÇA', 'QUARTA', 'QUINTA', 'SEXTA'];
 
-        // --- SISTEMA DE LOGIN GOOGLE ---
         function decodeJwt(token) {
             const base64Url = token.split('.')[1];
             const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -224,13 +226,11 @@
             } 
         };
 
-        // --- BUSCA ROBUSTA DE DADOS ---
         async function buscarDadosNuvem() {
             try {
                 const response = await fetch(API_URL);
                 const data = await response.json();
                 
-                // Tratamento anti-travamento garantido
                 dadosNuvem = data.map(aluno => {
                     let seguro = {};
                     for(let chave in aluno) {
@@ -243,18 +243,19 @@
                     seguro.instituicao = seguro.instituicao || "";
                     seguro.embarque = seguro.embarque || "";
                     seguro.status = seguro.status || "";
+                    // Puxando o ônibus (prevendo possíveis variações da coluna)
+                    seguro.onibus = seguro.onibus || seguro['ônibus'] || ""; 
                     return seguro;
-                }).reverse(); // Coloca os mais recentes no topo
+                }).reverse();
 
                 atualizarDashboardAdmin(); 
                 renderizar(); 
 
             } catch(err) {
-                document.getElementById('lista').innerHTML = '<tr><td colspan="8" style="text-align:center; color:red;">❌ Erro ao conectar com o banco de dados.</td></tr>';
+                document.getElementById('lista').innerHTML = '<tr><td colspan="9" style="text-align:center; color:red;">❌ Erro ao conectar com o banco de dados.</td></tr>';
             }
         }
 
-        // --- DASHBOARD ADMIN ---
         function atualizarDashboardAdmin() {
             const aprovados = dadosNuvem.filter(a => a.status === 'Aprovado');
             const pendentes = dadosNuvem.filter(a => a.status === 'Pendente').length;
@@ -286,20 +287,23 @@
             `;
         }
 
-        // --- RENDERIZAÇÃO DA TABELA (Com Numeração 1, 2, 3...) ---
         function renderizar() {
             const busca = document.getElementById('busca').value.toLowerCase();
             const tbody = document.getElementById('lista');
             tbody.innerHTML = '';
             
             let encontrados = 0;
-            let contador = 1; // Sua numeração pedida!
+            let contador = 1;
 
             dadosNuvem.forEach((aluno) => {
                 if(aluno.nome.toLowerCase().includes(busca) || aluno.proto.toLowerCase().includes(busca)) {
                     encontrados++;
                     let textoPrioridade = aluno.comorbidade === "Sim" ? `<span style="background:var(--amarelo); color:white; padding:4px 10px; border-radius:15px; font-size:12px; font-weight:bold;">Sim ♿</span>` : "Não";
                     
+                    // Tag visual para o Ônibus
+                    let badgeOnibus = aluno.onibus === 'AZUL' ? `<span style="background:#0056b3; color:white; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:bold;">Azul</span>` : 
+                                      (aluno.onibus === 'AMARELO' ? `<span style="background:#e6b800; color:white; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:bold;">Amarelo</span>` : `<span style="color:#999; font-size:11px;">N/D</span>`);
+
                     let acoesHtml = '';
                     if (aluno.status === 'Pendente') acoesHtml += `<button class="btn-acao" onclick="aprovar('${aluno.id}')" title="Aprovar">✅</button>`;
                     acoesHtml += `<button class="btn-acao" onclick="editar('${aluno.id}')" title="Editar">✏️</button>`;
@@ -310,6 +314,7 @@
                         <td>${aluno.proto}</td>
                         <td><strong>${aluno.nome}</strong></td>
                         <td>${aluno.instituicao}</td>
+                        <td>${badgeOnibus}</td>
                         <td>${aluno.embarque}</td>
                         <td>${textoPrioridade}</td>
                         <td style="color:${aluno.status=='Pendente'?'orange':'green'}"><strong>${aluno.status}</strong></td>
@@ -318,10 +323,9 @@
                 }
             });
 
-            if (encontrados === 0) tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;">Nenhum cadastro encontrado.</td></tr>`;
+            if (encontrados === 0) tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;">Nenhum cadastro encontrado.</td></tr>`;
         }
 
-        // --- LÓGICA DO FORMULÁRIO ---
         function abrirCadastro() { 
             idEdicaoAtual = null; 
             document.getElementById('titulo-form').innerText = "📝 Novo Cadastro de Aluno";
@@ -370,6 +374,9 @@
                 }
 
                 document.getElementById('embarque').value = aluno.embarque;
+                
+                // Carregando o campo Ônibus
+                document.getElementById('onibus').value = (aluno.onibus || "").toUpperCase().trim();
                 
                 if(aluno.novato) document.querySelector(`input[name="novato"][value="${aluno.novato}"]`).checked = true;
                 if(aluno.sobral) document.querySelector(`input[name="sobral"][value="${aluno.sobral}"]`).checked = true;
@@ -461,6 +468,7 @@
                 turno: turnoPrin,
                 dias: diasFinais.join(', '), 
                 embarque: document.getElementById('embarque').value,
+                onibus: document.getElementById('onibus').value, // <--- ADICIONADO AQUI
                 novato: document.querySelector('input[name="novato"]:checked').value,
                 sobral: document.querySelector('input[name="sobral"]:checked').value,
                 comorbidade: document.querySelector('input[name="comorbidade"]:checked').value,
@@ -477,7 +485,6 @@
             .catch(err => { alert("Erro de conexão."); btn.innerText = "💾 Salvar Cadastro"; btn.disabled = false; });
         });
 
-        // --- AÇÕES RÁPIDAS ---
         function aprovar(id) {
             if(confirm("Deseja aprovar este aluno?")) {
                 let index = dadosNuvem.findIndex(a => a.id == id);
@@ -496,10 +503,9 @@
             }
         }
 
-        // --- EXPORTAR EXCEL ---
         function exportar() {
-            let csv = "\uFEFFData;Protocolo;Nome;Nascimento;RG;CPF;Endereço;Telefone;Instituição;Turno;Dias;Embarque;Novato;Sobral;Comorbidade;Status\n";
-            dadosNuvem.forEach(a => csv += `${a.data||''};${a.proto||''};${a.nome||''};${a.nascimento||''};${a.rg||''};${a.cpf||''};${a.endereco||''};${a.telefone||''};${a.instituicao||''};${a.turno||''};${a.dias||''};${a.embarque||''};${a.novato||''};${a.sobral||''};${a.comorbidade||''};${a.status||''}\n`);
+            let csv = "\uFEFFData;Protocolo;Nome;Nascimento;RG;CPF;Endereço;Telefone;Instituição;Turno;Dias;Embarque;Ônibus;Novato;Sobral;Comorbidade;Status\n";
+            dadosNuvem.forEach(a => csv += `${a.data||''};${a.proto||''};${a.nome||''};${a.nascimento||''};${a.rg||''};${a.cpf||''};${a.endereco||''};${a.telefone||''};${a.instituicao||''};${a.turno||''};${a.dias||''};${a.embarque||''};${a.onibus||''};${a.novato||''};${a.sobral||''};${a.comorbidade||''};${a.status||''}\n`);
             const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
             const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "Transporte_Graca_Completo.csv"; link.click();
         }
