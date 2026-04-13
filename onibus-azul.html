@@ -92,7 +92,7 @@
                         </div>
                         <div style="flex: 1; min-width: 200px;">
                             <strong style="color: #333;">🏫 Desembarques em Sobral:</strong>
-                            <p style="font-size: 14px; color: #666; margin-top: 5px; font-weight: bold;">✔ UFC<br>✔ IFCE<br>✔ UVA (Campus Betânia)<br>✔ UVA (Campus CIDAO)<br>✔ UVA (Campus do Junco)<br>UVA(CAMPUS CCS)</p>
+                            <p style="font-size: 14px; color: #666; margin-top: 5px; font-weight: bold;">✔ UFC<br>✔ IFCE<br>✔ UVA (Campus Betânia)<br>✔ UVA (Campus CIDAO)<br>✔ UVA (Campus do Junco)<br>✔UVA(CAMPUS CCS)</p>
                         </div>
                     </div>
                 </div>
@@ -238,7 +238,7 @@
             const iconeDesembarque = L.icon({ iconUrl: 'universidade.png', iconSize: [40, 40], iconAnchor: [20, 40], popupAnchor: [0, -40] });
 
             const pontosEmbarque = [ { nome: "Sede", lat: -4.045501, lng: -40.752197 }, { nome: "Barro Vermelho", lat: -4.006092, lng: -40.744437 }, { nome: "Lapa", lat: -4.083549, lng: -40.822543 }, { nome: "Vila", lat: -4.046977, lng: -40.801735 } ];
-            const pontosDesembarque = [ { nome: "UFC", lat: -3.693388, lng: -40.355007 }, { nome: "IFCE", lat: -3.683037, lng: -40.341057 }, { nome: "UVA (Campus Betânia)", lat: -3.676747225955319, lng: -40.34018496245905 }, { nome: "UVA (Campus CIDAO)", lat: -3.683782, lng: -40.342115 }, { nome: "UVA (Campus do Junco)", lat: -3.680644, lng: -40.337560 } ];
+            const pontosDesembarque = [ { nome: "UFC", lat: -3.693388, lng: -40.355007 }, { nome: "IFCE", lat: -3.683037, lng: -40.341057 }, { nome: "UVA (Campus Betânia)", lat: -3.676747225955319, lng: -40.34018496245905 }, { nome: "UVA (Campus CIDAO)", lat: -3.683782, lng: -40.342115 }, { nome: "UVA (Campus do Junco)", lat: -3.680644, lng: -40.337560 }, { nome: "UVA (Campus CCS)", lat:-3.681480635824381, lng:-40.33755000447311 }  ];
 
             const bounds = [];
             pontosEmbarque.forEach(ponto => { L.marker([ponto.lat, ponto.lng], { icon: iconeEmbarque }).addTo(map).bindPopup(`<strong>📍 ${ponto.nome}</strong>`); bounds.push([ponto.lat, ponto.lng]); });
