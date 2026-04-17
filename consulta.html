@@ -187,8 +187,12 @@
                 </div>
             </div>
 
+            <h3 class="secao-titulo">🚍 Ocupação da Frota (Ônibus x Dias x Turno)</h3>
+            <p style="font-size: 12px; color: #888; margin-top: -15px; margin-bottom: 20px;">💡 Clique no card do ônibus para ver a lista de passageiros e seus destinos.</p>
+            <div class="dashboard-grid" id="cards-frota" style="grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));">
+                </div>
+
             <h3 class="secao-titulo">📍 Pontos de Embarque (Aprovados)</h3>
-            <p style="font-size: 12px; color: #888; margin-top: -15px; margin-bottom: 20px;">💡 Clique no card para ver a lista de nomes.</p>
             <div class="dashboard-grid">
                 <div class="dash-card card-clicavel" style="border-top: 4px solid var(--roxo);" onclick="abrirModalEmbarque('SEDE')">
                     <h3>🏢 Sede</h3>
@@ -209,7 +213,6 @@
             </div>
 
             <h3 class="secao-titulo">🏫 Ocupação por Instituição e Dias (Aprovados)</h3>
-            <p style="font-size: 12px; color: #888; margin-top: -15px; margin-bottom: 20px;">💡 Clique no card para ver a lista de nomes. O campo "(Manhã/Noite)" engloba alunos de Tarde, Integral ou com turno vazio.</p>
             <div class="dashboard-grid" id="cards-instituicoes"></div>
 
             <h3 class="secao-titulo">🔍 Consulta de Dados</h3>
@@ -323,69 +326,106 @@
             document.getElementById('emb-lapa').innerText = aprovados.filter(a => a.embarque.toUpperCase().trim() === 'LAPA').length;
             document.getElementById('emb-vila').innerText = aprovados.filter(a => a.embarque.toUpperCase().trim() === 'VILA').length;
 
-            const contagem = {};
+            const contagemInst = {};
+            const contagemFrota = {
+                AMARELO: { total: 0, dias: { seg: {M:0, N:0}, ter: {M:0, N:0}, qua: {M:0, N:0}, qui: {M:0, N:0}, sex: {M:0, N:0} } },
+                AZUL: { total: 0, dias: { seg: {M:0, N:0}, ter: {M:0, N:0}, qua: {M:0, N:0}, qui: {M:0, N:0}, sex: {M:0, N:0} } }
+            };
+
             aprovados.forEach(a => {
                 const inst = a.instituicao.trim();
+                const turno = (a.turno || "").toUpperCase().trim();
+                let tManha = turno.includes("MANHÃ") || turno.includes("MANHA");
+                let tNoite = turno.includes("NOITE");
+                const diasStr = (a.dias || "").toUpperCase();
+                const viajaDia = (dia) => diasStr.includes(dia);
+
+                // --- PROCESSAMENTO DA FROTA (ÔNIBUS) ---
+                const onibus = getOnibus(a);
+                if (onibus === 'AMARELO' || onibus === 'AZUL') {
+                    contagemFrota[onibus].total++;
+                    if (viajaDia("SEGUNDA")) { if (tManha) contagemFrota[onibus].dias.seg.M++; if (tNoite) contagemFrota[onibus].dias.seg.N++; }
+                    if (viajaDia("TERÇA") || viajaDia("TERCA")) { if (tManha) contagemFrota[onibus].dias.ter.M++; if (tNoite) contagemFrota[onibus].dias.ter.N++; }
+                    if (viajaDia("QUARTA")) { if (tManha) contagemFrota[onibus].dias.qua.M++; if (tNoite) contagemFrota[onibus].dias.qua.N++; }
+                    if (viajaDia("QUINTA")) { if (tManha) contagemFrota[onibus].dias.qui.M++; if (tNoite) contagemFrota[onibus].dias.qui.N++; }
+                    if (viajaDia("SEXTA")) { if (tManha) contagemFrota[onibus].dias.sex.M++; if (tNoite) contagemFrota[onibus].dias.sex.N++; }
+                }
+
+                // --- PROCESSAMENTO DAS INSTITUIÇÕES ---
                 if (!inst) return;
-                
-                // Inicializa o objeto da instituição com os dias separados por M (Manhã) e N (Noite)
-                if (!contagem[inst]) {
-                    contagem[inst] = { 
+                if (!contagemInst[inst]) {
+                    contagemInst[inst] = { 
                         manha: 0, noite: 0, outros: 0, total: 0,
                         dias: {
-                            seg: { M: 0, N: 0 },
-                            ter: { M: 0, N: 0 },
-                            qua: { M: 0, N: 0 },
-                            qui: { M: 0, N: 0 },
-                            sex: { M: 0, N: 0 }
+                            seg: { M: 0, N: 0 }, ter: { M: 0, N: 0 }, qua: { M: 0, N: 0 }, qui: { M: 0, N: 0 }, sex: { M: 0, N: 0 }
                         }
                     };
                 }
                 
-                const turno = (a.turno || "").toUpperCase().trim();
-                let tManha = turno.includes("MANHÃ") || turno.includes("MANHA");
-                let tNoite = turno.includes("NOITE");
-                
-                // Contagem geral
-                if (tManha && !tNoite) contagem[inst].manha++;
-                else if (tNoite && !tManha) contagem[inst].noite++;
-                else contagem[inst].outros++;
-                
-                contagem[inst].total++;
+                if (tManha && !tNoite) contagemInst[inst].manha++;
+                else if (tNoite && !tManha) contagemInst[inst].noite++;
+                else contagemInst[inst].outros++;
+                contagemInst[inst].total++;
 
-                // Contagem cruzada: Dias x Turno
-                const diasStr = (a.dias || "").toUpperCase();
-                
-                const viajaDia = (dia) => diasStr.includes(dia);
-
-                if (viajaDia("SEGUNDA")) {
-                    if (tManha) contagem[inst].dias.seg.M++;
-                    if (tNoite) contagem[inst].dias.seg.N++;
-                }
-                if (viajaDia("TERÇA") || viajaDia("TERCA")) {
-                    if (tManha) contagem[inst].dias.ter.M++;
-                    if (tNoite) contagem[inst].dias.ter.N++;
-                }
-                if (viajaDia("QUARTA")) {
-                    if (tManha) contagem[inst].dias.qua.M++;
-                    if (tNoite) contagem[inst].dias.qua.N++;
-                }
-                if (viajaDia("QUINTA")) {
-                    if (tManha) contagem[inst].dias.qui.M++;
-                    if (tNoite) contagem[inst].dias.qui.N++;
-                }
-                if (viajaDia("SEXTA")) {
-                    if (tManha) contagem[inst].dias.sex.M++;
-                    if (tNoite) contagem[inst].dias.sex.N++;
-                }
+                if (viajaDia("SEGUNDA")) { if (tManha) contagemInst[inst].dias.seg.M++; if (tNoite) contagemInst[inst].dias.seg.N++; }
+                if (viajaDia("TERÇA") || viajaDia("TERCA")) { if (tManha) contagemInst[inst].dias.ter.M++; if (tNoite) contagemInst[inst].dias.ter.N++; }
+                if (viajaDia("QUARTA")) { if (tManha) contagemInst[inst].dias.qua.M++; if (tNoite) contagemInst[inst].dias.qua.N++; }
+                if (viajaDia("QUINTA")) { if (tManha) contagemInst[inst].dias.qui.M++; if (tNoite) contagemInst[inst].dias.qui.N++; }
+                if (viajaDia("SEXTA")) { if (tManha) contagemInst[inst].dias.sex.M++; if (tNoite) contagemInst[inst].dias.sex.N++; }
             });
 
-            const grid = document.getElementById('cards-instituicoes');
-            grid.innerHTML = '';
-            
-            Object.keys(contagem).sort().forEach(inst => {
-                const d = contagem[inst];
-                grid.innerHTML += `
+            // RENDERIZAR CARDS DA FROTA
+            const gridFrota = document.getElementById('cards-frota');
+            gridFrota.innerHTML = '';
+            ['AMARELO', 'AZUL'].forEach(bus => {
+                const f = contagemFrota[bus];
+                const corTop = bus === 'AMARELO' ? 'var(--amarelo)' : '#0056b3';
+                const icone = bus === 'AMARELO' ? '🟡' : '🔵';
+                
+                gridFrota.innerHTML += `
+                    <div class="dash-card card-clicavel" style="border-top: 5px solid ${corTop};" onclick="abrirModalOnibus('${bus}')">
+                        <h3 style="color: ${corTop}; font-size: 18px;">${icone} Ônibus ${bus}</h3>
+                        <p style="text-align: center; font-size: 12px; color: #666; margin-top: -5px;">Total de Passageiros: <strong>${f.total}</strong></p>
+                        
+                        <table class="bus-table tabela-dias" style="margin-top: 10px;">
+                            <thead>
+                                <tr>
+                                    <th>Turno</th>
+                                    <th>Seg</th>
+                                    <th>Ter</th>
+                                    <th>Qua</th>
+                                    <th>Qui</th>
+                                    <th>Sex</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="background-color: #f9fff9;">
+                                    <td class="col-turno" style="color:#218838">Manhã</td>
+                                    <td>${f.dias.seg.M}</td>
+                                    <td>${f.dias.ter.M}</td>
+                                    <td>${f.dias.qua.M}</td>
+                                    <td>${f.dias.qui.M}</td>
+                                    <td>${f.dias.sex.M}</td>
+                                </tr>
+                                <tr style="background-color: #f4f8ff;">
+                                    <td class="col-turno" style="color:#17a2b8">Noite</td>
+                                    <td>${f.dias.seg.N}</td>
+                                    <td>${f.dias.ter.N}</td>
+                                    <td>${f.dias.qua.N}</td>
+                                    <td>${f.dias.qui.N}</td>
+                                    <td>${f.dias.sex.N}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>`;
+            });
+
+            // RENDERIZAR CARDS DAS INSTITUIÇÕES
+            const gridInst = document.getElementById('cards-instituicoes');
+            gridInst.innerHTML = '';
+            Object.keys(contagemInst).sort().forEach(inst => {
+                const d = contagemInst[inst];
+                gridInst.innerHTML += `
                     <div class="dash-card card-clicavel" onclick="abrirModalAlunos('${inst}')">
                         <h3>🎓 ${inst}</h3>
                         <div class="numero">${d.total}</div>
@@ -439,6 +479,24 @@
                         </table>
                     </div>`;
             });
+        }
+
+        // Funções dos Modais
+        function abrirModalOnibus(busName) {
+            const modal = document.getElementById('modal-alunos');
+            const lista = document.getElementById('lista-alunos-modal');
+            const titulo = document.getElementById('modal-titulo-inst');
+            const sub = document.getElementById('modal-subtitulo');
+            
+            const alunos = dadosNuvem.filter(a => getOnibus(a) === busName && a.status === 'Aprovado')
+                                     .sort((a, b) => a.nome.localeCompare(b.nome));
+
+            const icone = busName === 'AMARELO' ? '🟡' : '🔵';
+            titulo.innerText = `${icone} Passageiros: Ônibus ${busName}`;
+            sub.innerText = `${alunos.length} alunos vinculados`;
+            lista.innerHTML = alunos.map(a => `<li><strong>${a.nome.toUpperCase()}</strong> <span style="color:#666; font-size:12px">🏫 Inst: ${a.instituicao} | 🕒 Turno: ${a.turno}</span></li>`).join('');
+            
+            modal.style.display = 'flex';
         }
 
         function abrirModalAlunos(inst) {
