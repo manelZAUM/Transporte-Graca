@@ -130,8 +130,9 @@
         .modal-close { position: absolute; top: 15px; right: 15px; font-size: 24px; cursor: pointer; color: #888; }
         
         .lista-modal-alunos { list-style: none; padding: 0; margin: 0; }
-        .lista-modal-alunos li { padding: 10px; border-bottom: 1px solid #f0f0f0; display: flex; align-items: center; gap: 10px; font-size: 14px; }
-        .lista-modal-alunos li:before { content: "👤"; font-size: 12px; }
+        .lista-modal-alunos li { padding: 10px; border-bottom: 1px solid #f0f0f0; display: flex; flex-direction: column; gap: 4px; font-size: 14px; }
+        .lista-modal-alunos li strong { display: flex; align-items: center; gap: 8px; }
+        .lista-modal-alunos li strong:before { content: "👤"; font-size: 12px; }
 
         /* --- FILTROS E TABELA --- */
         .filtros-container { display: flex; gap: 10px; flex-wrap: wrap; background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid var(--verde-principal); }
@@ -181,6 +182,27 @@
                 </div>
             </div>
 
+            <h3 class="secao-titulo">📍 Pontos de Embarque (Aprovados)</h3>
+            <p style="font-size: 12px; color: #888; margin-top: -15px; margin-bottom: 20px;">💡 Clique no card para ver a lista de nomes.</p>
+            <div class="dashboard-grid">
+                <div class="dash-card card-clicavel" style="border-top: 4px solid var(--roxo);" onclick="abrirModalEmbarque('SEDE')">
+                    <h3>🏢 Sede</h3>
+                    <div class="numero" id="emb-sede">0</div>
+                </div>
+                <div class="dash-card card-clicavel" style="border-top: 4px solid var(--laranja);" onclick="abrirModalEmbarque('BARRO VERMELHO')">
+                    <h3>🔴 Barro Vermelho</h3>
+                    <div class="numero" id="emb-barro">0</div>
+                </div>
+                <div class="dash-card card-clicavel" style="border-top: 4px solid var(--verde-claro);" onclick="abrirModalEmbarque('LAPA')">
+                    <h3>⛪ Lapa</h3>
+                    <div class="numero" id="emb-lapa">0</div>
+                </div>
+                <div class="dash-card card-clicavel" style="border-top: 4px solid #e83e8c;" onclick="abrirModalEmbarque('VILA')">
+                    <h3>🏘️ Vila</h3>
+                    <div class="numero" id="emb-vila">0</div>
+                </div>
+            </div>
+
             <h3 class="secao-titulo">🏫 Ocupação por Instituição (Aprovados)</h3>
             <p style="font-size: 12px; color: #888; margin-top: -15px; margin-bottom: 20px;">💡 Clique no card para ver a lista de nomes.</p>
             <div class="dashboard-grid" id="cards-instituicoes"></div>
@@ -213,7 +235,7 @@
         <div class="modal-content" onclick="event.stopPropagation()">
             <span class="modal-close" onclick="fecharModal()">&times;</span>
             <div class="modal-header">
-                <h2 id="modal-titulo-inst">Instituição</h2>
+                <h2 id="modal-titulo-inst">Título</h2>
                 <small id="modal-subtitulo" style="color:#666"></small>
             </div>
             <ul id="lista-alunos-modal" class="lista-modal-alunos"></ul>
@@ -224,7 +246,6 @@
         const API_URL = "https://script.google.com/macros/s/AKfycbyAnZE7XRAGVogS81Z52nNi4Y3PvEUwiY0cGATxWP2n0LYEQ52K4iRAMxCHIqdCTNs/exec"; 
         let dadosNuvem = [];
 
-        // Adiciona evento de enter no input do CPF
         document.getElementById("cpf-input").addEventListener("keypress", function(event) {
             if (event.key === "Enter") {
                 event.preventDefault();
@@ -288,10 +309,18 @@
         function gerarDashboard() {
             const aprovados = dadosNuvem.filter(a => a.status === 'Aprovado');
             
+            // Totalizadores Gerais
             document.getElementById('total-alunos').innerText = dadosNuvem.length;
             document.getElementById('total-novatos').innerText = dadosNuvem.filter(a => a.novato === 'Sim').length;
             document.getElementById('total-residentes').innerText = dadosNuvem.filter(a => a.sobral === 'Sim').length;
 
+            // Totalizadores de Embarque
+            document.getElementById('emb-sede').innerText = aprovados.filter(a => a.embarque.toUpperCase().trim() === 'SEDE').length;
+            document.getElementById('emb-barro').innerText = aprovados.filter(a => a.embarque.toUpperCase().trim() === 'BARRO VERMELHO').length;
+            document.getElementById('emb-lapa').innerText = aprovados.filter(a => a.embarque.toUpperCase().trim() === 'LAPA').length;
+            document.getElementById('emb-vila').innerText = aprovados.filter(a => a.embarque.toUpperCase().trim() === 'VILA').length;
+
+            // Agrupamento por Instituição
             const contagem = {};
             aprovados.forEach(a => {
                 const inst = a.instituicao.trim();
@@ -332,7 +361,25 @@
 
             titulo.innerText = inst;
             sub.innerText = `${alunos.length} alunos aprovados`;
-            lista.innerHTML = alunos.map(a => `<li>${a.nome.toUpperCase()}</li>`).join('');
+            // Mostra o nome do aluno e em qual ponto ele embarca
+            lista.innerHTML = alunos.map(a => `<li><strong>${a.nome.toUpperCase()}</strong> <span style="color:#666; font-size:12px">📍 Embarque: ${a.embarque}</span></li>`).join('');
+            
+            modal.style.display = 'flex';
+        }
+
+        function abrirModalEmbarque(ponto) {
+            const modal = document.getElementById('modal-alunos');
+            const lista = document.getElementById('lista-alunos-modal');
+            const titulo = document.getElementById('modal-titulo-inst');
+            const sub = document.getElementById('modal-subtitulo');
+            
+            const alunos = dadosNuvem.filter(a => a.embarque.toUpperCase().trim() === ponto && a.status === 'Aprovado')
+                                     .sort((a, b) => a.nome.localeCompare(b.nome));
+
+            titulo.innerText = `Embarque: ${ponto}`;
+            sub.innerText = `${alunos.length} alunos aprovados`;
+            // Mostra o nome do aluno e para qual faculdade ele vai
+            lista.innerHTML = alunos.map(a => `<li><strong>${a.nome.toUpperCase()}</strong> <span style="color:#666; font-size:12px">🏫 Instituição: ${a.instituicao}</span></li>`).join('');
             
             modal.style.display = 'flex';
         }
