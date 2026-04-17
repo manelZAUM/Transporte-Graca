@@ -204,7 +204,7 @@
             </div>
 
             <h3 class="secao-titulo">🏫 Ocupação por Instituição (Aprovados)</h3>
-            <p style="font-size: 12px; color: #888; margin-top: -15px; margin-bottom: 20px;">💡 Clique no card para ver a lista de nomes.</p>
+            <p style="font-size: 12px; color: #888; margin-top: -15px; margin-bottom: 20px;">💡 Clique no card para ver a lista de nomes. O campo "(Manhã/Noite)" engloba alunos de Tarde, Integral ou com turno vazio.</p>
             <div class="dashboard-grid" id="cards-instituicoes"></div>
 
             <h3 class="secao-titulo">🔍 Consulta de Dados</h3>
@@ -325,11 +325,22 @@
             aprovados.forEach(a => {
                 const inst = a.instituicao.trim();
                 if (!inst) return;
-                if (!contagem[inst]) contagem[inst] = { manha: 0, noite: 0, total: 0 };
                 
-                const turno = (a.turno || "").toUpperCase();
-                if (turno.includes("MANHÃ")) contagem[inst].manha++;
-                if (turno.includes("NOITE")) contagem[inst].noite++;
+                if (!contagem[inst]) contagem[inst] = { manha: 0, noite: 0, outros: 0, total: 0 };
+                
+                const turno = (a.turno || "").toUpperCase().trim();
+                
+                let tManha = turno.includes("MANHÃ") || turno.includes("MANHA");
+                let tNoite = turno.includes("NOITE");
+                
+                if (tManha && !tNoite) {
+                    contagem[inst].manha++;
+                } else if (tNoite && !tManha) {
+                    contagem[inst].noite++;
+                } else {
+                    contagem[inst].outros++;
+                }
+                
                 contagem[inst].total++;
             });
 
@@ -343,8 +354,20 @@
                         <h3>🎓 ${inst}</h3>
                         <div class="numero">${d.total}</div>
                         <table class="bus-table">
-                            <thead><tr><th>Manhã</th><th>Noite</th></tr></thead>
-                            <tbody><tr><td>${d.manha}</td><td>${d.noite}</td></tr></tbody>
+                            <thead>
+                                <tr>
+                                    <th style="color:#218838">Manhã</th>
+                                    <th style="color:#17a2b8">Noite</th>
+                                    <th style="color:#888">(Manhã/Noite)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>${d.manha}</strong></td>
+                                    <td><strong>${d.noite}</strong></td>
+                                    <td><strong>${d.outros}</strong></td>
+                                </tr>
+                            </tbody>
                         </table>
                     </div>`;
             });
@@ -361,8 +384,7 @@
 
             titulo.innerText = inst;
             sub.innerText = `${alunos.length} alunos aprovados`;
-            // Mostra o nome do aluno e em qual ponto ele embarca
-            lista.innerHTML = alunos.map(a => `<li><strong>${a.nome.toUpperCase()}</strong> <span style="color:#666; font-size:12px">📍 Embarque: ${a.embarque}</span></li>`).join('');
+            lista.innerHTML = alunos.map(a => `<li><strong>${a.nome.toUpperCase()}</strong> <span style="color:#666; font-size:12px">📍 Embarque: ${a.embarque} | 🕒 Turno: ${a.turno}</span></li>`).join('');
             
             modal.style.display = 'flex';
         }
@@ -378,8 +400,7 @@
 
             titulo.innerText = `Embarque: ${ponto}`;
             sub.innerText = `${alunos.length} alunos aprovados`;
-            // Mostra o nome do aluno e para qual faculdade ele vai
-            lista.innerHTML = alunos.map(a => `<li><strong>${a.nome.toUpperCase()}</strong> <span style="color:#666; font-size:12px">🏫 Instituição: ${a.instituicao}</span></li>`).join('');
+            lista.innerHTML = alunos.map(a => `<li><strong>${a.nome.toUpperCase()}</strong> <span style="color:#666; font-size:12px">🏫 Inst: ${a.instituicao} | 🕒 Turno: ${a.turno}</span></li>`).join('');
             
             modal.style.display = 'flex';
         }
