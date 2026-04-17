@@ -86,14 +86,14 @@
         #sistema-container { display: none; }
         #dashboard-principal { max-width: 1150px; margin: 0 auto; padding: 30px 20px; }
         
-        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 40px; }
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 40px; }
         
-        .dash-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.04); border: 1px solid #eaeaea; position: relative; }
+        .dash-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.04); border: 1px solid #eaeaea; position: relative; display: flex; flex-direction: column; }
         .card-clicavel { cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
         .card-clicavel:hover { transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); border-color: var(--verde-claro); }
 
-        .dash-card h3 { font-size: 14px; margin: 0 0 10px 0; color: #555; text-transform: uppercase; letter-spacing: 0.5px; }
-        .dash-card .numero { font-size: 32px; font-weight: bold; color: var(--verde-escuro); }
+        .dash-card h3 { font-size: 14px; margin: 0 0 10px 0; color: #555; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; }
+        .dash-card .numero { font-size: 32px; font-weight: bold; color: var(--verde-escuro); text-align: center; }
 
         .secao-titulo { color: var(--verde-escuro); margin: 40px 0 20px 0; border-bottom: 2px solid #ddd; padding-bottom: 8px; font-size: 20px; display: flex; align-items: center; gap: 10px; }
 
@@ -101,6 +101,11 @@
         .bus-table { width: 100%; margin-top: 10px; border-collapse: collapse; font-size: 12px; }
         .bus-table th { padding: 5px; border-bottom: 2px solid #eee; text-align: center; }
         .bus-table td { padding: 5px; border-bottom: 1px solid #eee; text-align: center; }
+
+        .tabela-dias { margin-top: auto; padding-top: 15px; border-top: 1px dashed #e0e0e0; }
+        .tabela-dias th { font-size: 10px; color: #888; padding: 4px; text-transform: uppercase; font-weight: normal; }
+        .tabela-dias td { font-size: 11px; font-weight: bold; color: #444; padding: 4px; }
+        .tabela-dias .col-turno { font-weight: bold; font-size: 10px; text-align: left; }
 
         /* --- MODAL DE ALUNOS --- */
         #modal-alunos {
@@ -203,7 +208,7 @@
                 </div>
             </div>
 
-            <h3 class="secao-titulo">🏫 Ocupação por Instituição (Aprovados)</h3>
+            <h3 class="secao-titulo">🏫 Ocupação por Instituição e Dias (Aprovados)</h3>
             <p style="font-size: 12px; color: #888; margin-top: -15px; margin-bottom: 20px;">💡 Clique no card para ver a lista de nomes. O campo "(Manhã/Noite)" engloba alunos de Tarde, Integral ou com turno vazio.</p>
             <div class="dashboard-grid" id="cards-instituicoes"></div>
 
@@ -223,7 +228,7 @@
             <div class="table-responsive">
                 <table>
                     <thead>
-                        <tr><th>Nome</th><th>Instituição</th><th>Embarque</th><th>Ônibus</th><th>Turno</th><th>Status</th></tr>
+                        <tr><th>Nome</th><th>Instituição</th><th>Embarque</th><th>Ônibus</th><th>Turno</th><th>Dias</th><th>Status</th></tr>
                     </thead>
                     <tbody id="lista"></tbody>
                 </table>
@@ -309,39 +314,70 @@
         function gerarDashboard() {
             const aprovados = dadosNuvem.filter(a => a.status === 'Aprovado');
             
-            // Totalizadores Gerais
             document.getElementById('total-alunos').innerText = dadosNuvem.length;
             document.getElementById('total-novatos').innerText = dadosNuvem.filter(a => a.novato === 'Sim').length;
             document.getElementById('total-residentes').innerText = dadosNuvem.filter(a => a.sobral === 'Sim').length;
 
-            // Totalizadores de Embarque
             document.getElementById('emb-sede').innerText = aprovados.filter(a => a.embarque.toUpperCase().trim() === 'SEDE').length;
             document.getElementById('emb-barro').innerText = aprovados.filter(a => a.embarque.toUpperCase().trim() === 'BARRO VERMELHO').length;
             document.getElementById('emb-lapa').innerText = aprovados.filter(a => a.embarque.toUpperCase().trim() === 'LAPA').length;
             document.getElementById('emb-vila').innerText = aprovados.filter(a => a.embarque.toUpperCase().trim() === 'VILA').length;
 
-            // Agrupamento por Instituição
             const contagem = {};
             aprovados.forEach(a => {
                 const inst = a.instituicao.trim();
                 if (!inst) return;
                 
-                if (!contagem[inst]) contagem[inst] = { manha: 0, noite: 0, outros: 0, total: 0 };
+                // Inicializa o objeto da instituição com os dias separados por M (Manhã) e N (Noite)
+                if (!contagem[inst]) {
+                    contagem[inst] = { 
+                        manha: 0, noite: 0, outros: 0, total: 0,
+                        dias: {
+                            seg: { M: 0, N: 0 },
+                            ter: { M: 0, N: 0 },
+                            qua: { M: 0, N: 0 },
+                            qui: { M: 0, N: 0 },
+                            sex: { M: 0, N: 0 }
+                        }
+                    };
+                }
                 
                 const turno = (a.turno || "").toUpperCase().trim();
-                
                 let tManha = turno.includes("MANHÃ") || turno.includes("MANHA");
                 let tNoite = turno.includes("NOITE");
                 
-                if (tManha && !tNoite) {
-                    contagem[inst].manha++;
-                } else if (tNoite && !tManha) {
-                    contagem[inst].noite++;
-                } else {
-                    contagem[inst].outros++;
-                }
+                // Contagem geral
+                if (tManha && !tNoite) contagem[inst].manha++;
+                else if (tNoite && !tManha) contagem[inst].noite++;
+                else contagem[inst].outros++;
                 
                 contagem[inst].total++;
+
+                // Contagem cruzada: Dias x Turno
+                const diasStr = (a.dias || "").toUpperCase();
+                
+                const viajaDia = (dia) => diasStr.includes(dia);
+
+                if (viajaDia("SEGUNDA")) {
+                    if (tManha) contagem[inst].dias.seg.M++;
+                    if (tNoite) contagem[inst].dias.seg.N++;
+                }
+                if (viajaDia("TERÇA") || viajaDia("TERCA")) {
+                    if (tManha) contagem[inst].dias.ter.M++;
+                    if (tNoite) contagem[inst].dias.ter.N++;
+                }
+                if (viajaDia("QUARTA")) {
+                    if (tManha) contagem[inst].dias.qua.M++;
+                    if (tNoite) contagem[inst].dias.qua.N++;
+                }
+                if (viajaDia("QUINTA")) {
+                    if (tManha) contagem[inst].dias.qui.M++;
+                    if (tNoite) contagem[inst].dias.qui.N++;
+                }
+                if (viajaDia("SEXTA")) {
+                    if (tManha) contagem[inst].dias.sex.M++;
+                    if (tNoite) contagem[inst].dias.sex.N++;
+                }
             });
 
             const grid = document.getElementById('cards-instituicoes');
@@ -353,6 +389,7 @@
                     <div class="dash-card card-clicavel" onclick="abrirModalAlunos('${inst}')">
                         <h3>🎓 ${inst}</h3>
                         <div class="numero">${d.total}</div>
+                        
                         <table class="bus-table">
                             <thead>
                                 <tr>
@@ -366,6 +403,37 @@
                                     <td><strong>${d.manha}</strong></td>
                                     <td><strong>${d.noite}</strong></td>
                                     <td><strong>${d.outros}</strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <table class="bus-table tabela-dias">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Seg</th>
+                                    <th>Ter</th>
+                                    <th>Qua</th>
+                                    <th>Qui</th>
+                                    <th>Sex</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="col-turno" style="color:#218838">Manhã</td>
+                                    <td>${d.dias.seg.M}</td>
+                                    <td>${d.dias.ter.M}</td>
+                                    <td>${d.dias.qua.M}</td>
+                                    <td>${d.dias.qui.M}</td>
+                                    <td>${d.dias.sex.M}</td>
+                                </tr>
+                                <tr>
+                                    <td class="col-turno" style="color:#17a2b8">Noite</td>
+                                    <td>${d.dias.seg.N}</td>
+                                    <td>${d.dias.ter.N}</td>
+                                    <td>${d.dias.qua.N}</td>
+                                    <td>${d.dias.qui.N}</td>
+                                    <td>${d.dias.sex.N}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -435,6 +503,7 @@
                         <td>${a.embarque}</td>
                         <td>${onibus}</td>
                         <td>${a.turno}</td>
+                        <td>${a.dias}</td>
                         <td><span class="badge ${st}">${a.status}</span></td>
                     </tr>`;
             });
