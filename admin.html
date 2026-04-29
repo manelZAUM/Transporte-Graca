@@ -35,7 +35,7 @@
         .btn-vermelho { background: #dc3545; } .btn-vermelho:hover { background: #c82333; }
         .btn-cinza { background: #6c757d; } .btn-cinza:hover { background: #5a6268; }
 
-        /* Formulário Oculto por Padrão */
+        /* Formulário */
         .form-section { display: none; background: white; border-top: 4px solid var(--verde-escuro); border-radius: 10px; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 30px; }
         .form-group { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 15px; }
         .form-item { flex: 1; min-width: 150px; }
@@ -107,10 +107,14 @@
                     <div class="form-item"><label>Ponto de Embarque</label><select id="embarque"><option value="SEDE">SEDE</option><option value="BARRO VERMELHO">BARRO VERMELHO</option><option value="LAPA">LAPA</option><option value="VILA">VILA</option></select></div>
                     <div class="form-item"><label>🚌 Ônibus Fixo</label><select id="onibus"><option value="AZUL">Ônibus Azul</option><option value="AMARELO">Ônibus Amarelo</option></select></div>
                 </div>
+                
                 <div class="form-group">
                     <div class="form-item"><label>Turno</label><select id="turno"><option value="MANHÃ">MANHÃ</option><option value="NOITE">NOITE</option><option value="MANHÃ E NOITE">MANHÃ E NOITE</option></select></div>
+                    <div class="form-item"><label>Dias da Semana</label><input type="text" id="dias" placeholder="Ex: SEGUNDA A SEXTA"></div>
+                    <div class="form-item"><label>Novato?</label><select id="novato"><option value="Não">Não</option><option value="Sim">Sim</option></select></div>
                     <div class="form-item"><label>Status</label><select id="status"><option value="Aprovado">Aprovado</option><option value="Pendente">Pendente</option></select></div>
                 </div>
+
                 <div style="display: flex; gap: 10px; margin-top: 10px;">
                     <button type="submit" id="btnSubmit" class="btn btn-verde">💾 Salvar Alterações</button>
                     <button type="button" onclick="fecharCadastro()" class="btn btn-cinza">Cancelar</button>
@@ -140,7 +144,6 @@
     </div>
 
     <script>
-        // Configurações e Chaves
         const API_URL = "https://script.google.com/macros/s/AKfycbyQljrcnkEox6t6IKcBvYx2wSsSoLrA8NEMGvLjK4L5sVFmqo_hxP68iEiNdbUE5xg/exec";
         const ADMIN_KEY = "SuaChaveSecretaAqui"; 
         const EMAILS_AUTORIZADOS = ["manoelfariaspr@gmail.com"]; 
@@ -148,7 +151,6 @@
         let dadosNuvem = [];
         let idEdicaoAtual = null;
 
-        // Login
         function handleGoogleLogin(response) {
             const payload = JSON.parse(atob(response.credential.split('.')[1]));
             if (EMAILS_AUTORIZADOS.includes(payload.email)) {
@@ -161,7 +163,6 @@
             }
         }
 
-        // Buscar Dados
         async function buscarDadosNuvem() {
             try {
                 const response = await fetch(`${API_URL}?key=${ADMIN_KEY}`);
@@ -197,7 +198,6 @@
             `;
         }
 
-        // Tabela Detalhada
         function renderizar() {
             const busca = document.getElementById('busca').value.toLowerCase();
             const tbody = document.getElementById('lista');
@@ -227,8 +227,6 @@
             });
         }
 
-        // === FUNÇÕES DE AÇÃO RESTAURADAS === //
-
         function abrirCadastro() {
             idEdicaoAtual = null;
             document.getElementById('formCadastro').reset();
@@ -245,14 +243,12 @@
         }
 
         function editar(id) {
-            // Procura o aluno pelo ID para preencher o formulário
             const aluno = dadosNuvem.find(a => a.id == id);
             if(!aluno) return;
 
             idEdicaoAtual = aluno.id;
             
             document.getElementById('nome').value = aluno.nome || '';
-            document.getElementById('nascimento').value = aluno.nascimento || '';
             document.getElementById('rg').value = aluno.rg || '';
             document.getElementById('cpf').value = aluno.cpf || '';
             document.getElementById('telefone').value = aluno.telefone || '';
@@ -260,9 +256,19 @@
             document.getElementById('embarque').value = aluno.embarque || 'SEDE';
             document.getElementById('onibus').value = aluno.onibus || 'AMARELO';
             document.getElementById('turno').value = aluno.turno || 'MANHÃ';
+            document.getElementById('dias').value = aluno.dias || '';
+            document.getElementById('novato').value = aluno.novato || 'Não';
             document.getElementById('status').value = aluno.status || 'Pendente';
 
-            // Verifica instituição
+            // Correção da formatação da Data de Nascimento (Remove o formato ISO)
+            let dataNasc = aluno.nascimento || '';
+            if(dataNasc.includes('T')) {
+                let d = new Date(dataNasc);
+                // Adiciona o fuso horário para evitar que caia no dia anterior
+                dataNasc = new Date(d.getTime() + Math.abs(d.getTimezoneOffset() * 60000)).toLocaleDateString('pt-BR');
+            }
+            document.getElementById('nascimento').value = dataNasc;
+
             const instOpt = Array.from(document.getElementById('instituicao').options).map(o => o.value);
             if(instOpt.includes(aluno.instituicao)) {
                 document.getElementById('instituicao').value = aluno.instituicao;
@@ -277,7 +283,6 @@
             window.scrollTo({ top: document.getElementById('area-cadastro').offsetTop - 20, behavior: 'smooth' });
         }
 
-        // Submeter Formulário (Adicionar ou Editar)
         document.getElementById('formCadastro').addEventListener('submit', function(e) {
             e.preventDefault();
             const btn = document.getElementById('btnSubmit');
@@ -287,8 +292,8 @@
 
             const dados = {
                 action: idEdicaoAtual ? "edit" : "add",
-                key: ADMIN_KEY, // Nova segurança
-                token: token,   // Segurança antiga (caso o seu script ainda exija)
+                key: ADMIN_KEY, 
+                token: token,
                 id: idEdicaoAtual || Date.now().toString(),
                 nome: document.getElementById('nome').value,
                 nascimento: document.getElementById('nascimento').value,
@@ -300,6 +305,8 @@
                 embarque: document.getElementById('embarque').value,
                 onibus: document.getElementById('onibus').value,
                 turno: document.getElementById('turno').value,
+                dias: document.getElementById('dias').value,
+                novato: document.getElementById('novato').value,
                 status: document.getElementById('status').value
             };
 
@@ -313,7 +320,6 @@
             .finally(() => { btn.disabled = false; btn.innerText = "💾 Salvar Alterações"; });
         });
 
-        // Excluir Aluno
         function remover(id) {
             if(confirm("Tem a certeza que deseja EXCLUIR permanentemente este cadastro?")) {
                 const token = sessionStorage.getItem('google_token');
@@ -325,7 +331,7 @@
                 .then(r => r.json())
                 .then(res => {
                     if(res.erro) alert("Erro: " + res.erro);
-                    else { buscarDadosNuvem(); } // Atualiza a tabela
+                    else { buscarDadosNuvem(); } 
                 })
                 .catch(err => alert("Erro ao excluir."));
             }
