@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Consulta e Dashboard - Graça/CE</title>
+<<<<<<< Updated upstream
     <style>
         /* --- CORES E VARIÁVEIS GERAIS --- */
         :root {
@@ -248,10 +249,115 @@
                 <small id="modal-subtitulo" style="color:#666"></small>
             </div>
             <ul id="lista-alunos-modal" class="lista-modal-alunos"></ul>
+=======
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Estilos do Dashboard */
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .dash-card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); border-top: 4px solid var(--verde-principal); text-align: center; }
+        .dash-card h3 { color: #555; font-size: 16px; margin-bottom: 10px; }
+        .dash-card .numero { font-size: 32px; font-weight: bold; color: var(--verde-escuro); }
+        
+        .inst-list { text-align: left; font-size: 14px; margin-top: 15px; max-height: 150px; overflow-y: auto; padding-right: 5px; }
+        .inst-list div { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #eee; }
+        
+        /* Cards dos Ônibus Clicáveis */
+        .bus-card { text-decoration: none; color: inherit; display: block; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); transition: transform 0.2s, box-shadow 0.2s; }
+        .bus-card:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
+        .bus-amarelo { border-top: 5px solid #e6b800; }
+        .bus-azul { border-top: 5px solid #0056b3; }
+        
+        /* Forçando a cor preta em todos os cabeçalhos (th) para resolver a leitura */
+        th, .bus-table th { color: #000 !important; font-weight: bold; }
+
+        .bus-table { width: 100%; margin-top: 15px; border-collapse: collapse; font-size: 13px; text-align: center; }
+        .bus-table th { background: #f0f0f0; padding: 5px; border: 1px solid #ddd; }
+        .bus-table td { padding: 5px; border: 1px solid #ddd; }
+        .bus-amarelo .bus-table th { background: #fff8cc; }
+        .bus-azul .bus-table th { background: #e6f0ff; }
+    </style>
+</head>
+<body style="background-color: var(--fundo);">
+    <header><img src="Captura de tela 2026-02-23 080257.png" alt="Governo Municipal de Graça" class="logo-prefeitura"></header>
+
+    <div class="admin-table-container" style="margin-bottom: 40px; max-width: 1100px;">
+        
+        <h2 style="color: var(--verde-escuro); margin-bottom: 20px; text-align: center;">📊 Painel de Logística - Transporte Universitário</h2>
+        
+        <div class="dashboard-grid">
+            <div class="dash-card">
+                <h3>👥 Total de Cadastros</h3>
+                <div class="numero" id="total-alunos">0</div>
+                <p style="font-size: 12px; color: #888; margin-top: 5px;">Alunos registrados no sistema</p>
+            </div>
+            
+            <div class="dash-card" style="border-top-color: #28a745;">
+                <h3>🆕 Alunos Novatos</h3>
+                <div class="numero" id="total-novatos" style="color: #28a745;">0</div>
+                <p style="font-size: 12px; color: #888; margin-top: 5px;">Iniciando neste semestre</p>
+            </div>
+
+            <div class="dash-card" style="border-top-color: #17a2b8;">
+                <h3>🏠 Residentes</h3>
+                <div class="numero" id="total-residentes" style="color: #17a2b8;">0</div>
+                <p style="font-size: 12px; color: #888; margin-top: 5px;">Moram em Sobral</p>
+            </div>
+
+            <div class="dash-card">
+                <h3>🏫 Por Instituição (Aprovados)</h3>
+                <div class="inst-list" id="lista-instituicoes">
+                    </div>
+            </div>
+        </div>
+
+        <h3 style="color: var(--verde-escuro); margin-top: 10px; margin-bottom: 20px;">🚍 Ocupação por Ônibus e Turno</h3>
+        <div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
+            
+            <a href="onibus-amarelo.html" class="bus-card bus-amarelo">
+                <h3 style="color: #b38f00; margin: 0; font-size: 18px;">🚌 Ônibus Amarelo</h3>
+                <p style="font-size: 12px; color: #666; margin-top: 5px;">Clique para abrir a lista completa</p>
+                <table class="bus-table">
+                    <thead><tr><th>Dia</th><th>Manhã</th><th>Noite</th></tr></thead>
+                    <tbody id="tb-amarelo">
+                        </tbody>
+                </table>
+            </a>
+
+            <a href="onibus-azul.html" class="bus-card bus-azul">
+                <h3 style="color: #0056b3; margin: 0; font-size: 18px;">🚌 Ônibus Azul</h3>
+                <p style="font-size: 12px; color: #666; margin-top: 5px;">Clique para abrir a lista completa</p>
+                <table class="bus-table">
+                    <thead><tr><th>Dia</th><th>Manhã</th><th>Noite</th></tr></thead>
+                    <tbody id="tb-azul">
+                        </tbody>
+                </table>
+            </a>
+            
+        </div>
+        <div class="card-header" style="background-color: var(--verde-escuro); margin-top: 40px; border-radius: 8px 8px 0 0;">
+            <h2>🔍 Consulta de Alunos Cadastrados</h2>
+        </div>
+
+        <div style="padding:20px; display:flex; gap:10px; flex-wrap: wrap; background: white;">
+            <input type="text" id="busca" placeholder="Filtrar por nome ou protocolo..." onkeyup="renderizarTabela()" style="padding:10px; flex:1; min-width: 200px; border-radius:5px; border:1px solid #ccc;">
+            <a href="index.html" class="btn btn-aluno" style="width:auto; padding:10px 20px; margin: 0;">⬅ Voltar ao Início</a>
+        </div>
+        
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr><th>Protocolo</th><th>Nome do Aluno (A-Z)</th><th>Instituição</th><th>Novato</th><th>Prioridade</th><th>Status</th></tr>
+                </thead>
+                <tbody id="lista">
+                    <tr><td colspan="6" style="text-align:center; padding: 30px;">⏳ Buscando dados na nuvem...</td></tr>
+                </tbody>
+            </table>
+>>>>>>> Stashed changes
         </div>
     </div>
 
     <script>
+<<<<<<< Updated upstream
         const API_URL = "https://script.google.com/macros/s/AKfycbyAnZE7XRAGVogS81Z52nNi4Y3PvEUwiY0cGATxWP2n0LYEQ52K4iRAMxCHIqdCTNs/exec"; 
         let dadosNuvem = [];
 
@@ -544,9 +650,102 @@
             const busca = document.getElementById('buscaGeral').value.toLowerCase();
             const instF = document.getElementById('filtroInstituicao').value;
             const busF = document.getElementById('filtroOnibus').value;
+=======
+        // O SEU NOVO LINK AQUI
+        const API_URL = "https://script.google.com/macros/s/AKfycbyQljrcnkEox6t6IKcBvYx2wSsSoLrA8NEMGvLjK4L5sVFmqo_hxP68iEiNdbUE5xg/exec"; 
+        let dadosNuvem = [];
+
+        function buscarDadosNuvem() {
+            fetch(API_URL).then(res => res.json()).then(data => {
+                dadosNuvem = data; 
+                gerarDashboard();
+                renderizarTabela();
+            }).catch(err => {
+                document.getElementById('lista').innerHTML = '<tr><td colspan="6" style="text-align:center; color:red;">❌ Não foi possível carregar as informações.</td></tr>';
+            });
+        }
+
+        function gerarDashboard() {
+            // Totais Básicos
+            document.getElementById('total-alunos').innerText = dadosNuvem.length;
+            
+            // Novatos
+            const novatos = dadosNuvem.filter(a => a.novato === 'Sim').length;
+            document.getElementById('total-novatos').innerText = novatos;
+
+            // Residentes
+            const residentes = dadosNuvem.filter(a => a.sobral === 'Sim').length;
+            document.getElementById('total-residentes').innerText = residentes;
+
+            // Filtra só os aprovados para calcular ocupação e instituições
+            const aprovados = dadosNuvem.filter(a => a.status === 'Aprovado');
+
+            // --- CÁLCULO DE INSTITUIÇÕES ---
+            const contagemInst = {};
+            aprovados.forEach(a => {
+                let inst = a.instituicao.trim();
+                contagemInst[inst] = (contagemInst[inst] || 0) + 1;
+            });
+            
+            // Ordena instituições da maior quantidade para a menor
+            const instOrdenadas = Object.keys(contagemInst).sort((a, b) => contagemInst[b] - contagemInst[a]);
+            let htmlInst = '';
+            instOrdenadas.forEach(inst => {
+                htmlInst += `<div><strong>${inst}</strong> <span>${contagemInst[inst]}</span></div>`;
+            });
+            document.getElementById('lista-instituicoes').innerHTML = htmlInst || '<div style="color:#888;">Nenhum aluno aprovado.</div>';
+
+            // --- CÁLCULO DE ÔNIBUS, DIAS E TURNOS ---
+            const instituicoesAmarelo = ["UNINTA", "FLF", "FACULDADE LUCIANO FEIJÃO", "LUCIANO FEIJÃO", "ANHANGUERA", "GRAU TÉCNICO", "GRAU TECNICO", "UVA-CCS", "UVA CCS"];
+            const diasSemana = ['SEGUNDA', 'TERÇA', 'QUARTA', 'QUINTA', 'SEXTA'];
+            
+            // Estrutura para guardar os números [Ônibus][Dia][Turno]
+            const contagemOnibus = {
+                AMARELO: { SEGUNDA: {M:0, N:0}, TERÇA: {M:0, N:0}, QUARTA: {M:0, N:0}, QUINTA: {M:0, N:0}, SEXTA: {M:0, N:0} },
+                AZUL: { SEGUNDA: {M:0, N:0}, TERÇA: {M:0, N:0}, QUARTA: {M:0, N:0}, QUINTA: {M:0, N:0}, SEXTA: {M:0, N:0} }
+            };
+
+            aprovados.forEach(aluno => {
+                // Descobre qual ônibus o aluno pega
+                const instAluno = aluno.instituicao.toUpperCase().trim();
+                const vaiNoAmarelo = instituicoesAmarelo.some(inst => instAluno.includes(inst));
+                const onibus = vaiNoAmarelo ? 'AMARELO' : 'AZUL';
+
+                if(aluno.dias) {
+                    diasSemana.forEach(dia => {
+                        // Verifica se ele viaja de Manhã
+                        if(aluno.dias.includes(`${dia}-MANHÃ`) || (aluno.dias.includes(dia) && aluno.turno === 'MANHÃ' && !aluno.dias.includes("-"))) {
+                            contagemOnibus[onibus][dia].M++;
+                        }
+                        // Verifica se ele viaja a Noite
+                        if(aluno.dias.includes(`${dia}-NOITE`) || (aluno.dias.includes(dia) && aluno.turno === 'NOITE' && !aluno.dias.includes("-"))) {
+                            contagemOnibus[onibus][dia].N++;
+                        }
+                    });
+                }
+            });
+
+            // --- RENDERIZA AS TABELAS DOS CARDS ---
+            let htmlAmarelo = ''; let htmlAzul = '';
+            diasSemana.forEach(dia => {
+                let sigla = dia.substring(0, 3); // Deixa "SEG", "TER"...
+                htmlAmarelo += `<tr><td><strong>${sigla}</strong></td><td>${contagemOnibus.AMARELO[dia].M}</td><td>${contagemOnibus.AMARELO[dia].N}</td></tr>`;
+                htmlAzul += `<tr><td><strong>${sigla}</strong></td><td>${contagemOnibus.AZUL[dia].M}</td><td>${contagemOnibus.AZUL[dia].N}</td></tr>`;
+            });
+            document.getElementById('tb-amarelo').innerHTML = htmlAmarelo;
+            document.getElementById('tb-azul').innerHTML = htmlAzul;
+        }
+
+        function renderizarTabela() {
+            const busca = document.getElementById('busca').value.toLowerCase();
+>>>>>>> Stashed changes
             const tbody = document.getElementById('lista');
             tbody.innerHTML = '';
+            
+            // Cria uma cópia para não bagunçar o dashboard e ordena A-Z
+            let dadosOrdenados = [...dadosNuvem].sort((a, b) => a.nome.localeCompare(b.nome));
 
+<<<<<<< Updated upstream
             dadosNuvem.filter(a => {
                 const bN = a.nome.toLowerCase().includes(busca);
                 const bI = !instF || a.instituicao === instF;
@@ -564,9 +763,31 @@
                         <td>${a.turno}</td>
                         <td>${a.dias}</td>
                         <td><span class="badge ${st}">${a.status}</span></td>
+=======
+            dadosOrdenados.forEach((aluno) => {
+                if(aluno.nome.toLowerCase().includes(busca) || aluno.proto.toLowerCase().includes(busca)) {
+                    
+                    let textoPrioridade = aluno.comorbidade === "Sim" ? `<span style="background:var(--amarelo); color:white; padding:4px 10px; border-radius:15px; font-size:12px; font-weight:bold;">Sim ♿</span>` : "Não";
+                    let textoNovato = aluno.novato === "Sim" ? `<span style="color:var(--verde-principal); font-weight:bold;">Sim</span>` : "Não";
+
+                    tbody.innerHTML += `<tr>
+                        <td><strong>${aluno.proto}</strong></td>
+                        <td>${aluno.nome}</td>
+                        <td>${aluno.instituicao}</td>
+                        <td>${textoNovato}</td>
+                        <td>${textoPrioridade}</td>
+                        <td style="color:${aluno.status === 'Pendente' ? 'orange' : 'green'}">
+                            <strong>${aluno.status === 'Pendente' ? 'Em Análise' : aluno.status}</strong>
+                        </td>
+>>>>>>> Stashed changes
                     </tr>`;
             });
         }
+<<<<<<< Updated upstream
+=======
+        
+        window.onload = buscarDadosNuvem;
+>>>>>>> Stashed changes
     </script>
 </body>
 </html>
