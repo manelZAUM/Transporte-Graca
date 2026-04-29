@@ -1,0 +1,36 @@
+:root {
+    --verde-principal: #218838;
+    --verde-escuro: #145523;
+    --verde-claro: #28a745;
+    --laranja: #fd7e14;
+    --roxo: #6f42c1;
+    --azul-claro: #17a2b8;
+    --amarelo: #ffc107;
+    --fundo: #f8f9fa; 
+    --cor-texto: #333;
+}
+
+body { margin: 0; font-family: 'Segoe UI', sans-serif; color: var(--cor-texto); min-height: 100vh; }
+body.login-ativo { background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('fundo-login.jpg') no-repeat center fixed; background-size: cover; }
+body:not(.login-ativo) { background-color: var(--fundo); background-image: radial-gradient(#d1dbd4 1.5px, transparent 1.5px); background-size: 25px 25px; }
+
+#login-wrapper { position: fixed; top: 0; left: 0; right: 0; bottom: 0; display: flex; justify-content: center; align-items: center; z-index: 9999; }
+.login-box { background: white; box-shadow: 0 15px 35px rgba(0,0,0,0.3); max-width: 400px; width: 90%; padding: 30px; border-radius: 8px; text-align: center; }
+
+/* Spinner de Carregamento */
+.spinner {
+    display: none;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+    margin-right: 10px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+button { display: flex; align-items: center; justify-content: center; width: 100%; padding: 12px; background-color: var(--verde-escuro); color: #fff; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+button:disabled { background-color: #666; cursor: not-allowed; }
+
+/* ... (Mantenha os restantes estilos de cards e tabelas que já tinha) */
