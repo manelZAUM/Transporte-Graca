@@ -1,111 +1,291 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Painel de Consulta - Graça/CE</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Consulta Geral - Transporte Graça/CE</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-blue: #0056b3;
+            --primary-yellow: #f1c40f;
+            --dark: #2d3436;
+            --muted: #636e72;
+            --bg-glass: rgba(255, 255, 255, 0.95);
+            --border-radius: 12px;
+            --shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            
+            /* Cores do Dashboard */
+            --success: #28a745;
+            --info: #17a2b8;
+            --purple: #6f42c1;
+            --orange: #fd7e14;
+            --pink: #e83e8c;
+            --danger: #dc3545;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body { 
+            font-family: 'Inter', sans-serif;
+            background-image: url('fundo-login.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: var(--dark);
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.5); /* Fundo escurecido para destacar o painel */
+            z-index: -1;
+        }
+
+        /* Cabeçalho */
+        .cabecalho-oficial { padding: 20px; display: flex; justify-content: center; }
+        .pill-logo { background: white; padding: 10px 25px; border-radius: 50px; box-shadow: var(--shadow); }
+        .pill-logo img { height: 45px; }
+
+        /* Container Principal */
+        .main-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 80vh;
+            padding: 20px;
+        }
+
+        .glass-card {
+            background: var(--bg-glass);
+            backdrop-filter: blur(10px);
+            width: 100%;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Login Secção */
+        .card-header { background-color: var(--dark); color: white; padding: 30px; text-align: center; }
+        .card-body { padding: 30px; }
+        .cpf-input { width: 100%; max-width: 320px; padding: 15px; margin: 20px auto; display: block; border: 2px solid #ddd; border-radius: 8px; font-size: 18px; text-align: center; transition: 0.3s; }
+        .cpf-input:focus { outline: none; border-color: var(--dark); }
+        
+        .btn-primary {
+            background-color: var(--dark); color: white; border: none; padding: 15px 35px;
+            font-size: 16px; font-weight: 700; border-radius: 8px; cursor: pointer;
+            width: 100%; max-width: 320px; display: flex; justify-content: center; align-items: center; gap: 10px; margin: 0 auto; transition: 0.3s;
+        }
+        .btn-primary:hover { background-color: #000; transform: scale(1.02); }
+        .btn-primary:disabled { background-color: #777; cursor: not-allowed; transform: none; }
+
+        .spinner { border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid white; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: none; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Dashboard Secção */
+        .secao-titulo { font-size: 20px; font-weight: 700; color: var(--dark); margin: 40px 0 20px; padding-bottom: 10px; border-bottom: 2px solid #eee; }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+        }
+
+        .dash-card {
+            background: white;
+            padding: 25px 20px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            text-align: center;
+            border: 1px solid #eee;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card-clicavel { cursor: pointer; }
+        .card-clicavel:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
+
+        .dash-card h3 { font-size: 15px; color: var(--muted); font-weight: 600; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .dash-card .numero { font-size: 36px; font-weight: 800; color: var(--dark); line-height: 1; }
+
+        /* Matriz de Turnos (Tabelinhas nos cards) */
+        .bus-table { width: 100%; margin-top: 15px; border-collapse: collapse; font-size: 13px; }
+        .bus-table th { background: #f8f9fa; padding: 6px; color: var(--muted); font-weight: 600; border-bottom: 2px solid #eee; }
+        .bus-table td { padding: 8px 4px; border-bottom: 1px solid #eee; font-weight: 500; }
+        .bus-table .col-turno { font-weight: 700; text-align: left; }
+
+        /* Filtros e Tabela Principal */
+        .filtros-container { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px; }
+        .input-filtro { flex: 1; min-width: 200px; padding: 12px 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; font-family: inherit; }
+        
+        .table-responsive { overflow-x: auto; border-radius: var(--border-radius); border: 1px solid #eee; background: white; }
+        .table-geral { width: 100%; border-collapse: collapse; min-width: 700px; }
+        .table-geral th { background: #f8f9fa; padding: 15px; text-align: left; font-size: 14px; color: var(--muted); font-weight: 600; }
+        .table-geral td { padding: 15px; border-top: 1px solid #eee; font-size: 14px; color: var(--dark); }
+
+        .status-badge { padding: 4px 10px; border-radius: 50px; font-size: 12px; font-weight: 700; }
+        .status-aprovado { background: #d4edda; color: #155724; }
+        .status-pendente { background: #fff3cd; color: #856404; }
+
+        /* Modal / Pop-up */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px);
+            display: none; align-items: center; justify-content: center; z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white; width: 100%; max-width: 500px;
+            border-radius: var(--border-radius); padding: 30px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            position: relative; max-height: 85vh; display: flex; flex-direction: column;
+            animation: zoomIn 0.3s ease;
+        }
+
+        @keyframes zoomIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        .modal-close { position: absolute; top: 20px; right: 20px; font-size: 24px; cursor: pointer; color: var(--muted); line-height: 1; transition: 0.3s; }
+        .modal-close:hover { color: var(--danger); }
+        
+        .modal-header { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
+        .modal-header h2 { font-size: 20px; color: var(--dark); }
+        
+        .lista-modal-alunos { list-style: none; overflow-y: auto; flex: 1; padding-right: 10px; }
+        .lista-modal-alunos li { padding: 12px; border-bottom: 1px solid #eee; display: flex; flex-direction: column; gap: 4px; }
+        .lista-modal-alunos li:last-child { border-bottom: none; }
+        .lista-modal-alunos li strong { color: var(--dark); font-size: 15px; }
+
+    </style>
 </head>
-<body class="login-ativo">
+<body>
 
-    <div id="login-wrapper">
-        <div class="login-box">
-            <img src="Captura de tela 2026-02-23 080257.png" alt="Governo Municipal de Graça">
-            <h2>Acesso Restrito</h2>
-            <p>Introduza o seu CPF para aceder ao painel.</p>
-            <input type="text" id="cpf-input" placeholder="000.000.000-00" maxlength="14">
-            <button onclick="tentarAcesso()" id="btn-entrar">
-                <div id="spinner" class="spinner"></div>
-                <span>Entrar no Painel</span>
-            </button>
-            <div id="feedback-login" style="margin-top:15px; font-size: 14px; font-weight: bold;"></div>
-            
-            <div style="margin-top: 20px;">
-                <a href="index.html" style="color: #666; font-size: 13px; text-decoration: none;">⬅ Voltar ao Início</a>
-            </div>
+    <header class="cabecalho-oficial">
+        <div class="pill-logo">
+            <img src="Logo prefeitura.png" alt="LOGO Governo Municipal de Graça">
         </div>
+    </header>
+
+    <div class="main-container">
+        
+        <section id="login-wrapper" class="glass-card" style="max-width: 450px;">
+            <div class="card-header">
+                <h2 style="font-size: 24px;">📊 Painel Geral</h2>
+                <p style="opacity: 0.9; font-size: 14px; margin-top: 5px;">Acesso restrito à coordenação</p>
+            </div>
+            <div class="card-body" style="text-align: center;">
+                <p style="color: var(--muted);">Informe seu CPF para carregar a base de dados.</p>
+                <input type="text" id="cpf-input" class="cpf-input" placeholder="000.000.000-00" maxlength="14">
+                
+                <button onclick="tentarAcesso()" id="btn-entrar" class="btn-primary">
+                    <div id="spinner" class="spinner"></div>
+                    <span>Carregar Sistema</span>
+                </button>
+                
+                <div id="feedback-login" style="margin-top:15px; font-size: 14px; font-weight: 600;"></div>
+                <div style="margin-top: 25px;">
+                    <a href="index.html" style="color: var(--muted); font-size: 14px; text-decoration: none;">← Voltar ao Início</a>
+                </div>
+            </div>
+        </section>
+
+        <main id="sistema-container" class="glass-card" style="display: none; max-width: 1200px;">
+            <div class="card-header" style="text-align: left; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                <div>
+                    <h2 style="font-size: 24px;">Visão Geral do Transporte</h2>
+                    <p style="opacity: 0.9; font-size: 14px; margin-top: 5px;">Acompanhamento e gestão de passageiros aprovados.</p>
+                </div>
+                <button onclick="window.location.reload()" class="btn-primary" style="margin: 0; width: auto; max-width: none; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.5);">🚪 Sair</button>
+            </div>
+
+            <div class="card-body">
+                
+                <div class="dashboard-grid">
+                    <div class="dash-card">
+                        <h3>Total de Cadastros</h3>
+                        <div class="numero" id="total-alunos">0</div>
+                    </div>
+                    <div class="dash-card" style="border-bottom: 4px solid var(--success);">
+                        <h3>Alunos Novatos</h3>
+                        <div class="numero" id="total-novatos" style="color:var(--success)">0</div>
+                    </div>
+                    <div class="dash-card" style="border-bottom: 4px solid var(--info);">
+                        <h3>Residem em Sobral</h3>
+                        <div class="numero" id="total-residentes" style="color:var(--info)">0</div>
+                    </div>
+                </div>
+
+                <h3 class="secao-titulo">🚍 Ocupação da Frota (Semanal)</h3>
+                <div class="dashboard-grid" id="cards-frota" style="grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));"></div>
+
+                <h3 class="secao-titulo">📍 Pontos de Embarque (Aprovados)</h3>
+                <div class="dashboard-grid">
+                    <div class="dash-card card-clicavel" style="border-top: 4px solid var(--purple);" onclick="abrirModalEmbarque('SEDE')">
+                        <h3 style="color: var(--purple);">🏢 Sede</h3>
+                        <div class="numero" id="emb-sede">0</div>
+                    </div>
+                    <div class="dash-card card-clicavel" style="border-top: 4px solid var(--orange);" onclick="abrirModalEmbarque('BARRO VERMELHO')">
+                        <h3 style="color: var(--orange);">🔴 Barro Vermelho</h3>
+                        <div class="numero" id="emb-barro">0</div>
+                    </div>
+                    <div class="dash-card card-clicavel" style="border-top: 4px solid var(--success);" onclick="abrirModalEmbarque('LAPA')">
+                        <h3 style="color: var(--success);">⛪ Lapa</h3>
+                        <div class="numero" id="emb-lapa">0</div>
+                    </div>
+                    <div class="dash-card card-clicavel" style="border-top: 4px solid var(--pink);" onclick="abrirModalEmbarque('VILA')">
+                        <h3 style="color: var(--pink);">🏘️ Vila</h3>
+                        <div class="numero" id="emb-vila">0</div>
+                    </div>
+                </div>
+
+                <h3 class="secao-titulo">🏫 Ocupação por Instituição</h3>
+                <div class="dashboard-grid" id="cards-instituicoes"></div>
+
+                <h3 class="secao-titulo">🔍 Tabela Geral de Passageiros</h3>
+                <div class="filtros-container">
+                    <input type="text" id="buscaGeral" class="input-filtro" placeholder="Buscar por nome..." onkeyup="renderizarTabela()">
+                    <select id="filtroInstituicao" class="input-filtro" onchange="renderizarTabela()">
+                        <option value="">Todas Instituições</option>
+                    </select>
+                    <select id="filtroOnibus" class="input-filtro" onchange="renderizarTabela()">
+                        <option value="">Todos os Ônibus</option>
+                        <option value="AMARELO">🟡 Amarelo</option>
+                        <option value="AZUL">🔵 Azul</option>
+                    </select>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table-geral">
+                        <thead>
+                            <tr>
+                                <th>Nome do Aluno</th>
+                                <th>Instituição</th>
+                                <th>Embarque</th>
+                                <th>Ônibus</th>
+                                <th>Turno</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lista"></tbody>
+                    </table>
+                </div>
+
+            </div>
+        </main>
     </div>
 
-    <div id="sistema-container">
-        <header class="cabecalho-oficial">
-            <div class="pill-logo"><img src="Captura de tela 2026-02-23 080257.png" alt="Logo Graça"></div>
-        </header>
-
-        <div id="dashboard-principal">
-            <div class="dashboard-grid">
-                <div class="dash-card">
-                    <h3>Total Geral</h3>
-                    <div class="numero" id="total-alunos">0</div>
-                </div>
-                <div class="dash-card">
-                    <h3>Novatos</h3>
-                    <div class="numero" id="total-novatos" style="color:var(--verde-claro)">0</div>
-                </div>
-                <div class="dash-card">
-                    <h3>Residentes Sobral</h3>
-                    <div class="numero" id="total-residentes" style="color:var(--azul-claro)">0</div>
-                </div>
-            </div>
-
-            <h3 class="secao-titulo">🚍 Ocupação da Frota (Quantitativo Semanal)</h3>
-            <div class="dashboard-grid" id="cards-frota" style="grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));"></div>
-
-            <h3 class="secao-titulo">📍 Pontos de Embarque (Aprovados)</h3>
-            <div class="dashboard-grid">
-                <div class="dash-card card-clicavel" style="border-top: 4px solid var(--roxo);" onclick="abrirModalEmbarque('SEDE')">
-                    <h3>🏢 Sede</h3>
-                    <div class="numero" id="emb-sede">0</div>
-                </div>
-                <div class="dash-card card-clicavel" style="border-top: 4px solid var(--laranja);" onclick="abrirModalEmbarque('BARRO VERMELHO')">
-                    <h3>🔴 Barro Vermelho</h3>
-                    <div class="numero" id="emb-barro">0</div>
-                </div>
-                <div class="dash-card card-clicavel" style="border-top: 4px solid var(--verde-claro);" onclick="abrirModalEmbarque('LAPA')">
-                    <h3>⛪ Lapa</h3>
-                    <div class="numero" id="emb-lapa">0</div>
-                </div>
-                <div class="dash-card card-clicavel" style="border-top: 4px solid #e83e8c;" onclick="abrirModalEmbarque('VILA')">
-                    <h3>🏘️ Vila</h3>
-                    <div class="numero" id="emb-vila">0</div>
-                </div>
-            </div>
-
-            <h3 class="secao-titulo">🏫 Ocupação por Instituição (Quantitativo Semanal)</h3>
-            <div class="dashboard-grid" id="cards-instituicoes"></div>
-
-            <h3 class="secao-titulo">🔍 Consulta de Passageiros (Sem dias individuais)</h3>
-            <div class="filtros-container">
-                <input type="text" id="buscaGeral" class="input-filtro" placeholder="Buscar por nome..." onkeyup="renderizarTabela()">
-                <select id="filtroInstituicao" class="input-filtro" onchange="renderizarTabela()">
-                    <option value="">Todas Instituições</option>
-                </select>
-                <select id="filtroOnibus" class="input-filtro" onchange="renderizarTabela()">
-                    <option value="">Todos Ônibus</option>
-                    <option value="AMARELO">🟡 Amarelo</option>
-                    <option value="AZUL">🔵 Azul</option>
-                </select>
-            </div>
-
-            <div class="table-responsive">
-                <table>
-                    <thead>
-                        <tr><th>Nome do Aluno</th><th>Instituição</th><th>Embarque</th><th>Ônibus</th><th>Turno</th><th>Status</th></tr>
-                    </thead>
-                    <tbody id="lista"></tbody>
-                </table>
-            </div>
-            
-            <div style="text-align: center; margin-top: 40px;">
-                <button onclick="window.location.reload()" style="background:#555; color:white; padding:10px 20px; border:none; border-radius:5px; cursor:pointer;">🚪 Sair do Painel</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="modal-alunos" onclick="fecharModal()">
+    <div id="modal-alunos" class="modal-overlay" onclick="fecharModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <span class="modal-close" onclick="fecharModal()">&times;</span>
             <div class="modal-header">
                 <h2 id="modal-titulo-inst">Título</h2>
-                <small id="modal-subtitulo" style="color:#666"></small>
+                <span id="modal-subtitulo" style="color:var(--muted); font-size: 14px; font-weight: 500;"></span>
             </div>
             <ul id="lista-alunos-modal" class="lista-modal-alunos"></ul>
         </div>
@@ -115,7 +295,7 @@
         const API_URL = "https://script.google.com/macros/s/AKfycbyQljrcnkEox6t6IKcBvYx2wSsSoLrA8NEMGvLjK4L5sVFmqo_hxP68iEiNdbUE5xg/exec"; 
         let dadosNuvem = [];
 
-        // Formatação automática do CPF enquanto digita
+        // Máscara de CPF
         document.getElementById('cpf-input').addEventListener('input', function(e) {
             let value = e.target.value.replace(/\D/g, '');
             if (value.length > 3) value = value.replace(/^(\d{3})(\d)/, '$1.$2');
@@ -133,21 +313,23 @@
             const feedback = document.getElementById('feedback-login');
             const btn = document.getElementById('btn-entrar');
             const spinner = document.getElementById('spinner');
+            const btnText = btn.querySelector('span');
 
             if (cpf.length !== 11) {
-                feedback.innerText = "❌ Digite um CPF válido."; feedback.style.color = "red";
+                feedback.innerText = "❌ Informe um CPF válido."; feedback.style.color = "var(--danger)";
                 return;
             }
 
-            btn.disabled = true; spinner.style.display = "block";
-            feedback.innerText = "A carregar dados do sistema..."; feedback.style.color = "var(--verde-escuro)";
+            btn.disabled = true; 
+            spinner.style.display = "block";
+            btnText.innerText = "A carregar...";
+            feedback.innerText = "";
 
             try {
                 const response = await fetch(`${API_URL}?cpf=${cpf}`);
                 const data = await response.json();
 
                 if (!data.erro) {
-                    // Normaliza as chaves do JSON para evitar erros de acentos nas colunas da folha de cálculo
                     dadosNuvem = data.map(aluno => {
                         let obj = {};
                         for(let k in aluno) {
@@ -159,19 +341,19 @@
                     
                     document.getElementById('login-wrapper').style.display = 'none';
                     document.getElementById('sistema-container').style.display = 'block';
-                    document.body.classList.remove('login-ativo');
                     
                     gerarDashboard();
                     popularFiltros();
                     renderizarTabela();
                 } else {
-                    feedback.innerText = "❌ " + data.erro; feedback.style.color = "red";
+                    feedback.innerText = "❌ " + data.erro; feedback.style.color = "var(--danger)";
                 }
             } catch (e) { 
-                console.error(e);
-                feedback.innerText = "❌ Erro de ligação com o servidor."; feedback.style.color = "red";
+                feedback.innerText = "❌ Erro ao conectar ao servidor."; feedback.style.color = "var(--danger)";
             } finally {
-                btn.disabled = false; spinner.style.display = "none";
+                btn.disabled = false; 
+                spinner.style.display = "none";
+                btnText.innerText = "Carregar Sistema";
             }
         }
 
@@ -222,14 +404,11 @@
                 if (!inst) return;
                 if (!contagemInst[inst]) {
                     contagemInst[inst] = { 
-                        manha: 0, noite: 0, outros: 0, total: 0,
+                        total: 0,
                         dias: { seg: { M: 0, N: 0 }, ter: { M: 0, N: 0 }, qua: { M: 0, N: 0 }, qui: { M: 0, N: 0 }, sex: { M: 0, N: 0 } }
                     };
                 }
                 
-                if (tManha && !tNoite) contagemInst[inst].manha++;
-                else if (tNoite && !tManha) contagemInst[inst].noite++;
-                else contagemInst[inst].outros++;
                 contagemInst[inst].total++;
 
                 if (viajaDia("SEGUNDA")) { if (tManha) contagemInst[inst].dias.seg.M++; if (tNoite) contagemInst[inst].dias.seg.N++; }
@@ -243,19 +422,20 @@
             gridFrota.innerHTML = '';
             ['AMARELO', 'AZUL'].forEach(bus => {
                 const f = contagemFrota[bus];
-                const corTop = bus === 'AMARELO' ? 'var(--amarelo)' : '#0056b3';
+                const cor = bus === 'AMARELO' ? 'var(--primary-yellow)' : 'var(--primary-blue)';
+                const textCor = bus === 'AMARELO' ? 'var(--dark)' : '#fff';
                 const icone = bus === 'AMARELO' ? '🟡' : '🔵';
                 
                 gridFrota.innerHTML += `
-                    <div class="dash-card card-clicavel" style="border-top: 5px solid ${corTop};" onclick="abrirModalOnibus('${bus}')">
-                        <h3 style="color: ${corTop}; font-size: 18px;">${icone} Ônibus ${bus}</h3>
-                        <p style="text-align: center; font-size: 12px; color: #666; margin-top: -5px;">Total de Passageiros: <strong>${f.total}</strong></p>
+                    <div class="dash-card card-clicavel" style="border-top: 5px solid ${cor};" onclick="abrirModalOnibus('${bus}')">
+                        <h3 style="color: var(--dark); font-size: 18px; margin-bottom: 5px;">${icone} Ônibus ${bus}</h3>
+                        <p style="font-size: 13px; color: var(--muted);">Passageiros únicos: <strong>${f.total}</strong></p>
                         
-                        <table class="bus-table tabela-dias" style="margin-top: 10px;">
+                        <table class="bus-table">
                             <thead><tr><th>Turno</th><th>Seg</th><th>Ter</th><th>Qua</th><th>Qui</th><th>Sex</th></tr></thead>
                             <tbody>
-                                <tr style="background-color: #f9fff9;"><td class="col-turno" style="color:#218838">Manhã</td><td>${f.dias.seg.M}</td><td>${f.dias.ter.M}</td><td>${f.dias.qua.M}</td><td>${f.dias.qui.M}</td><td>${f.dias.sex.M}</td></tr>
-                                <tr style="background-color: #f4f8ff;"><td class="col-turno" style="color:#17a2b8">Noite</td><td>${f.dias.seg.N}</td><td>${f.dias.ter.N}</td><td>${f.dias.qua.N}</td><td>${f.dias.qui.N}</td><td>${f.dias.sex.N}</td></tr>
+                                <tr style="background-color: #f9fff9;"><td class="col-turno" style="color:var(--success)">Manhã</td><td>${f.dias.seg.M}</td><td>${f.dias.ter.M}</td><td>${f.dias.qua.M}</td><td>${f.dias.qui.M}</td><td>${f.dias.sex.M}</td></tr>
+                                <tr style="background-color: #f4f8ff;"><td class="col-turno" style="color:var(--info)">Noite</td><td>${f.dias.seg.N}</td><td>${f.dias.ter.N}</td><td>${f.dias.qua.N}</td><td>${f.dias.qui.N}</td><td>${f.dias.sex.N}</td></tr>
                             </tbody>
                         </table>
                     </div>`;
@@ -267,52 +447,48 @@
                 const d = contagemInst[inst];
                 gridInst.innerHTML += `
                     <div class="dash-card card-clicavel" onclick="abrirModalAlunos('${inst}')">
-                        <h3>🎓 ${inst}</h3>
-                        <div class="numero">${d.total}</div>
+                        <h3 style="color: var(--dark); margin-bottom: 5px;">🎓 ${inst}</h3>
+                        <div class="numero" style="font-size: 28px; margin-bottom: 10px;">${d.total}</div>
                         
-                        <table class="bus-table tabela-dias">
+                        <table class="bus-table">
                             <thead><tr><th></th><th>Seg</th><th>Ter</th><th>Qua</th><th>Qui</th><th>Sex</th></tr></thead>
                             <tbody>
-                                <tr><td class="col-turno" style="color:#218838">Manhã</td><td>${d.dias.seg.M}</td><td>${d.dias.ter.M}</td><td>${d.dias.qua.M}</td><td>${d.dias.qui.M}</td><td>${d.dias.sex.M}</td></tr>
-                                <tr><td class="col-turno" style="color:#17a2b8">Noite</td><td>${d.dias.seg.N}</td><td>${d.dias.ter.N}</td><td>${d.dias.qua.N}</td><td>${d.dias.qui.N}</td><td>${d.dias.sex.N}</td></tr>
+                                <tr><td class="col-turno" style="color:var(--success)">M</td><td>${d.dias.seg.M}</td><td>${d.dias.ter.M}</td><td>${d.dias.qua.M}</td><td>${d.dias.qui.M}</td><td>${d.dias.sex.M}</td></tr>
+                                <tr><td class="col-turno" style="color:var(--info)">N</td><td>${d.dias.seg.N}</td><td>${d.dias.ter.N}</td><td>${d.dias.qua.N}</td><td>${d.dias.qui.N}</td><td>${d.dias.sex.N}</td></tr>
                             </tbody>
                         </table>
                     </div>`;
             });
         }
 
-        // AS FUNÇÕES DE MODAL AGORA SÓ EXIBEM O NOME, INSTITUIÇÃO/EMBARQUE E TURNO. (SEM DIAS)
         function abrirModalOnibus(busName) {
-            const modal = document.getElementById('modal-alunos');
             const lista = document.getElementById('lista-alunos-modal');
             const alunos = dadosNuvem.filter(a => getOnibus(a) === busName && a.status === 'Aprovado').sort((a, b) => a.nome.localeCompare(b.nome));
 
-            document.getElementById('modal-titulo-inst').innerText = `${busName === 'AMARELO' ? '🟡' : '🔵'} Passageiros: Ônibus ${busName}`;
+            document.getElementById('modal-titulo-inst').innerText = `${busName === 'AMARELO' ? '🟡' : '🔵'} Frota ${busName}`;
             document.getElementById('modal-subtitulo').innerText = `${alunos.length} alunos vinculados`;
-            lista.innerHTML = alunos.map(a => `<li><strong>${a.nome.toUpperCase()}</strong> <span style="color:#666; font-size:12px">🏫 Inst: ${a.instituicao} | 🕒 Turno: ${a.turno}</span></li>`).join('');
-            modal.style.display = 'flex';
+            lista.innerHTML = alunos.map(a => `<li><strong>${a.nome.toUpperCase()}</strong> <span style="color:var(--muted); font-size:13px">🏫 ${a.instituicao} | 🕒 ${a.turno}</span></li>`).join('');
+            document.getElementById('modal-alunos').style.display = 'flex';
         }
 
         function abrirModalAlunos(inst) {
-            const modal = document.getElementById('modal-alunos');
             const lista = document.getElementById('lista-alunos-modal');
             const alunos = dadosNuvem.filter(a => a.instituicao.trim() === inst && a.status === 'Aprovado').sort((a, b) => a.nome.localeCompare(b.nome));
 
             document.getElementById('modal-titulo-inst').innerText = inst;
-            document.getElementById('modal-subtitulo').innerText = `${alunos.length} alunos aprovados`;
-            lista.innerHTML = alunos.map(a => `<li><strong>${a.nome.toUpperCase()}</strong> <span style="color:#666; font-size:12px">📍 Embarque: ${a.embarque} | 🕒 Turno: ${a.turno}</span></li>`).join('');
-            modal.style.display = 'flex';
+            document.getElementById('modal-subtitulo').innerText = `${alunos.length} alunos matriculados`;
+            lista.innerHTML = alunos.map(a => `<li><strong>${a.nome.toUpperCase()}</strong> <span style="color:var(--muted); font-size:13px">📍 Embarque: ${a.embarque} | 🕒 ${a.turno}</span></li>`).join('');
+            document.getElementById('modal-alunos').style.display = 'flex';
         }
 
         function abrirModalEmbarque(ponto) {
-            const modal = document.getElementById('modal-alunos');
             const lista = document.getElementById('lista-alunos-modal');
             const alunos = dadosNuvem.filter(a => a.embarque.toUpperCase().trim() === ponto && a.status === 'Aprovado').sort((a, b) => a.nome.localeCompare(b.nome));
 
-            document.getElementById('modal-titulo-inst').innerText = `Embarque: ${ponto}`;
-            document.getElementById('modal-subtitulo').innerText = `${alunos.length} alunos aprovados`;
-            lista.innerHTML = alunos.map(a => `<li><strong>${a.nome.toUpperCase()}</strong> <span style="color:#666; font-size:12px">🏫 Inst: ${a.instituicao} | 🕒 Turno: ${a.turno}</span></li>`).join('');
-            modal.style.display = 'flex';
+            document.getElementById('modal-titulo-inst').innerText = `Ponto: ${ponto}`;
+            document.getElementById('modal-subtitulo').innerText = `${alunos.length} passageiros`;
+            lista.innerHTML = alunos.map(a => `<li><strong>${a.nome.toUpperCase()}</strong> <span style="color:var(--muted); font-size:13px">🏫 ${a.instituicao} | 🕒 ${a.turno}</span></li>`).join('');
+            document.getElementById('modal-alunos').style.display = 'flex';
         }
 
         function fecharModal() { document.getElementById('modal-alunos').style.display = 'none'; }
@@ -339,17 +515,16 @@
                 return bN && bI && bO;
             }).forEach(aluno => {
                 let onibusStr = getOnibus(aluno) === 'AMARELO' ? '🟡 Amarelo' : '🔵 Azul';
-                
-                // NA TABELA PRINCIPAL, OS DIAS TAMBÉM FORAM REMOVIDOS
+                let classeStatus = aluno.status === 'Pendente' ? 'status-pendente' : 'status-aprovado';
+                let textoStatus = aluno.status === 'Pendente' ? 'Em Análise' : aluno.status;
+
                 tbody.innerHTML += `<tr>
                     <td><strong>${aluno.nome}</strong></td>
                     <td>${aluno.instituicao}</td>
                     <td>${aluno.embarque}</td>
                     <td>${onibusStr}</td>
                     <td>${aluno.turno}</td>
-                    <td style="color:${aluno.status === 'Pendente' ? 'orange' : 'green'}">
-                        <strong>${aluno.status === 'Pendente' ? 'Em Análise' : aluno.status}</strong>
-                    </td>
+                    <td><span class="status-badge ${classeStatus}">${textoStatus}</span></td>
                 </tr>`;
             });
         }
