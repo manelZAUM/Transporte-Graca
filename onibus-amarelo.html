@@ -4,55 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rota Amarela - Graça/CE</title>
-<<<<<<< Updated upstream
-=======
     <link rel="stylesheet" href="style.css">
->>>>>>> Stashed changes
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <style>
-        :root { --verde-escuro: #145523; --laranja: #fd7e14; --amarelo: #e6b800; --azul: #0056b3; }
-        
-        /* Modificação no Body para receber a imagem de fundo */
         body { 
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
-            margin: 0; 
-            color: #333; 
-            background-color: #f4f7f6;
-            background-image: url('Arco_de_Nossa_Senhora_de_Fátima,_Sobral,_CE.jpg');
+            background-image: url('img/Arco_de_Nossa_Senhora_de_Fátima,_Sobral,_CE.jpg');
             background-size: cover;
             background-position: center center;
             background-attachment: fixed;
-            background-repeat: no-repeat;
             transition: background-image 0.5s ease-in-out;
         }
-        
-        .cabecalho-oficial { background-color: var(--verde-escuro); border-bottom: 5px solid var(--laranja); padding: 20px 0; display: flex; justify-content: center; align-items: center; width: 100%; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .pill-logo { background-color: #ffffff; padding: 12px 60px; border-radius: 50px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); display: flex; justify-content: center; align-items: center; }
-        .pill-logo img { max-width: 160px; display: block; margin: 0; }
-
         .login-container { display: flex; justify-content: center; padding: 50px 20px; }
-        .card-login { background: white; max-width: 450px; width: 100%; border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); overflow: hidden; text-align: center; border-top: 5px solid var(--amarelo); }
-        .card-login-header { background-color: var(--amarelo); color: white; padding: 20px; text-shadow: 1px 1px 2px rgba(0,0,0,0.2); }
+        .card-login { background: white; max-width: 450px; width: 100%; border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); overflow: hidden; text-align: center; border-top: 5px solid var(--amarelo-rota); }
+        .card-login-header { background-color: var(--amarelo-rota); color: white; padding: 20px; }
         .card-login-body { padding: 30px; }
         input.cpf-input { width: 80%; padding: 12px; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px; text-align: center; }
-        button.btn-login { background-color: var(--amarelo); color: white; border: none; padding: 12px 25px; font-size: 16px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 85%; transition: 0.3s; text-shadow: 1px 1px 2px rgba(0,0,0,0.2); }
-        button.btn-login:hover { background-color: #cca300; }
+        button.btn-login { background-color: var(--amarelo-rota); color: white; border: none; padding: 12px 25px; font-size: 16px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 85%; transition: 0.3s; }
+        button.btn-login:hover { opacity: 0.8; }
         button.btn-login:disabled { background-color: #ccc; cursor: not-allowed; }
         .msg-erro { margin-top: 15px; padding: 15px; border-radius: 5px; display: none; font-size: 15px; }
         .msg-erro.show { display: block; }
-        
         .tabs-container { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
-        .btn-tab { padding: 10px 20px; border: 2px solid #ccc; background-color: rgba(255,255,255,0.8); color: #555; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; }
-        .btn-tab:hover { background-color: #f0f0f0; }
-<<<<<<< Updated upstream
-        .btn-tab.ativo-amarelo { background-color: var(--amarelo); color: white; border-color: var(--amarelo); text-shadow: 1px 1px 2px rgba(0,0,0,0.2); }
-=======
-        .btn-tab.ativo-amarelo { background-color: #e6b800; color: white; border-color: #e6b800; text-shadow: 1px 1px 2px rgba(0,0,0,0.2); }
-        /* Garantindo que o mapa não fique por cima de menus */
->>>>>>> Stashed changes
+        .btn-tab { padding: 10px 20px; border: 2px solid #ccc; background-color: rgba(255,255,255,0.8); border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s; }
+        .btn-tab.ativo { background-color: var(--amarelo-rota); color: white; border-color: var(--amarelo-rota); }
         #mapa-rota { z-index: 1; }
     </style>
 </head>
@@ -60,7 +37,7 @@
 
     <header class="cabecalho-oficial">
         <div class="pill-logo">
-            <img src="Captura de tela 2026-02-23 080257.png" alt="Governo Municipal de Graça" onerror="this.outerHTML='<h3 style=\'color:#145523; margin:0;\'>Transporte Graça</h3>'">
+            <img src="img/captura-de-tela-2026-02-23-080257-1.png" alt="Governo Municipal de Graça">
         </div>
     </header>
 
@@ -73,77 +50,61 @@
             <div class="card-login-body">
                 <p style="color: #666; margin-bottom: 20px;">Digite seu CPF para acessar o painel deste ônibus.</p>
                 <input type="text" id="cpfInput" class="cpf-input" placeholder="000.000.000-00" maxlength="14">
-                <button id="btnEntrar" class="btn-login" onclick="verificarAcesso()" disabled>⏳ Carregando sistema...</button>
+                <button id="btnEntrar" class="btn-login" onclick="verificarAcesso()">Acessar Ônibus</button>
                 <div id="msgBox" class="msg-erro"></div>
                 <div style="margin-top: 20px;">
-                    <a href="consulta.html" style="color: #555; font-size: 14px; text-decoration: none;">⬅ Voltar ao Início</a>
+                    <a href="index.html" style="color: #555; font-size: 14px; text-decoration: none;">⬅ Voltar ao Início</a>
                 </div>
             </div>
         </div>
     </div>
 
     <main id="main-section" style="display: none; justify-content: center; padding: 30px 20px;">
-        <div style="border-top: 5px solid var(--amarelo); max-width: 900px; width: 100%; background: white; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow: hidden;">
-            <div style="background-color: var(--amarelo); color: white; padding: 20px; text-align: center;">
-                <h2 style="margin:0; text-shadow: 1px 1px 2px rgba(0,0,0,0.2);">🚌 Rota: Ônibus Amarelo</h2>
-                <p style="margin-top:10px; opacity:0.9;">Bem-vindo(a), <strong id="nomeAlunoLogado"></strong>!</p>
+        <div style="border-top: 5px solid var(--amarelo-rota); max-width: 900px; width: 100%; background: white; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow: hidden;">
+            <div style="background-color: var(--amarelo-rota); color: white; padding: 20px; text-align: center;">
+                <h2 style="margin:0;">🚌 Rota: Ônibus Amarelo</h2>
+                <p style="margin-top:10px;">Bem-vindo(a), <strong id="nomeAlunoLogado"></strong>!</p>
             </div>
             
             <div style="padding: 30px; text-align: center;">
-<<<<<<< Updated upstream
-                <div style="margin-bottom: 30px; text-align: left; background: #fffcf2; padding: 20px; border-radius: 8px; border: 1px solid var(--amarelo);">
-                    <h4 style="color: #b38f00; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">🗺️ Trajeto e Paradas Oficiais</h4>
+                <div style="margin-bottom: 30px; text-align: left; background: #fffdf5; padding: 20px; border-radius: 8px; border: 1px solid var(--amarelo-rota);">
+                    <h4 style="color: #b38f00; margin-bottom: 15px;">🗺️ Trajeto e Paradas Oficiais</h4>
                     <div id="mapa-rota" style="width: 100%; height: 350px; border-radius: 8px; border: 1px solid #ccc;"></div>
-=======
-
-                <div style="margin-bottom: 30px; text-align: left; background: #fffdf5; padding: 20px; border-radius: 8px; border: 1px solid #e6b800;">
-                    <h4 style="color: #b38f00; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
-                        🗺️ Trajeto e Paradas Oficiais
-                    </h4>
-                    
-                    <div id="mapa-rota" style="width: 100%; height: 350px; border-radius: 8px; border: 1px solid #ccc;"></div>
-
->>>>>>> Stashed changes
                     <div style="display: flex; gap: 20px; margin-top: 15px; flex-wrap: wrap;">
                         <div style="flex: 1; min-width: 200px;">
-                            <strong style="color: #333;">📍 Embarques em Graça:</strong>
-                            <p style="font-size: 14px; color: #666; margin-top: 5px;">✔ Sede<br>✔ Barro Vermelho<br>✔ Lapa<br>✔ Vila</p>
+                            <strong>📍 Embarques em Graça:</strong>
+                            <p style="font-size: 14px; color: #666;">✔ Sede<br>✔ Barro Vermelho<br>✔ Lapa<br>✔ Vila</p>
                         </div>
                         <div style="flex: 1; min-width: 200px;">
-                            <strong style="color: #333;">🏫 Desembarques em Sobral:</strong>
-                            <p style="font-size: 14px; color: #666; margin-top: 5px; font-weight: bold;">✔ UNINTA<br>✔ Faculdade Luciano Feijão<br>✔ Anhanguera (Shopping)
+                            <strong>🏫 Desembarques em Sobral:</strong>
+                            <p style="font-size: 14px; color: #666;">✔ UNINTA<br>✔ Faculdade Luciano Feijão<br>✔ Anhanguera / Grau Técnico</p>
                         </div>
                     </div>
                 </div>
 
-                <h4 style="color: #b38f00; margin-bottom: 10px;">1. Selecione o Turno</h4>
+                <h4 style="color: #b38f00;">1. Selecione o Turno</h4>
                 <div class="tabs-container" id="filtro-turno">
-                    <button class="btn-tab ativo-amarelo" onclick="selecionarTab('turno', this)">MANHÃ</button>
+                    <button class="btn-tab ativo" onclick="selecionarTab('turno', this)">MANHÃ</button>
                     <button class="btn-tab" onclick="selecionarTab('turno', this)">NOITE</button>
                 </div>
 
-                <h4 style="color: #b38f00; margin-bottom: 10px; margin-top: 20px;">2. Selecione o Dia</h4>
+                <h4 style="color: #b38f00; margin-top: 20px;">2. Selecione o Dia</h4>
                 <div class="tabs-container" id="filtro-dia">
-                    <button class="btn-tab ativo-amarelo" onclick="selecionarTab('dia', this)">SEGUNDA</button>
+                    <button class="btn-tab ativo" onclick="selecionarTab('dia', this)">SEGUNDA</button>
                     <button class="btn-tab" onclick="selecionarTab('dia', this)">TERÇA</button>
                     <button class="btn-tab" onclick="selecionarTab('dia', this)">QUARTA</button>
                     <button class="btn-tab" onclick="selecionarTab('dia', this)">QUINTA</button>
                     <button class="btn-tab" onclick="selecionarTab('dia', this)">SEXTA</button>
                 </div>
 
-                <div id="conteudo-rota" style="background: #f8f9fa; border-radius: 8px; border: 1px dashed #ccc; margin-top: 20px; min-height: 150px; display: flex; align-items: center; justify-content: center;"></div>
-                <a href="consulta.html" style="background-color: #555; color: white; display: inline-block; padding: 12px 25px; border-radius: 5px; text-decoration: none; margin-top: 30px;">⬅ Sair / Voltar ao Início</a>
+                <div id="conteudo-rota" style="background: #f8f9fa; border-radius: 8px; margin-top: 20px; min-height: 150px; display: flex; align-items: center; justify-content: center;"></div>
+                <a href="index.html" class="btn" style="background-color: #555; display: inline-block; width: auto; padding: 12px 25px; margin-top: 30px;">⬅ Sair / Voltar ao Início</a>
             </div>
         </div>
     </main>
 
-<<<<<<< Updated upstream
-  <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbyAnZE7XRAGVogS81Z52nNi4Y3PvEUwiY0cGATxWP2n0LYEQ52K4iRAMxCHIqdCTNs/exec"; 
-=======
-<script>
+    <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbyQljrcnkEox6t6IKcBvYx2wSsSoLrA8NEMGvLjK4L5sVFmqo_hxP68iEiNdbUE5xg/exec"; 
->>>>>>> Stashed changes
         let dadosNuvem = [];
         let mapaCarregado = false;
 
@@ -155,21 +116,11 @@
             e.target.value = value;
         });
 
-        window.onload = () => {
-<<<<<<< Updated upstream
-            let btn = document.getElementById('btnEntrar');
-            btn.innerText = 'Acessar Ônibus';
-            btn.disabled = false;
-        };
-
         function limparCPF(cpf) { return (cpf || "").toString().replace(/\D/g, ''); }
 
         function mostrarMensagem(texto, bg, cor) {
             const box = document.getElementById('msgBox');
-            box.innerHTML = texto;
-            box.style.backgroundColor = bg;
-            box.style.border = `1px solid ${cor}`;
-            box.style.color = cor;
+            box.innerHTML = texto; box.style.backgroundColor = bg; box.style.color = cor;
             box.classList.add('show');
         }
 
@@ -178,12 +129,10 @@
             const btn = document.getElementById('btnEntrar');
             
             if (cpfDigitado.length !== 11) {
-                mostrarMensagem('❌ Por favor, digite um CPF válido com 11 números.', '#ffe6e6', '#cc0000'); 
-                return;
+                mostrarMensagem('❌ Digite um CPF válido.', '#ffe6e6', '#cc0000'); return;
             }
 
-            btn.innerText = '⏳ Consultando sistema...';
-            btn.disabled = true;
+            btn.innerText = '⏳ Consultando...'; btn.disabled = true;
 
             try {
                 const response = await fetch(`${API_URL}?cpf=${cpfDigitado}`);
@@ -191,26 +140,20 @@
 
                 if (data.erro) {
                     mostrarMensagem(`❌ ${data.erro}`, '#ffe6e6', '#cc0000');
-                    btn.innerText = 'Acessar Ônibus';
-                    btn.disabled = false;
-                    return;
+                    btn.innerText = 'Acessar Ônibus'; btn.disabled = false; return;
                 }
 
                 dadosNuvem = data; 
                 const aluno = dadosNuvem.find(a => limparCPF(a.cpf) === cpfDigitado);
 
                 if (!aluno) {
-                    mostrarMensagem('❌ CPF não encontrado no sistema.', '#ffe6e6', '#cc0000'); 
-                    btn.innerText = 'Acessar Ônibus';
-                    btn.disabled = false;
-                    return;
+                    mostrarMensagem('❌ CPF não encontrado.', '#ffe6e6', '#cc0000'); 
+                    btn.innerText = 'Acessar Ônibus'; btn.disabled = false; return;
                 }
                 
                 if (aluno.status !== "Aprovado") {
                     mostrarMensagem(`⚠️ Seu cadastro consta como: <strong>${aluno.status || "Pendente"}</strong>.`, '#fff3cd', '#856404'); 
-                    btn.innerText = 'Acessar Ônibus';
-                    btn.disabled = false;
-                    return;
+                    btn.innerText = 'Acessar Ônibus'; btn.disabled = false; return;
                 }
 
                 let onibusDefinido = (aluno.onibus || aluno['ônibus'] || "").toUpperCase().trim();
@@ -220,132 +163,59 @@
                     corOnibusAluno = onibusDefinido;
                 } else {
                     const instAluno = (aluno.instituicao || "").toUpperCase().trim();
-                    // LISTA ATUALIZADA COM "UVA" AQUI TAMBÉM:
                     const eDoAzul = ["UFC", "CIDAO", "IFCE", "JUNCO", "BETÂNIA", "BETANIA", "UVA"].some(inst => instAluno.includes(inst));
                     corOnibusAluno = eDoAzul ? "AZUL" : "AMARELO";
                 }
 
                 if (corOnibusAluno !== "AMARELO") {
-                    mostrarMensagem(`Acesso negado. O seu ônibus é o <strong>AZUL</strong>.<br><br><a href="onibus-azul.html" style="color:var(--azul); font-weight:bold;">Ir para o Ônibus Azul ➡</a>`, '#e6f0fa', 'var(--azul)');
-                    btn.innerText = 'Acessar Ônibus';
-                    btn.disabled = false;
-                    return;
+                    mostrarMensagem(`Acesso negado. O seu ônibus é o <strong>AZUL</strong>.<br><br><a href="onibus-azul.html">Ir para o Ônibus Azul ➡</a>`, '#e6f0fa', 'var(--azul-rota)');
+                    btn.innerText = 'Acessar Ônibus'; btn.disabled = false; return;
                 }
 
                 document.getElementById('nomeAlunoLogado').innerText = aluno.nome;
                 document.getElementById('login-section').style.display = 'none';
                 document.getElementById('main-section').style.display = 'flex';
                 
-                if (!mapaCarregado) {
-                    carregarMapa();
-                    mapaCarregado = true;
-                }
+                if (!mapaCarregado) { carregarMapa(); mapaCarregado = true; }
                 atualizarPainel();
 
             } catch (erro) {
-                mostrarMensagem('❌ Erro de conexão. Verifique a internet ou a permissão da API.', '#ffe6e6', '#cc0000');
-                btn.innerText = 'Acessar Ônibus';
-                btn.disabled = false;
+                mostrarMensagem('❌ Erro de conexão.', '#ffe6e6', '#cc0000');
+                btn.innerText = 'Acessar Ônibus'; btn.disabled = false;
             }
         }
 
-        document.getElementById('cpfInput').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                verificarAcesso();
-            }
-        });
-
         function carregarMapa() {
             const map = L.map('mapa-rota');
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors' }).addTo(map);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
             const iconeEmbarque = L.icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/3448/3448339.png', iconSize: [38, 38], iconAnchor: [19, 38], popupAnchor: [0, -38] });
-            const iconeDesembarque = L.icon({ iconUrl: 'universidade.png', iconSize: [40, 40], iconAnchor: [20, 40], popupAnchor: [0, -40] });
+            const iconeDesembarque = L.icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/2231/2231662.png', iconSize: [40, 40], iconAnchor: [20, 40], popupAnchor: [0, -40] });
 
             const pontosEmbarque = [ { nome: "Sede", lat: -4.045501, lng: -40.752197 }, { nome: "Barro Vermelho", lat: -4.006092, lng: -40.744437 }, { nome: "Lapa", lat: -4.083549, lng: -40.822543 }, { nome: "Vila", lat: -4.046977, lng: -40.801735 } ];
             const pontosDesembarque = [ { nome: "UNINTA", lat: -3.694253, lng: -40.344319 }, { nome: "Faculdade Luciano Feijão", lat:-3.700538, lng: -40.348424 }, { nome: "Anhanguera", lat: -3.696958, lng: -40.347907 } ];
             
             const bounds = [];
-            pontosEmbarque.forEach(ponto => { L.marker([ponto.lat, ponto.lng], { icon: iconeEmbarque }).addTo(map).bindPopup(`<strong>📍 ${ponto.nome}</strong>`); bounds.push([ponto.lat, ponto.lng]); });
-            pontosDesembarque.forEach(ponto => { L.marker([ponto.lat, ponto.lng], { icon: iconeDesembarque }).addTo(map).bindPopup(`<strong style="color: #b38f00;">🏫 ${ponto.nome}</strong>`); bounds.push([ponto.lat, ponto.lng]); });
-=======
-            carregarMapa(); // Inicializa o mapa
-            document.getElementById('conteudo-rota').innerHTML = '<p style="color: #666; font-size: 16px;">⏳ Buscando alunos na nuvem...</p>';
-            fetch(API_URL).then(res => res.json()).then(data => { dadosNuvem = data; atualizarPainel(); })
-            .catch(err => { document.getElementById('conteudo-rota').innerHTML = '<p style="color: red;">❌ Erro ao carregar os dados.</p>'; });
-        };
-
-        // Função do Mapa
-        function carregarMapa() {
-            const map = L.map('mapa-rota');
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; OpenStreetMap contributors'
-            }).addTo(map);
-
-            const iconeEmbarque = L.icon({
-                iconUrl: 'https://cdn-icons-png.flaticon.com/512/3448/3448339.png', 
-                iconSize: [38, 38], iconAnchor: [19, 38], popupAnchor: [0, -38] 
-            });
-
-            const iconeDesembarque = L.icon({
-                iconUrl: 'universidade.png', // Ícone de Faculdade/Escola
-                iconSize: [40, 40], iconAnchor: [20, 40], popupAnchor: [0, -40] 
-            });
-
-            const pontosEmbarque = [
-                { nome: "Sede", lat: -4.045501, lng: -40.752197, desc: "Embarque" },
-                { nome: "Barro Vermelho", lat: -4.006092, lng: -40.744437, desc: "Embarque" },
-                { nome: "Lapa", lat: -4.083549, lng: -40.822543, desc: "Embarque" },
-                { nome: "Vila", lat: -4.046977, lng: -40.801735, desc: "Embarque" }
-            ];
-
-            const pontosDesembarque = [
-                { nome: "UNINTA", lat: -3.694253678529826, lng: -40.34431984727328, desc: "Desembarque" },
-                { nome: "Faculdade Luciano Feijão", lat:-3.700538425982656, lng: -40.34842476511466, desc: "Desembarque" },
-                { nome: "UVA (Campus CCS)", lat: -3.681507402554007, lng: -40.33756073378051, desc: "Desembarque" },
-                { nome: "Anhanguera / Grau Técnico", lat: -3.6969589825036895, lng: -40.347907004219, desc: "Desembarque (shopping sobral)" }
-            ];
-
-            const bounds = [];
-
-            pontosEmbarque.forEach(ponto => {
-                L.marker([ponto.lat, ponto.lng], { icon: iconeEmbarque }).addTo(map)
-                 .bindPopup(`<div style="text-align: center;"><strong>📍 ${ponto.nome}</strong><br><span style="color: #666;">${ponto.desc}</span></div>`);
-                bounds.push([ponto.lat, ponto.lng]);
-            });
-
-            pontosDesembarque.forEach(ponto => {
-                L.marker([ponto.lat, ponto.lng], { icon: iconeDesembarque }).addTo(map)
-                 .bindPopup(`<div style="text-align: center;"><strong style="color: #b38f00;">🏫 ${ponto.nome}</strong><br><span style="color: #666;">${ponto.desc}</span></div>`);
-                bounds.push([ponto.lat, ponto.lng]);
-            });
-
-            // Ajusta o zoom automaticamente para mostrar Graça e Sobral na mesma tela!
->>>>>>> Stashed changes
+            pontosEmbarque.forEach(p => { L.marker([p.lat, p.lng], { icon: iconeEmbarque }).addTo(map).bindPopup(`<strong>📍 ${p.nome}</strong>`); bounds.push([p.lat, p.lng]); });
+            pontosDesembarque.forEach(p => { L.marker([p.lat, p.lng], { icon: iconeDesembarque }).addTo(map).bindPopup(`<strong>🏫 ${p.nome}</strong>`); bounds.push([p.lat, p.lng]); });
             map.fitBounds(bounds, { padding: [30, 30] });
         }
 
         function selecionarTab(grupo, elementoClicado) {
-            elementoClicado.parentElement.querySelectorAll('.btn-tab').forEach(btn => btn.classList.remove('ativo-amarelo'));
-            elementoClicado.classList.add('ativo-amarelo');
+            elementoClicado.parentElement.querySelectorAll('.btn-tab').forEach(btn => btn.classList.remove('ativo'));
+            elementoClicado.classList.add('ativo');
             atualizarPainel();
         }
 
         function atualizarPainel() {
-            const turnoAtivo = document.querySelector('#filtro-turno .ativo-amarelo').innerText.toUpperCase();
-            const diaAtivo = document.querySelector('#filtro-dia .ativo-amarelo').innerText.toUpperCase();
+            const turnoAtivo = document.querySelector('#filtro-turno .ativo').innerText.toUpperCase();
+            const diaAtivo = document.querySelector('#filtro-dia .ativo').innerText.toUpperCase();
             
-            if (turnoAtivo === 'MANHÃ') {
-                document.body.style.backgroundImage = "url('Arco_de_Nossa_Senhora_de_Fátima,_Sobral,_CE.jpg')";
-            } else {
-                document.body.style.backgroundImage = "url('cidade-sobral-ceara (noite).jpg')";
-            }
+            document.body.style.backgroundImage = turnoAtivo === 'MANHÃ' ? "url('img/Arco_de_Nossa_Senhora_de_Fátima,_Sobral,_CE.jpg')" : "url('img/cidade-sobral-ceara (noite).jpg')";
 
             const painel = document.getElementById('conteudo-rota');
             
             const alunosFiltrados = dadosNuvem.filter(aluno => {
                 if (aluno.status !== 'Aprovado') return false;
-
                 const diaTurnoCombo = diaAtivo + "-" + turnoAtivo; 
                 let viajaNesseTurno = false;
                 if (aluno.dias && aluno.dias.includes(diaTurnoCombo)) viajaNesseTurno = true;
@@ -356,30 +226,25 @@
                 if (onibusDefinido) return onibusDefinido === "AMARELO";
                 
                 const instAluno = (aluno.instituicao || "").toUpperCase().trim();
-                // LISTA ATUALIZADA COM "UVA" AQUI TAMBÉM:
                 const eDoAzul = ["UFC", "CIDAO", "IFCE", "JUNCO", "BETÂNIA", "BETANIA", "UVA"].some(inst => instAluno.includes(inst));
                 return !eDoAzul;
-            });
-
-            alunosFiltrados.sort((a, b) => a.nome.localeCompare(b.nome));
+            }).sort((a, b) => a.nome.localeCompare(b.nome));
 
             let html = `<div style="width: 100%; overflow-x: auto;">
                 <table style="width: 100%; border-collapse: collapse; background: white; text-align: left;">
-                    <thead><tr style="background-color: var(--amarelo); color: white;">
-                        <th style="padding: 12px; border-radius: 8px 0 0 0;">Nome do Aluno</th><th style="padding: 12px;">Instituição</th><th style="padding: 12px; border-radius: 0 8px 0 0;">Embarque</th>
+                    <thead><tr style="background-color: var(--amarelo-rota); color: white;">
+                        <th style="padding: 12px;">Nome do Aluno</th><th style="padding: 12px;">Instituição</th><th style="padding: 12px;">Embarque</th>
                     </tr></thead><tbody>`;
 
             if (alunosFiltrados.length === 0) {
                 html += `<tr><td colspan="3" style="text-align: center; padding: 30px; color: #666;">Nenhum aluno nesta rota para <strong>${diaAtivo} (${turnoAtivo})</strong>.</td></tr>`;
             } else {
                 alunosFiltrados.forEach(aluno => {
-                    let seloPrioridade = aluno.comorbidade === "Sim" ? ` <span style="background:#cc0000; color:white; padding:2px 6px; border-radius:10px; font-size:10px; font-weight:bold;">♿</span>` : "";
+                    let seloPrioridade = aluno.comorbidade === "Sim" ? ` <span style="background:#cc0000; color:white; padding:2px 6px; border-radius:10px; font-size:10px;">♿</span>` : "";
                     html += `<tr style="border-bottom: 1px solid #eee;"><td style="padding: 12px;"><strong>${aluno.nome}</strong>${seloPrioridade}</td><td style="padding: 12px;">${aluno.instituicao}</td><td style="padding: 12px;">${aluno.embarque}</td></tr>`;
                 });
             }
-            html += `</tbody></table></div>`;
-            painel.innerHTML = html;
-            painel.style.padding = "0"; painel.style.border = "none";
+            painel.innerHTML = html + `</tbody></table></div>`;
         }
     </script>
 </body>

@@ -1,0 +1,149 @@
+
+        /* Variáveis de cores baseadas no padrão institucional (Azul, Amarelo e Verde) */
+        :root {
+            --cor-primaria: #004d99; 
+            --cor-secundaria: #f39c12; 
+            --cor-terciaria: #27ae60; 
+            --cor-fundo-footer: #1a252f;
+            --cor-texto: #333333;
+        }
+
+        /* Reset básico de CSS */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: #f4f6f9;
+        }
+
+        /* Estilo do Cabeçalho Oficial */
+        .cabecalho-oficial {
+            background-color: #ffffff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .pill-logo img {
+            max-height: 60px;
+            object-fit: contain;
+        }
+
+        /* Área principal: Aqui aplicamos o Fundo.jpg com overlay para manter legibilidade */
+        .area-portal {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            background: linear-gradient(rgba(0, 40, 85, 0.8), rgba(0, 40, 85, 0.8)), url("Fundo.jpg");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        /* Card Centralizado (Branco para destacar do fundo) */
+        .card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 40px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            animation: fadeIn 0.8s ease-in-out;
+        }
+
+        .card h2 {
+            color: var(--cor-primaria);
+            font-size: 26px;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .card p {
+            color: #555555;
+            font-size: 15px;
+            margin-bottom: 30px;
+        }
+
+        /* Estilização dos Botões */
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            padding: 14px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #ffffff;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .bg-azul {
+            background-color: var(--cor-primaria);
+        }
+        .bg-azul:hover {
+            background-color: #003366;
+        }
+
+        .bg-amarelo {
+            background-color: var(--cor-secundaria);
+        }
+        .bg-amarelo:hover {
+            background-color: #d68910;
+        }
+
+        .bg-verde {
+            background-color: var(--cor-terciaria);
+        }
+        .bg-verde:hover {
+            background-color: #1e8449;
+        }
+
+        /* Rodapé Institucional */
+        footer {
+            background-color: var(--cor-fundo-footer);
+            color: #bdc7bd;
+            text-align: center;
+            padding: 20px;
+            font-size: 13px;
+        }
+
+        /* Efeito de entrada suave */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+        }

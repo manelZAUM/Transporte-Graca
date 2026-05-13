@@ -2,87 +2,34 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Portal do Universitário - Graça/CE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal do Universitário - Prefeitura de Graça/CE</title>
     <link rel="stylesheet" href="style.css">
-    
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body>
-    <header>
-        <img src="Captura de tela 2026-02-23 080257.png" alt="Governo Municipal de Graça" class="logo-prefeitura">
+
+    <header class="cabecalho-oficial">
+        <div class="pill-logo">
+            <img src="Logo prefeitura.png" alt="Logo Prefeitura de Graça">
+        </div>
     </header>
 
-    <main class="main-content bg-universitarios">
+    <main class="area-portal">
         <div class="card">
-            <div class="card-header">
-                <h2 style="margin:0;">Portal do Universitário</h2>
-                <p style="margin-top:10px; opacity:0.9;">Acompanhamento de Transporte Acadêmico</p>
-            </div>
+            <h2>Portal do Universitário</h2>
+            <p>Selecione sua rota ou consulte a lista geral</p>
+            
             <div class="btn-group">
-                <a href="onibus-azul.html" class="btn" style="background-color: #0056b3; color: white;">🚌 Rota - Ônibus Azul</a>
-                <a href="onibus-amarelo.html" class="btn" style="background-color: #e6b800; color: white;">🚌 Rota - Ônibus Amarelo</a>
-                
-                <a href="consulta.html" class="btn" style="background-color: var(--verde-escuro); color: white;">🔍 Consultar Lista Geral</a>
-                <a href="admin.html" class="btn btn-admin">📊 Acesso Secretaria</a>
+                <a href="onibus-azul.html" class="btn bg-azul">🚌 Rota - Ônibus Azul</a>
+                <a href="onibus-amarelo.html" class="btn bg-amarelo">🚌 Rota - Ônibus Amarelo</a>
+                <a href="consulta.html" class="btn bg-verde">🔍 Consultar Lista Geral</a>
             </div>
         </div>
     </main>
 
-    <section class="map-section">
-        <h3 style="text-align: center; color: var(--verde-escuro); margin-bottom: 20px;">🗺️ Mapa Geral de Embarque</h3>
-        <div id="mapa"></div>
-    </section>
-
     <footer>
-        <div class="footer-logo-container">
-            <img src="Logo_secretaria-removebg-preview.png" alt="Secretaria da Educação Graça-CE" class="logo-secretaria">
-        </div>
-        <div class="footer-grid">
-            <div class="footer-section">
-                <h4>Institucional</h4>
-                <p>👤 Prefeito(a): Maria Iraldice de Alcântara</p>
-                <p>📑 CNPJ: 23.467.889/0001-17</p>
-            </div>
-            <div class="footer-section">
-                <h4>Contatos</h4>
-                <p>📞 (88) 3656-1255</p>
-                <p>📧 gabineteprefeita@graca.ce.gov.br</p>
-            </div>
-            <div class="footer-section">
-                <h4>Localização</h4>
-                <p>📍 Av. Jose Candido de Carvalho, 483 - Centro</p>
-                <p>⏰ 07:30 às 11:30</p>
-            </div>
-        </div>
-        <div class="social-strip">© 2026 Todos os Direitos Reservados - Governo Municipal de Graça</div>
+        &copy; 2026 Governo Municipal de Graça/CE. Todos os direitos reservados.
     </footer>
 
-    <script>
-        const latGraca = -4.0456;
-        const lngGraca = -40.7497;
-        const map = L.map('mapa').setView([latGraca, lngGraca], 12);
-
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
-
-        const iconeOnibus = L.icon({
-            iconUrl: 'https://cdn-icons-png.flaticon.com/512/3448/3448339.png', 
-            iconSize: [38, 38], iconAnchor: [19, 38], popupAnchor: [0, -38] 
-        });
-
-        const pontosEmbarque = [
-            { nome: "Sede", lat: -4.045501986241979, lng: -40.75219751340825, desc: "Ponto principal, em frente a prefeitura" },
-            { nome: "Barro Vermelho", lat: -4.006092580904621, lng: -40.74443785717311, desc: "Em frente a escola do Barro Vermelho" },
-            { nome: "Lapa", lat: -4.083549097199902, lng: -40.82254370738335, desc: "Embarque na praça em frente a igreja." },
-            { nome: "Vila", lat: -4.0469779744805905, lng: -40.80173526342903, desc: "Embarque na região da Vila." }
-        ];
-
-        pontosEmbarque.forEach(ponto => {
-            L.marker([ponto.lat, ponto.lng], { icon: iconeOnibus }).addTo(map)
-             .bindPopup(`<div style="text-align: center;"><strong style="color: var(--verde-escuro); font-size: 16px;">${ponto.nome}</strong><br><span style="color: #666;">${ponto.desc}</span></div>`);
-        });
-    </script>
 </body>
 </html>
