@@ -4,258 +4,62 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rota Azul - Transporte Universitário Graça/CE</title>
-    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    
     <style>
-        :root {
-            --primary-blue: #0056b3;
-            --dark-blue: #003d80;
-            --light-blue: #e7f1ff;
-            --accent-yellow: #ffc107;
-            --error-red: #dc3545;
-            --success-green: #28a745;
-            --text-dark: #2d3436;
-            --text-muted: #636e72;
-            --border-radius: 12px;
-            --shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-        }
-
-
+        :root { --primary-blue: #0056b3; --dark-blue: #003d80; --light-blue: #e7f1ff; --text-muted: #636e72; --border-radius: 12px; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body { 
-            font-family: 'Inter', sans-serif;
-            background-image: url('fundo-login.jpg');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            color: var(--text-dark);
-            transition: background-image 0.8s ease;
-        }
-
-        /* Overlay para legibilidade */
-        body::before {
-            content: "";
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.4);
-            z-index: -1;
-        }
-
-        /* Header */
-        .cabecalho-oficial {
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-        }
-
-        .pill-logo {
-            background: white;
-            padding: 10px 25px;
-            border-radius: 50px;
-            box-shadow: var(--shadow);
-        }
-
+        body { font-family: 'Inter', sans-serif; background-image: url('fundo-login.jpg'); background-size: cover; background-attachment: fixed; }
+        body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: -1; }
+        .cabecalho-oficial { padding: 20px; display: flex; justify-content: center; }
+        .pill-logo { background: white; padding: 10px 25px; border-radius: 50px; }
         .pill-logo img { height: 45px; }
-
-        /* Container Principal */
-        .main-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 80vh;
-            padding: 20px;
-        }
-
-        /* Card Estilizado */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            max-width: 800px;
-            width: 100%;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-            overflow: hidden;
-            animation: fadeIn 0.5s ease;
-        }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-        .card-header {
-            background-color: var(--primary-blue);
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
-
-        .card-body { padding: 30px; }
-
-        /* Formulários */
-        .cpf-input {
-            width: 100%;
-            max-width: 320px;
-            padding: 15px;
-            margin: 20px auto;
-            display: block;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 18px;
-            text-align: center;
-            transition: border-color 0.3s;
-        }
-
-        .cpf-input:focus { outline: none; border-color: var(--primary-blue); }
-
-        .btn-primary {
-            background-color: var(--primary-blue);
-            color: white;
-            border: none;
-            padding: 15px 35px;
-            font-size: 16px;
-            font-weight: 700;
-            border-radius: 8px;
-            cursor: pointer;
-            width: 100%;
-            max-width: 320px;
-            display: block;
-            margin: 0 auto;
-            transition: all 0.3s;
-        }
-
-        .btn-primary:hover { background-color: var(--dark-blue); transform: scale(1.02); }
+        .main-container { display: flex; justify-content: center; align-items: center; min-height: 80vh; padding: 20px; }
+        .glass-card { background: rgba(255, 255, 255, 0.95); max-width: 800px; width: 100%; border-radius: var(--border-radius); overflow: hidden; }
+        .card-header { background-color: var(--primary-blue); color: white; padding: 30px; text-align: center; }
+        .card-body { padding: 30px; text-align: center; }
+        .cpf-input { width: 100%; max-width: 320px; padding: 15px; margin: 20px auto; display: block; border: 2px solid #ddd; border-radius: 8px; font-size: 18px; text-align: center; }
+        .btn-primary { background-color: var(--primary-blue); color: white; border: none; padding: 15px 35px; font-size: 16px; font-weight: 700; border-radius: 8px; cursor: pointer; width: 100%; max-width: 320px; margin: 0 auto; display: block; }
         .btn-primary:disabled { background-color: #ccc; cursor: not-allowed; }
-
-        /* Abas (Turnos e Dias) */
-        .tabs-label { font-weight: 600; color: var(--primary-blue); margin: 20px 0 10px; text-align: center; }
-        
-        .tabs-container { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
-
-        .btn-tab {
-            padding: 10px 18px;
-            border: 1px solid #ddd;
-            background: white;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .btn-tab.ativo {
-            background-color: var(--primary-blue);
-            color: white;
-            border-color: var(--primary-blue);
-            box-shadow: 0 4px 10px rgba(0, 86, 179, 0.3);
-        }
-
-        /* Mapa e Tabela */
-        #mapa-rota {
-            width: 100%;
-            height: 300px;
-            border-radius: var(--border-radius);
-            margin: 15px 0;
-            border: 1px solid #eee;
-        }
-
-        .table-wrapper { overflow-x: auto; margin-top: 20px; border-radius: 8px; border: 1px solid #eee; }
-        
-        table { width: 100%; border-collapse: collapse; min-width: 500px; }
-        
-        th { background: #f8f9fa; padding: 15px; text-align: left; font-size: 14px; color: var(--text-muted); }
-        
-        td { padding: 15px; border-top: 1px solid #eee; font-size: 14px; }
-
-        .badge-priority { background: var(--accent-yellow); padding: 2px 8px; border-radius: 10px; font-size: 11px; margin-left: 5px; }
-
         .msg-erro { margin-top: 15px; padding: 15px; border-radius: 8px; display: none; font-weight: 500; }
         .msg-erro.show { display: block; }
-
     </style>
 </head>
 <body>
-
     <header class="cabecalho-oficial">
-        <div class="pill-logo">
-            <img src="Logo prefeitura.png" alt="LOGOGoverno Municipal de Graça">
-        </div>
+        <div class="pill-logo"><img src="Logo prefeitura.png" alt="Governo de Graça"></div>
     </header>
 
     <div class="main-container">
         <section id="login-section" class="glass-card" style="max-width: 450px;">
             <div class="card-header">
-                <h2 style="font-size: 24px;">🚌 Ônibus Azul</h2>
-                <p style="opacity: 0.9; font-size: 14px;">Portal do Passageiro</p>
+                <h2>🚌 Ônibus Azul</h2>
+                <p>Portal do Passageiro</p>
             </div>
-            <div class="card-body" style="text-align: center;">
-                <p style="color: var(--text-muted);">Informe seu CPF para acessar as informações da sua rota.</p>
+            <div class="card-body">
+                <p style="color: var(--text-muted);">Informe seu CPF para acessar sua rota.</p>
                 <input type="text" id="cpfInput" class="cpf-input" placeholder="000.000.000-00" maxlength="14">
                 <button id="btnEntrar" class="btn-primary" onclick="verificarAcesso()">Acessar Painel</button>
                 <div id="msgBox" class="msg-erro"></div>
-                <div style="margin-top: 25px;">
-                    <a href="index.html" style="color: var(--text-muted); font-size: 14px; text-decoration: none;">← Voltar ao Início</a>
-                </div>
+                <div style="margin-top: 25px;"><a href="index.html" style="color: var(--text-muted); text-decoration: none;">← Voltar ao Início</a></div>
             </div>
         </section>
 
         <main id="main-section" class="glass-card" style="display: none;">
             <div class="card-header">
-                <h2 style="font-size: 22px;">🚌 Rota: Ônibus Azul</h2>
+                <h2>🚌 Rota: Ônibus Azul</h2>
                 <p>Olá, <span id="nomeAlunoLogado" style="font-weight: 700;"></span>!</p>
             </div>
-            
             <div class="card-body">
-                <div style="background: var(--light-blue); padding: 20px; border-radius: var(--border-radius); border-left: 5px solid var(--primary-blue);">
-                    <h4 style="color: var(--dark-blue); display: flex; align-items: center; gap: 8px;">🗺️ Trajeto Oficial</h4>
-                    <div id="mapa-rota"></div>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px;">
-                        <div>
-                            <strong style="font-size: 14px;">📍 Embarques (Graça)</strong>
-                            <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6;">Sede, Barro Vermelho, Lapa e Vila.</p>
-                        </div>
-                        <div>
-                            <strong style="font-size: 14px;">🏫 Destinos (Sobral)</strong>
-                            <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6;">UFC, IFCE e UVA (Todos os campi).</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="tabs-label">1. Escolha o Turno</div>
-                <div class="tabs-container" id="filtro-turno">
-                    <button class="btn-tab ativo" onclick="selecionarTab('turno', this)">MANHÃ</button>
-                    <button class="btn-tab" onclick="selecionarTab('turno', this)">NOITE</button>
-                </div>
-
-                <div class="tabs-label">2. Escolha o Dia da Semana</div>
-                <div class="tabs-container" id="filtro-dia">
-                    <button class="btn-tab ativo" onclick="selecionarTab('dia', this)">SEG</button>
-                    <button class="btn-tab" onclick="selecionarTab('dia', this)">TER</button>
-                    <button class="btn-tab" onclick="selecionarTab('dia', this)">QUA</button>
-                    <button class="btn-tab" onclick="selecionarTab('dia', this)">QUI</button>
-                    <button class="btn-tab" onclick="selecionarTab('dia', this)">SEX</button>
-                </div>
-
-                <div id="conteudo-rota" class="table-wrapper">
-                    </div>
-
-                <button onclick="location.reload()" class="btn-primary" style="background-color: #636e72; margin-top: 30px; max-width: 200px;">Sair do Painel</button>
+                <p>✅ <b>Acesso Liberado!</b> Você está na lista oficial deste veículo.</p>
+                <button onclick="location.reload()" class="btn-primary" style="background-color: #636e72; margin-top: 30px;">Sair do Painel</button>
             </div>
         </main>
     </div>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // Mantenha sua lógica de API e funções JavaScript originais aqui, 
-        // apenas ajustando as referências de ID se necessário.
-        // DICA: No atualizarPainel(), mudei o texto dos botões de dia para SEG, TER... 
-        // ajuste o filtro se necessário para bater com o dado da sua planilha.
-        
-        const API_URL ="https://script.google.com/macros/s/AKfycbxWQe4jSBRRJDbtU47NNo90BHsHFT0I0orI-jRM46susVLlctFs0BLyMtddX2nI9mQ/exec";
-        let dadosNuvem = [];
-        let mapaCarregado = false;
+        const API_URL = "https://script.google.com/macros/s/AKfycbwOmGvAcKgiIMEKZBrRD6zofIbTeMBdxiwW353J12ENW8Wf2hYAZ32UytOERnqorAs/exec";
 
-        // Máscara de CPF
         document.getElementById('cpfInput').addEventListener('input', function(e) {
             let v = e.target.value.replace(/\D/g, '');
             if (v.length > 3) v = v.replace(/^(\d{3})(\d)/, '$1.$2');
@@ -264,8 +68,6 @@
             e.target.value = v;
         });
 
-        function limparCPF(cpf) { return (cpf || "").toString().replace(/\D/g, ''); }
-
         function mostrarMensagem(texto, bg, cor) {
             const box = document.getElementById('msgBox');
             box.innerHTML = texto; box.style.backgroundColor = bg; box.style.color = cor;
@@ -273,59 +75,34 @@
         }
 
         async function verificarAcesso() {
-            const cpfDigitado = limparCPF(document.getElementById('cpfInput').value);
+            const cpfDigitado = document.getElementById('cpfInput').value.replace(/\D/g, '');
             const btn = document.getElementById('btnEntrar');
+            
             if (cpfDigitado.length !== 11) { mostrarMensagem('⚠️ Informe o CPF completo.', '#fff3cd', '#856404'); return; }
 
-            btn.innerText = 'Consultando...'; btn.disabled = true;
+            btn.innerHTML = '🔄 Consultando servidor...'; btn.disabled = true;
+            mostrarMensagem('📡 Conectando à base de dados da prefeitura...', '#e7f1ff', '#003d80');
 
             try {
-                const response = await fetch(`${API_URL}?cpf=${cpfDigitado}`);
+                // AQUI ESTÁ A MÁGICA: Ação e Rota na URL
+                const response = await fetch(`${API_URL}?acao=login_rota&rota=AZUL&cpf=${cpfDigitado}`);
                 const data = await response.json();
 
                 if (data.erro) {
-                    mostrarMensagem(`❌ ${data.erro}`, '#f8d7da', '#721c24');
-                    btn.innerText = 'Acessar Painel'; btn.disabled = false; return;
+                    mostrarMensagem(data.erro, '#f8d7da', '#721c24');
+                    btn.innerHTML = 'Acessar Painel'; btn.disabled = false; return;
                 }
 
-                dadosNuvem = data; 
-                const aluno = dadosNuvem.find(a => limparCPF(a.cpf) === cpfDigitado);
-
-                if (!aluno || aluno.status !== "Aprovado") {
-                    mostrarMensagem('❌ Acesso não autorizado ou pendente.', '#f8d7da', '#721c24');
-                    btn.innerText = 'Acessar Painel'; btn.disabled = false; return;
+                if (data.sucesso) {
+                    document.getElementById('msgBox').style.display = 'none';
+                    document.getElementById('nomeAlunoLogado').innerText = data.dados.nome;
+                    document.getElementById('login-section').style.display = 'none';
+                    document.getElementById('main-section').style.display = 'block';
                 }
-
-                document.getElementById('nomeAlunoLogado').innerText = aluno.nome;
-                document.getElementById('login-section').style.display = 'none';
-                document.getElementById('main-section').style.display = 'block';
-                
-                if (!mapaCarregado) { carregarMapa(); mapaCarregado = true; }
-                atualizarPainel();
-
             } catch (erro) {
-                mostrarMensagem('❌ Falha na conexão com o servidor.', '#f8d7da', '#721c24');
-                btn.innerText = 'Acessar Painel'; btn.disabled = false;
+                mostrarMensagem('❌ Servidor indisponível no momento.', '#f8d7da', '#721c24');
+                btn.innerHTML = 'Acessar Painel'; btn.disabled = false;
             }
-        }
-
-        function carregarMapa() {
-            const map = L.map('mapa-rota').setView([-3.86, -40.54], 10);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-            // ... (resto da sua lógica de markers do mapa)
-        }
-
-        function selecionarTab(grupo, elemento) {
-            elemento.parentElement.querySelectorAll('.btn-tab').forEach(b => b.classList.remove('ativo'));
-            elemento.classList.add('ativo');
-            atualizarPainel();
-        }
-
-        function atualizarPainel() {
-            // Lógica de filtro e renderização da tabela (idêntica à sua, mas com as classes novas)
-            const turno = document.querySelector('#filtro-turno .ativo').innerText;
-            const dia = document.querySelector('#filtro-dia .ativo').innerText;
-            // ... renderizar os dados em 'conteudo-rota'
         }
     </script>
 </body>
