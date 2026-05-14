@@ -4,60 +4,160 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rota Amarela - Transporte Universitário Graça/CE</title>
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
     <style>
-        :root { --primary-yellow: #d39e00; --dark-yellow: #a67c00; --light-yellow: #fff3cd; --text-muted: #636e72; --border-radius: 12px; }
+        :root {
+            --primary-yellow: #d39e00;
+            --dark-yellow: #a67c00;
+            --light-yellow: #fff3cd;
+            --text-dark: #2d3436;
+            --text-muted: #636e72;
+            --border-radius: 12px;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background-image: url('fundo-login.jpg'); background-size: cover; background-attachment: fixed; }
-        body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: -1; }
+
+        body { 
+            font-family: 'Inter', sans-serif;
+            /* A imagem padrão ao abrir será a de dia */
+            background-image: url('Arco_de_Nossa_Senhora_de_Fátima,_Sobral,_CE.jpg');
+            background-size: cover; /* Preenche a tela toda padronizada */
+            background-position: center center; /* Centraliza no Arco */
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            color: var(--text-dark);
+            transition: background-image 0.6s ease-in-out; /* Transição suave na troca */
+        }
+
+        body::before {
+            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.2); /* Reduzimos de 0.5 para 0.2 para a imagem brilhar mais! */
+            z-index: -1;
+        }
+
         .cabecalho-oficial { padding: 20px; display: flex; justify-content: center; }
-        .pill-logo { background: white; padding: 10px 25px; border-radius: 50px; }
+        .pill-logo { background: white; padding: 10px 25px; border-radius: 50px; box-shadow: var(--shadow); }
         .pill-logo img { height: 45px; }
+
         .main-container { display: flex; justify-content: center; align-items: center; min-height: 80vh; padding: 20px; }
-        .glass-card { background: rgba(255, 255, 255, 0.95); max-width: 800px; width: 100%; border-radius: var(--border-radius); overflow: hidden; }
-        .card-header { background-color: var(--primary-yellow); color: white; padding: 30px; text-align: center; }
-        .card-body { padding: 30px; text-align: center; }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            max-width: 800px; width: 100%;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .card-header { background-color: var(--primary-yellow); color: white; padding: 30px; text-align: center; text-shadow: 1px 1px 2px rgba(0,0,0,0.2); }
+        .card-body { padding: 30px; }
+
         .cpf-input { width: 100%; max-width: 320px; padding: 15px; margin: 20px auto; display: block; border: 2px solid #ddd; border-radius: 8px; font-size: 18px; text-align: center; }
-        .btn-primary { background-color: var(--primary-yellow); color: white; border: none; padding: 15px 35px; font-size: 16px; font-weight: 700; border-radius: 8px; cursor: pointer; width: 100%; max-width: 320px; margin: 0 auto; display: block; text-shadow: 1px 1px 2px rgba(0,0,0,0.2); }
-        .btn-primary:disabled { background-color: #ccc; cursor: not-allowed; }
-        .msg-erro { margin-top: 15px; padding: 15px; border-radius: 8px; display: none; font-weight: 500; }
+        .cpf-input:focus { outline: none; border-color: var(--primary-yellow); }
+
+        .btn-primary {
+            background-color: var(--primary-yellow); color: white; border: none; padding: 15px 35px;
+            font-size: 16px; font-weight: 700; border-radius: 8px; cursor: pointer;
+            width: 100%; max-width: 320px; display: block; margin: 0 auto; transition: all 0.3s;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+        .btn-primary:hover { background-color: var(--dark-yellow); }
+        .btn-primary:disabled { background-color: #ccc; cursor: not-allowed; text-shadow: none; }
+
+        /* Abas (Turnos e Dias) */
+        .tabs-label { font-weight: 600; color: var(--dark-yellow); margin: 20px 0 10px; text-align: center; }
+        .tabs-container { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+
+        .btn-tab {
+            padding: 10px 18px; border: 1px solid #ddd; background: white; border-radius: 20px;
+            font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.3s;
+        }
+        .btn-tab.ativo { background-color: var(--primary-yellow); color: white; border-color: var(--primary-yellow); text-shadow: 1px 1px 2px rgba(0,0,0,0.2); }
+
+        /* Mapa e Tabela */
+        #mapa-rota { width: 100%; height: 250px; border-radius: var(--border-radius); margin: 15px 0; border: 1px solid #eee; }
+        .table-wrapper { overflow-x: auto; margin-top: 20px; border-radius: 8px; border: 1px solid #eee; }
+        table { width: 100%; border-collapse: collapse; min-width: 500px; }
+        th { background: #f8f9fa; padding: 15px; text-align: left; font-size: 14px; color: var(--text-muted); }
+        td { padding: 15px; border-top: 1px solid #eee; font-size: 14px; }
+
+        .msg-erro { margin-top: 15px; padding: 15px; border-radius: 8px; display: none; font-weight: 500; text-align: center;}
         .msg-erro.show { display: block; }
     </style>
 </head>
 <body>
+
     <header class="cabecalho-oficial">
-        <div class="pill-logo"><img src="Logo prefeitura.png" alt="Governo de Graça"></div>
+        <div class="pill-logo"><img src="Logo prefeitura.png" alt="Governo Municipal de Graça"></div>
     </header>
 
     <div class="main-container">
         <section id="login-section" class="glass-card" style="max-width: 450px;">
             <div class="card-header">
-                <h2>🟡 Ônibus Amarelo</h2>
-                <p>Portal do Passageiro</p>
+                <h2 style="font-size: 24px;">🚌 Ônibus Amarelo</h2>
+                <p style="opacity: 0.9; font-size: 14px;">Portal do Passageiro</p>
             </div>
             <div class="card-body">
-                <p style="color: var(--text-muted);">Informe seu CPF para acessar sua rota.</p>
+                <p style="color: var(--text-muted); text-align: center;">Informe o seu CPF para acessar sua rota.</p>
                 <input type="text" id="cpfInput" class="cpf-input" placeholder="000.000.000-00" maxlength="14">
                 <button id="btnEntrar" class="btn-primary" onclick="verificarAcesso()">Acessar Painel</button>
                 <div id="msgBox" class="msg-erro"></div>
-                <div style="margin-top: 25px;"><a href="index.html" style="color: var(--text-muted); text-decoration: none;">← Voltar ao Início</a></div>
+                <div style="margin-top: 25px; text-align: center;">
+                    <a href="index.html" style="color: var(--text-muted); font-size: 14px; text-decoration: none;">← Voltar ao Início</a>
+                </div>
             </div>
         </section>
 
         <main id="main-section" class="glass-card" style="display: none;">
             <div class="card-header">
-                <h2>🟡 Rota: Ônibus Amarelo</h2>
-                <p>Olá, <span id="nomeAlunoLogado" style="font-weight: 700;"></span>!</p>
+                <h2 style="font-size: 22px;">🟡 Rota: Ônibus Amarelo</h2>
+                <p>Olá, <span id="nomeAlunoLogado" style="font-weight: 700; text-transform: uppercase;"></span>!</p>
             </div>
+            
             <div class="card-body">
-                <p>✅ <b>Acesso Liberado!</b> Você está na lista oficial deste veículo.</p>
-                <button onclick="location.reload()" class="btn-primary" style="background-color: #636e72; margin-top: 30px;">Sair do Painel</button>
+                <p style="text-align: center; color: #28a745; font-weight: 600; margin-bottom: 20px;">✅ Acesso Liberado! Você está na lista oficial deste veículo.</p>
+                
+                <div style="background: var(--light-yellow); padding: 20px; border-radius: var(--border-radius); border-left: 5px solid var(--primary-yellow);">
+                    <h4 style="color: var(--dark-yellow); display: flex; align-items: center; gap: 8px;">🗺️ Trajeto Oficial</h4>
+                    <div id="mapa-rota"></div>
+                </div>
+
+                <div class="tabs-label">1. Escolha o Turno</div>
+                <div class="tabs-container" id="filtro-turno">
+                    <button class="btn-tab ativo" onclick="selecionarTab(this)">MANHÃ</button>
+                    <button class="btn-tab" onclick="selecionarTab(this)">NOITE</button>
+                </div>
+
+                <div class="tabs-label">2. Escolha o Dia da Semana</div>
+                <div class="tabs-container" id="filtro-dia">
+                    <button class="btn-tab ativo" onclick="selecionarTab(this)">SEG</button>
+                    <button class="btn-tab" onclick="selecionarTab(this)">TER</button>
+                    <button class="btn-tab" onclick="selecionarTab(this)">QUA</button>
+                    <button class="btn-tab" onclick="selecionarTab(this)">QUI</button>
+                    <button class="btn-tab" onclick="selecionarTab(this)">SEX</button>
+                </div>
+
+                <div id="conteudo-rota" class="table-wrapper"></div>
+
+                <div style="text-align: center; margin-top: 30px;">
+                    <button onclick="location.reload()" class="btn-primary" style="background-color: #636e72; max-width: 200px;">Sair do Painel</button>
+                </div>
             </div>
         </main>
     </div>
 
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbwOmGvAcKgiIMEKZBrRD6zofIbTeMBdxiwW353J12ENW8Wf2hYAZ32UytOERnqorAs/exec";
+        // ATENÇÃO: COLOQUE AQUI O SEU LINK DA API (WEB APP) DO GOOGLE
+        const API_URL = "https://script.google.com/macros/s/AKfycbwEU_6n9bEC8koOM_ox6FmuifnMfPl7lEBHTGTu-9gM1QI-yJKCdqHDldx8aB9Eq64/exec";
+        
+        let passageirosRota = []; 
+        let mapaCarregado = false;
 
         document.getElementById('cpfInput').addEventListener('input', function(e) {
             let v = e.target.value.replace(/\D/g, '');
@@ -80,10 +180,10 @@
             if (cpfDigitado.length !== 11) { mostrarMensagem('⚠️ Informe o CPF completo.', '#fff3cd', '#856404'); return; }
 
             btn.innerHTML = '🔄 Consultando servidor...'; btn.disabled = true;
-            mostrarMensagem('📡 Conectando à base de dados da prefeitura...', 'var(--light-yellow)', 'var(--dark-yellow)');
+            mostrarMensagem('📡 Conectando à base de dados...', 'var(--light-yellow)', 'var(--dark-yellow)');
 
             try {
-                // AQUI ESTÁ A MÁGICA: Ação e Rota na URL (AMARELO)
+                // Requisição pedindo os dados da Rota AMARELO
                 const response = await fetch(`${API_URL}?acao=login_rota&rota=AMARELO&cpf=${cpfDigitado}`);
                 const data = await response.json();
 
@@ -95,13 +195,105 @@
                 if (data.sucesso) {
                     document.getElementById('msgBox').style.display = 'none';
                     document.getElementById('nomeAlunoLogado').innerText = data.dados.nome;
+                    
+                    // Esconde login e mostra o painel principal
                     document.getElementById('login-section').style.display = 'none';
                     document.getElementById('main-section').style.display = 'block';
+                    
+                    passageirosRota = data.passageiros;
+                    
+                    // Inicia o mapa apenas quando a tela for visível
+                    if (!mapaCarregado) { carregarMapa(); mapaCarregado = true; }
+                    
+                    // Desenha a tabela com as abas ativas
+                    atualizarPainel(); 
                 }
             } catch (erro) {
                 mostrarMensagem('❌ Servidor indisponível no momento.', '#f8d7da', '#721c24');
                 btn.innerHTML = 'Acessar Painel'; btn.disabled = false;
             }
+        }
+
+        function carregarMapa() {
+            const map = L.map('mapa-rota').setView([-3.86, -40.54], 10);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+            // Pode adicionar marcadores ao seu gosto aqui
+        }
+
+        function selecionarTab(elemento) {
+            elemento.parentElement.querySelectorAll('.btn-tab').forEach(b => b.classList.remove('ativo'));
+            elemento.classList.add('ativo');
+            atualizarPainel();
+        }
+
+        function atualizarPainel() {
+            const container = document.getElementById('conteudo-rota');
+            const turnoSelecionado = document.querySelector('#filtro-turno .ativo').innerText.trim().toUpperCase();
+            const diaSelecionado = document.querySelector('#filtro-dia .ativo').innerText.trim().toUpperCase();
+
+            // ==========================================
+            // MÁGICA DO FUNDO: Troca a imagem pelo turno
+            // ==========================================
+            if (turnoSelecionado === "MANHÃ") {
+                document.body.style.backgroundImage = "url('Arco_de_Nossa_Senhora_de_Fátima,_Sobral,_CE.jpg')";
+            } else if (turnoSelecionado === "NOITE") {
+                document.body.style.backgroundImage = "url('cidade-sobral-ceara (noite).jpg')";
+            }
+
+            const dicionarioDias = { "SEG": "SEGUNDA", "TER": "TERÇA", "QUA": "QUARTA", "QUI": "QUINTA", "SEX": "SEXTA" };
+            const diaDaPlanilha = dicionarioDias[diaSelecionado];
+
+            const filtrados = passageirosRota.filter(aluno => {
+                const turnoAluno = (aluno.turno || "").toUpperCase();
+                const diasAluno = (aluno.dias || "").toUpperCase();
+
+                let bateTurno = false;
+                if (turnoSelecionado === "MANHÃ" && (turnoAluno.includes("MANHÃ") || turnoAluno.includes("MANHA"))) bateTurno = true;
+                if (turnoSelecionado === "NOITE" && turnoAluno.includes("NOITE")) bateTurno = true;
+
+                let bateDia = false;
+                if (diaDaPlanilha === "TERÇA") {
+                    bateDia = diasAluno.includes("TERÇA") || diasAluno.includes("TERCA");
+                } else {
+                    bateDia = diasAluno.includes(diaDaPlanilha);
+                }
+
+                return bateTurno && bateDia;
+            });
+
+            if (filtrados.length === 0) {
+                container.innerHTML = `<p style="text-align:center; padding: 30px; color: var(--text-muted); font-size: 15px;">Nenhum passageiro registrado no ônibus para o turno da <b>${turnoSelecionado.toLowerCase()}</b> na <b>${diaDaPlanilha.toLowerCase()}</b>.</p>`;
+                return;
+            }
+
+            filtrados.sort((a, b) => a.nome.localeCompare(b.nome));
+
+            let tabelaHTML = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nº</th>
+                            <th>Nome do Passageiro</th>
+                            <th>Instituição</th>
+                            <th>Embarque</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            filtrados.forEach((aluno, index) => {
+                tabelaHTML += `
+                    <tr>
+                        <td style="color: var(--text-muted);"><strong>${index + 1}</strong></td>
+                        <td style="font-weight: 600;">${aluno.nome}</td>
+                        <td>${aluno.instituicao}</td>
+                        <td><span style="background: #eee; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">📍 ${aluno.embarque}</span></td>
+                    </tr>
+                `;
+            });
+
+            tabelaHTML += `</tbody></table>`;
+            container.innerHTML = tabelaHTML;
         }
     </script>
 </body>

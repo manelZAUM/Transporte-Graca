@@ -30,7 +30,7 @@
 
         body { 
             font-family: 'Inter', sans-serif;
-            background-image: url('fundo-login.jpg');
+            background-image: url('fundo-login.jpg'); /* Se quiser pode trocar para as fotos do Arco aqui também! */
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -42,7 +42,7 @@
             content: "";
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.5); /* Fundo escurecido para destacar o painel */
+            background: rgba(0, 0, 0, 0.5);
             z-index: -1;
         }
 
@@ -52,21 +52,11 @@
         .pill-logo img { height: 45px; }
 
         /* Container Principal */
-        .main-container {
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 80vh;
-            padding: 20px;
-        }
+        .main-container { display: flex; justify-content: center; align-items: flex-start; min-height: 80vh; padding: 20px; }
 
         .glass-card {
-            background: var(--bg-glass);
-            backdrop-filter: blur(10px);
-            width: 100%;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-            overflow: hidden;
+            background: var(--bg-glass); backdrop-filter: blur(10px); width: 100%;
+            border-radius: var(--border-radius); box-shadow: var(--shadow); overflow: hidden;
             animation: fadeIn 0.5s ease;
         }
 
@@ -92,19 +82,11 @@
         /* Dashboard Secção */
         .secao-titulo { font-size: 20px; font-weight: 700; color: var(--dark); margin: 40px 0 20px; padding-bottom: 10px; border-bottom: 2px solid #eee; }
         
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 20px;
-        }
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
 
         .dash-card {
-            background: white;
-            padding: 25px 20px;
-            border-radius: var(--border-radius);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            text-align: center;
-            border: 1px solid #eee;
+            background: white; padding: 25px 20px; border-radius: var(--border-radius);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; border: 1px solid #eee;
             transition: transform 0.2s, box-shadow 0.2s;
         }
 
@@ -114,7 +96,7 @@
         .dash-card h3 { font-size: 15px; color: var(--muted); font-weight: 600; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
         .dash-card .numero { font-size: 36px; font-weight: 800; color: var(--dark); line-height: 1; }
 
-        /* Matriz de Turnos (Tabelinhas nos cards) */
+        /* Matriz de Turnos */
         .bus-table { width: 100%; margin-top: 15px; border-collapse: collapse; font-size: 13px; }
         .bus-table th { background: #f8f9fa; padding: 6px; color: var(--muted); font-weight: 600; border-bottom: 2px solid #eee; }
         .bus-table td { padding: 8px 4px; border-bottom: 1px solid #eee; font-weight: 500; }
@@ -137,15 +119,12 @@
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px);
-            display: none; align-items: center; justify-content: center; z-index: 1000;
-            padding: 20px;
+            display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px;
         }
 
         .modal-content {
-            background: white; width: 100%; max-width: 500px;
-            border-radius: var(--border-radius); padding: 30px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
-            position: relative; max-height: 85vh; display: flex; flex-direction: column;
+            background: white; width: 100%; max-width: 500px; border-radius: var(--border-radius); padding: 30px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2); position: relative; max-height: 85vh; display: flex; flex-direction: column;
             animation: zoomIn 0.3s ease;
         }
 
@@ -180,7 +159,7 @@
                 <p style="opacity: 0.9; font-size: 14px; margin-top: 5px;">Acesso restrito à coordenação</p>
             </div>
             <div class="card-body" style="text-align: center;">
-                <p style="color: var(--muted);">Informe seu CPF para carregar a base de dados.</p>
+                <p style="color: var(--muted);">Informe seu CPF (cadastrado na base) para carregar o sistema.</p>
                 <input type="text" id="cpf-input" class="cpf-input" placeholder="000.000.000-00" maxlength="14">
                 
                 <button onclick="tentarAcesso()" id="btn-entrar" class="btn-primary">
@@ -292,77 +271,251 @@
     </div>
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbwOmGvAcKgiIMEKZBrRD6zofIbTeMBdxiwW353J12ENW8Wf2hYAZ32UytOERnqorAs/exec";
-let dadosNuvem = [];
+        // ATENÇÃO: COLOQUE A SUA URL DA API AQUI
+        const API_URL = "https://script.google.com/macros/s/AKfycbwEU_6n9bEC8koOM_ox6FmuifnMfPl7lEBHTGTu-9gM1QI-yJKCdqHDldx8aB9Eq64/exec"; 
+        
+        let dadosNuvem = [];
 
-// Máscara de CPF
-document.getElementById('cpf-input').addEventListener('input', function(e) {
-    let value = e.target.value.replace(/\D/g, '');
-    if (value.length > 3) value = value.replace(/^(\d{3})(\d)/, '$1.$2');
-    if (value.length > 6) value = value.replace(/^(\d{3})\.(\d{3})(\d)/, '$1.$2.$3');
-    if (value.length > 9) value = value.replace(/^(\d{3})\.(\d{3})\.(\d{3})(\d)/, '$1.$2.$3-$4');
-    e.target.value = value;
-});
+        // Máscara de CPF
+        document.getElementById('cpf-input').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 3) value = value.replace(/^(\d{3})(\d)/, '$1.$2');
+            if (value.length > 6) value = value.replace(/^(\d{3})\.(\d{3})(\d)/, '$1.$2.$3');
+            if (value.length > 9) value = value.replace(/^(\d{3})\.(\d{3})\.(\d{3})(\d)/, '$1.$2.$3-$4');
+            e.target.value = value;
+        });
 
-document.getElementById("cpf-input").addEventListener("keypress", function(event) {
-    if (event.key === "Enter") tentarAcesso();
-});
+        document.getElementById("cpf-input").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") tentarAcesso();
+        });
 
-async function tentarAcesso() {
-    const cpf = document.getElementById('cpf-input').value.trim().replace(/\D/g, '');
-    const feedback = document.getElementById('feedback-login');
-    const btn = document.getElementById('btn-entrar');
-    const spinner = document.getElementById('spinner');
-    const btnText = btn.querySelector('span');
+        async function tentarAcesso() {
+            const cpf = document.getElementById('cpf-input').value.trim().replace(/\D/g, '');
+            const feedback = document.getElementById('feedback-login');
+            const btn = document.getElementById('btn-entrar');
+            const spinner = document.getElementById('spinner');
+            const btnText = btn.querySelector('span');
 
-    if (cpf.length !== 11) {
-        feedback.innerText = "❌ Informe um CPF válido."; feedback.style.color = "var(--danger)";
-        return;
-    }
+            if (cpf.length !== 11) {
+                feedback.innerText = "❌ Informe um CPF válido."; feedback.style.color = "var(--danger)";
+                return;
+            }
 
-    btn.disabled = true; 
-    spinner.style.display = "block";
-    btnText.innerText = "Consultando base de dados...";
-    feedback.innerText = "Validando credenciais da coordenação...";
-    feedback.style.color = "var(--info)";
+            btn.disabled = true; 
+            spinner.style.display = "block";
+            btnText.innerText = "A consultar...";
+            feedback.innerText = "Validando permissão de acesso...";
+            feedback.style.color = "var(--info)";
 
-    try {
-        // Envia a ação "dashboard" para retornar a planilha inteira
-        const response = await fetch(`${API_URL}?acao=dashboard&cpf=${cpf}`);
-        const data = await response.json();
+            try {
+                // A requisição usa a acao=dashboard para buscar a base inteira
+                const response = await fetch(`${API_URL}?acao=dashboard&cpf=${cpf}`);
+                const data = await response.json();
 
-        if (data.erro) {
-            feedback.innerText = "❌ " + data.erro; feedback.style.color = "var(--danger)";
-        } else if (data.sucesso) {
-            feedback.innerText = "✅ Acesso Autorizado! Montando painel...";
-            feedback.style.color = "var(--success)";
-            
-            // Agora a lista vem dentro de "dadosGerais"
-            dadosNuvem = data.dadosGerais.map(aluno => {
-                let obj = {};
-                for(let k in aluno) {
-                    let key = k.normalize('NFD').replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
-                    obj[key] = String(aluno[k] || "");
+                if (data.erro) {
+                    feedback.innerText = "❌ " + data.erro; feedback.style.color = "var(--danger)";
+                } else if (data.sucesso) {
+                    feedback.innerText = "✅ Acesso Autorizado! A montar painel...";
+                    feedback.style.color = "var(--success)";
+                    
+                    // Extrai a lista que veio dentro de dadosGerais e converte para objetos fáceis de ler
+                    dadosNuvem = data.dadosGerais.map(aluno => {
+                        let obj = {};
+                        for(let k in aluno) {
+                            let key = k.normalize('NFD').replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+                            obj[key] = String(aluno[k] || "");
+                        }
+                        return obj;
+                    });
+                    
+                    document.getElementById('login-wrapper').style.display = 'none';
+                    document.getElementById('sistema-container').style.display = 'block';
+                    
+                    gerarDashboard();
+                    popularFiltros();
+                    renderizarTabela();
                 }
-                return obj;
-            });
-            
-            document.getElementById('login-wrapper').style.display = 'none';
-            document.getElementById('sistema-container').style.display = 'block';
-            
-            gerarDashboard();
-            popularFiltros();
-            renderizarTabela();
+            } catch (e) { 
+                feedback.innerText = "❌ Erro ao conectar ao servidor."; feedback.style.color = "var(--danger)";
+            } finally {
+                btn.disabled = false; 
+                spinner.style.display = "none";
+                btnText.innerText = "Carregar Sistema";
+            }
         }
-    } catch (e) { 
-        feedback.innerText = "❌ Erro ao conectar ao servidor."; feedback.style.color = "var(--danger)";
-    } finally {
-        btn.disabled = false; 
-        spinner.style.display = "none";
-        btnText.innerText = "Carregar Sistema";
-    }
-}
-    </script>
 
+        // Descobre o ônibus baseado na instituição se a coluna estiver vazia
+        function getOnibus(aluno) {
+            const inst = (aluno.instituicao || "").toUpperCase();
+            if (aluno.onibus && aluno.onibus.toUpperCase().includes('AMARELO')) return 'AMARELO';
+            if (aluno.onibus && aluno.onibus.toUpperCase().includes('AZUL')) return 'AZUL';
+            const vaiAmarelo = ["UNINTA", "FLF", "LUCIANO FEIJÃO", "ANHANGUERA", "GRAU", "UVA-CCS"].some(i => inst.includes(i));
+            return vaiAmarelo ? 'AMARELO' : 'AZUL';
+        }
+
+        function gerarDashboard() {
+            const aprovados = dadosNuvem.filter(a => a.status === 'Aprovado');
+            
+            document.getElementById('total-alunos').innerText = dadosNuvem.length;
+            document.getElementById('total-novatos').innerText = dadosNuvem.filter(a => a.novato === 'Sim').length;
+            document.getElementById('total-residentes').innerText = dadosNuvem.filter(a => a.sobral === 'Sim').length;
+
+            document.getElementById('emb-sede').innerText = aprovados.filter(a => a.embarque.toUpperCase().trim() === 'SEDE').length;
+            document.getElementById('emb-barro').innerText = aprovados.filter(a => a.embarque.toUpperCase().trim() === 'BARRO VERMELHO').length;
+            document.getElementById('emb-lapa').innerText = aprovados.filter(a => a.embarque.toUpperCase().trim() === 'LAPA').length;
+            document.getElementById('emb-vila').innerText = aprovados.filter(a => a.embarque.toUpperCase().trim() === 'VILA').length;
+
+            const contagemInst = {};
+            const contagemFrota = {
+                AMARELO: { total: 0, dias: { seg: {M:0, N:0}, ter: {M:0, N:0}, qua: {M:0, N:0}, qui: {M:0, N:0}, sex: {M:0, N:0} } },
+                AZUL: { total: 0, dias: { seg: {M:0, N:0}, ter: {M:0, N:0}, qua: {M:0, N:0}, qui: {M:0, N:0}, sex: {M:0, N:0} } }
+            };
+
+            aprovados.forEach(a => {
+                const inst = a.instituicao.trim();
+                const turno = (a.turno || "").toUpperCase().trim();
+                let tManha = turno.includes("MANHÃ") || turno.includes("MANHA");
+                let tNoite = turno.includes("NOITE");
+                const diasStr = (a.dias || "").toUpperCase();
+                const viajaDia = (dia) => diasStr.includes(dia);
+
+                const onibus = getOnibus(a);
+                if (onibus === 'AMARELO' || onibus === 'AZUL') {
+                    contagemFrota[onibus].total++;
+                    if (viajaDia("SEGUNDA")) { if (tManha) contagemFrota[onibus].dias.seg.M++; if (tNoite) contagemFrota[onibus].dias.seg.N++; }
+                    if (viajaDia("TERÇA") || viajaDia("TERCA")) { if (tManha) contagemFrota[onibus].dias.ter.M++; if (tNoite) contagemFrota[onibus].dias.ter.N++; }
+                    if (viajaDia("QUARTA")) { if (tManha) contagemFrota[onibus].dias.qua.M++; if (tNoite) contagemFrota[onibus].dias.qua.N++; }
+                    if (viajaDia("QUINTA")) { if (tManha) contagemFrota[onibus].dias.qui.M++; if (tNoite) contagemFrota[onibus].dias.qui.N++; }
+                    if (viajaDia("SEXTA")) { if (tManha) contagemFrota[onibus].dias.sex.M++; if (tNoite) contagemFrota[onibus].dias.sex.N++; }
+                }
+
+                if (!inst) return;
+                if (!contagemInst[inst]) {
+                    contagemInst[inst] = { 
+                        total: 0,
+                        dias: { seg: { M: 0, N: 0 }, ter: { M: 0, N: 0 }, qua: { M: 0, N: 0 }, qui: { M: 0, N: 0 }, sex: { M: 0, N: 0 } }
+                    };
+                }
+                
+                contagemInst[inst].total++;
+
+                if (viajaDia("SEGUNDA")) { if (tManha) contagemInst[inst].dias.seg.M++; if (tNoite) contagemInst[inst].dias.seg.N++; }
+                if (viajaDia("TERÇA") || viajaDia("TERCA")) { if (tManha) contagemInst[inst].dias.ter.M++; if (tNoite) contagemInst[inst].dias.ter.N++; }
+                if (viajaDia("QUARTA")) { if (tManha) contagemInst[inst].dias.qua.M++; if (tNoite) contagemInst[inst].dias.qua.N++; }
+                if (viajaDia("QUINTA")) { if (tManha) contagemInst[inst].dias.qui.M++; if (tNoite) contagemInst[inst].dias.qui.N++; }
+                if (viajaDia("SEXTA")) { if (tManha) contagemInst[inst].dias.sex.M++; if (tNoite) contagemInst[inst].dias.sex.N++; }
+            });
+
+            const gridFrota = document.getElementById('cards-frota');
+            gridFrota.innerHTML = '';
+            ['AMARELO', 'AZUL'].forEach(bus => {
+                const f = contagemFrota[bus];
+                const cor = bus === 'AMARELO' ? 'var(--primary-yellow)' : 'var(--primary-blue)';
+                const textCor = bus === 'AMARELO' ? 'var(--dark)' : '#fff';
+                const icone = bus === 'AMARELO' ? '🟡' : '🔵';
+                
+                gridFrota.innerHTML += `
+                    <div class="dash-card card-clicavel" style="border-top: 5px solid ${cor};" onclick="abrirModalOnibus('${bus}')">
+                        <h3 style="color: var(--dark); font-size: 18px; margin-bottom: 5px;">${icone} Ônibus ${bus}</h3>
+                        <p style="font-size: 13px; color: var(--muted);">Passageiros únicos: <strong>${f.total}</strong></p>
+                        
+                        <table class="bus-table">
+                            <thead><tr><th>Turno</th><th>Seg</th><th>Ter</th><th>Qua</th><th>Qui</th><th>Sex</th></tr></thead>
+                            <tbody>
+                                <tr style="background-color: #f9fff9;"><td class="col-turno" style="color:var(--success)">Manhã</td><td>${f.dias.seg.M}</td><td>${f.dias.ter.M}</td><td>${f.dias.qua.M}</td><td>${f.dias.qui.M}</td><td>${f.dias.sex.M}</td></tr>
+                                <tr style="background-color: #f4f8ff;"><td class="col-turno" style="color:var(--info)">Noite</td><td>${f.dias.seg.N}</td><td>${f.dias.ter.N}</td><td>${f.dias.qua.N}</td><td>${f.dias.qui.N}</td><td>${f.dias.sex.N}</td></tr>
+                            </tbody>
+                        </table>
+                    </div>`;
+            });
+
+            const gridInst = document.getElementById('cards-instituicoes');
+            gridInst.innerHTML = '';
+            Object.keys(contagemInst).sort().forEach(inst => {
+                const d = contagemInst[inst];
+                gridInst.innerHTML += `
+                    <div class="dash-card card-clicavel" onclick="abrirModalAlunos('${inst}')">
+                        <h3 style="color: var(--dark); margin-bottom: 5px;">🎓 ${inst}</h3>
+                        <div class="numero" style="font-size: 28px; margin-bottom: 10px;">${d.total}</div>
+                        
+                        <table class="bus-table">
+                            <thead><tr><th></th><th>Seg</th><th>Ter</th><th>Qua</th><th>Qui</th><th>Sex</th></tr></thead>
+                            <tbody>
+                                <tr><td class="col-turno" style="color:var(--success)">M</td><td>${d.dias.seg.M}</td><td>${d.dias.ter.M}</td><td>${d.dias.qua.M}</td><td>${d.dias.qui.M}</td><td>${d.dias.sex.M}</td></tr>
+                                <tr><td class="col-turno" style="color:var(--info)">N</td><td>${d.dias.seg.N}</td><td>${d.dias.ter.N}</td><td>${d.dias.qua.N}</td><td>${d.dias.qui.N}</td><td>${d.dias.sex.N}</td></tr>
+                            </tbody>
+                        </table>
+                    </div>`;
+            });
+        }
+
+        function abrirModalOnibus(busName) {
+            const lista = document.getElementById('lista-alunos-modal');
+            const alunos = dadosNuvem.filter(a => getOnibus(a) === busName && a.status === 'Aprovado').sort((a, b) => a.nome.localeCompare(b.nome));
+
+            document.getElementById('modal-titulo-inst').innerText = `${busName === 'AMARELO' ? '🟡' : '🔵'} Frota ${busName}`;
+            document.getElementById('modal-subtitulo').innerText = `${alunos.length} alunos vinculados`;
+            lista.innerHTML = alunos.map(a => `<li><strong>${a.nome.toUpperCase()}</strong> <span style="color:var(--muted); font-size:13px">🏫 ${a.instituicao} | 🕒 ${a.turno}</span></li>`).join('');
+            document.getElementById('modal-alunos').style.display = 'flex';
+        }
+
+        function abrirModalAlunos(inst) {
+            const lista = document.getElementById('lista-alunos-modal');
+            const alunos = dadosNuvem.filter(a => a.instituicao.trim() === inst && a.status === 'Aprovado').sort((a, b) => a.nome.localeCompare(b.nome));
+
+            document.getElementById('modal-titulo-inst').innerText = inst;
+            document.getElementById('modal-subtitulo').innerText = `${alunos.length} alunos matriculados`;
+            lista.innerHTML = alunos.map(a => `<li><strong>${a.nome.toUpperCase()}</strong> <span style="color:var(--muted); font-size:13px">📍 Embarque: ${a.embarque} | 🕒 ${a.turno}</span></li>`).join('');
+            document.getElementById('modal-alunos').style.display = 'flex';
+        }
+
+        function abrirModalEmbarque(ponto) {
+            const lista = document.getElementById('lista-alunos-modal');
+            const alunos = dadosNuvem.filter(a => a.embarque.toUpperCase().trim() === ponto && a.status === 'Aprovado').sort((a, b) => a.nome.localeCompare(b.nome));
+
+            document.getElementById('modal-titulo-inst').innerText = `Ponto: ${ponto}`;
+            document.getElementById('modal-subtitulo').innerText = `${alunos.length} passageiros`;
+            lista.innerHTML = alunos.map(a => `<li><strong>${a.nome.toUpperCase()}</strong> <span style="color:var(--muted); font-size:13px">🏫 ${a.instituicao} | 🕒 ${a.turno}</span></li>`).join('');
+            document.getElementById('modal-alunos').style.display = 'flex';
+        }
+
+        function fecharModal() { document.getElementById('modal-alunos').style.display = 'none'; }
+
+        function popularFiltros() {
+            const sel = document.getElementById('filtroInstituicao');
+            const insts = [...new Set(dadosNuvem.map(a => a.instituicao.trim()))].filter(i => i).sort();
+            insts.forEach(i => sel.innerHTML += `<option value="${i}">${i}</option>`);
+        }
+
+        function renderizarTabela() {
+            const busca = document.getElementById('buscaGeral').value.toLowerCase();
+            const instF = document.getElementById('filtroInstituicao').value;
+            const busF = document.getElementById('filtroOnibus').value;
+            const tbody = document.getElementById('lista');
+            tbody.innerHTML = '';
+
+            let dadosOrdenados = [...dadosNuvem].sort((a, b) => a.nome.localeCompare(b.nome));
+
+            dadosOrdenados.filter(a => {
+                const bN = (a.nome || "").toLowerCase().includes(busca);
+                const bI = !instF || a.instituicao === instF;
+                const bO = !busF || getOnibus(a) === busF;
+                return bN && bI && bO;
+            }).forEach(aluno => {
+                let onibusStr = getOnibus(aluno) === 'AMARELO' ? '🟡 Amarelo' : '🔵 Azul';
+                let classeStatus = aluno.status === 'Pendente' ? 'status-pendente' : 'status-aprovado';
+                let textoStatus = aluno.status === 'Pendente' ? 'Em Análise' : (aluno.status || "");
+
+                tbody.innerHTML += `<tr>
+                    <td><strong>${aluno.nome || ""}</strong></td>
+                    <td>${aluno.instituicao || ""}</td>
+                    <td>${aluno.embarque || ""}</td>
+                    <td>${onibusStr}</td>
+                    <td>${aluno.turno || ""}</td>
+                    <td><span class="status-badge ${classeStatus}">${textoStatus}</span></td>
+                </tr>`;
+            });
+        }
+    </script>
 </body>
 </html>
