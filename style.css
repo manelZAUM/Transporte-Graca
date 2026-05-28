@@ -125,6 +125,12 @@
         .bg-verde:hover {
             background-color: #1e8449;
         }
+        .bg-amarelo2 {
+            background-color: var(--cor-secundaria);
+        }
+        .bg-amarelo2:hover {
+            background-color: #ffc400e0;
+        }
 
         /* Rodapé Institucional */
         footer {
