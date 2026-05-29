@@ -3,39 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Área Admin - Portal do Universitário</title>
+    <title>Área Restrita - Secretaria</title>
     <link rel="stylesheet" href="style.css">
     
-    <!-- Script oficial do Google Identity Services -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
 
-    <!-- Cabeçalho idêntico ao portal principal -->
     <header class="cabecalho-oficial">
-        <div class="pill-logo">
-            <img src="Logo prefeitura.png" alt="Logo Prefeitura de Graça">
-        </div>
-        <!-- Botão alterado para voltar ao início -->
-        <a href="index.html" class="botaosec btn bg-verde">Voltar ao Portal</a> 
+        <a href="index.html" class="botaosec btn bg-verde">Voltar ao Início</a>
     </header>
 
     <main class="area-portal">
         <div class="card" style="text-align: center;">
-            <h2>Área da Secretaria de Educação</h2>
-            <p>Acesso restrito. Faça login com sua conta Google autorizada para gerenciar o sistema.</p>
+            <h2>Painel da Secretaria</h2>
+            <p>Faça login com seu e-mail institucional (@gmail.com) para gerenciar o transporte universitário.</p>
             
-            <!-- Container flexível para centralizar o botão do Google dentro do card -->
-            <div style="display: flex; justify-content: center; margin: 30px 0;">
-                
-                <!-- Configurações do App do Google -->
+            <div style="display: flex; justify-content: center; margin-top: 20px;">
                 <div id="g_id_onload"
-                     data-client_id="SEU_CLIENT_ID_AQUI.apps.googleusercontent.com"
+                     data-client_id="http://138368767568-pev4pjotvo2j0h5iibt0q71m3gdoqb6d.apps.googleusercontent.com/"
                      data-callback="handleCredentialResponse"
                      data-auto_prompt="false">
                 </div>
                 
-                <!-- Botão visual do Google -->
                 <div class="g_id_signin"
                      data-type="standard"
                      data-size="large"
@@ -45,20 +35,11 @@
                      data-logo_alignment="left">
                 </div>
             </div>
-            
-            <!-- Mensagem de erro que fica oculta por padrão -->
-            <p id="mensagem-erro" style="color: #d9534f; display: none; font-weight: bold; margin-top: 15px;">
-                ⚠️ Acesso negado. Este e-mail não possui permissão de administrador.
-            </p>
+
+            <p id="mensagem-sistema" style="display: none; font-weight: bold; margin-top: 15px;"></p>
         </div>
     </main>
 
-    <!-- Rodapé idêntico ao portal principal -->
-    <footer>
-        &copy; 2026 Governo Municipal de Graça/CE. Todos os direitos reservados.
-    </footer>
-
-    <!-- Script que processará o login -->
-    <script src="admin-auth.js"></script>
+    <script src="auth.js"></script>
 </body>
 </html>
