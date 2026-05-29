@@ -1,30 +1,64 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Portal do Universitário - Sistema de Transportes</title>
-<link rel="stylesheet" href="globals.css">
-<link rel="stylesheet" href="styleguide.css">
-<link rel="stylesheet" href="style.css">
-    </head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Área Admin - Portal do Universitário</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Script oficial do Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
 <body>
-<main class="rea-inicial-HOME" aria-label="Página inicial do Portal do Universitário">
-<section class="card-como-funciona" aria-label="Área de conteúdo"></section>
-<header class="barra" role="banner" aria-label="Cabeçalho principal">
-<div class="rectangle" aria-hidden="true"></div>
-<div class="logo-graa" aria-label="Logo Graça">
-<img class="img" src="img/rectangle-3.svg" alt="" aria-hidden="true" />
-<div class="div" aria-hidden="true"></div>
-<img class="captura-de-tela" src="img/captura-de-tela-2026-02-23-080257-1.png" alt="Logo Graça" />
-</div>
-<img class="ellipse" src="img/ellipse-1.svg" alt="" aria-hidden="true" />
-<img class="logo-secretaria" src="img/logo-secretaria-removebg-preview-1.png" alt="Logo da Secretaria" />
-<p class="portal-do-universit">
-<span class="text-wrapper">Portal do Universitário<br></span>
-<span class="span">Sistema de Transportes</span>
-</p>
-</header>
-</main>
+
+    <!-- Cabeçalho idêntico ao portal principal -->
+    <header class="cabecalho-oficial">
+        <div class="pill-logo">
+            <img src="Logo prefeitura.png" alt="Logo Prefeitura de Graça">
+        </div>
+        <!-- Botão alterado para voltar ao início -->
+        <a href="index.html" class="botaosec btn bg-verde">Voltar ao Portal</a> 
+    </header>
+
+    <main class="area-portal">
+        <div class="card" style="text-align: center;">
+            <h2>Área da Secretaria de Educação</h2>
+            <p>Acesso restrito. Faça login com sua conta Google autorizada para gerenciar o sistema.</p>
+            
+            <!-- Container flexível para centralizar o botão do Google dentro do card -->
+            <div style="display: flex; justify-content: center; margin: 30px 0;">
+                
+                <!-- Configurações do App do Google -->
+                <div id="g_id_onload"
+                     data-client_id="SEU_CLIENT_ID_AQUI.apps.googleusercontent.com"
+                     data-callback="handleCredentialResponse"
+                     data-auto_prompt="false">
+                </div>
+                
+                <!-- Botão visual do Google -->
+                <div class="g_id_signin"
+                     data-type="standard"
+                     data-size="large"
+                     data-theme="outline"
+                     data-text="sign_in_with"
+                     data-shape="rectangular"
+                     data-logo_alignment="left">
+                </div>
+            </div>
+            
+            <!-- Mensagem de erro que fica oculta por padrão -->
+            <p id="mensagem-erro" style="color: #d9534f; display: none; font-weight: bold; margin-top: 15px;">
+                ⚠️ Acesso negado. Este e-mail não possui permissão de administrador.
+            </p>
+        </div>
+    </main>
+
+    <!-- Rodapé idêntico ao portal principal -->
+    <footer>
+        &copy; 2026 Governo Municipal de Graça/CE. Todos os direitos reservados.
+    </footer>
+
+    <!-- Script que processará o login -->
+    <script src="admin-auth.js"></script>
 </body>
 </html>

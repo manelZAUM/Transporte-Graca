@@ -41,6 +41,12 @@
             object-fit: contain;
         }
 
+        .botaosec{
+            position: absolute;
+            right: 20px;
+            top: 15px;
+        }
+
         /* Área principal: Aqui aplicamos o Fundo.jpg com overlay para manter legibilidade */
         .area-portal {
             flex: 1;
