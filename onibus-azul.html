@@ -213,11 +213,30 @@
             }
         }
 
-        function carregarMapa() {
-            const map = L.map('mapa-rota').setView([-3.86, -40.54], 10);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-            // Pode adicionar marcadores ao seu gosto aqui
-        }
+function carregarMapa() {
+    // Centralizando o mapa numa visão geral do trajeto entre Graça e Sobral
+    const map = L.map('mapa-rota').setView([-3.86, -40.54], 10);
+    
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    // Lista de pontos de embarque (Você pode ajustar as coordenadas exatas depois)
+    const pontos = [
+        { nome: "🏢 Sede (Graça)", coords: [-4.044379847241413, -40.752178191448145] },
+        { nome: "🔴 Barro Vermelho", coords: [-4.006311948847917, -40.7493451337771] }, // Coordenada aproximada
+        { nome: "⛪ Lapa", coords: [-4.085158077152727, -40.823890239252734] },           // Coordenada aproximada
+        { nome: "🏘️ Vila", coords: [-4.046357260374837, -40.7565734779549] },           // Coordenada aproximada
+        { nome: "🎓 Destino: Universidades (UFC, etc.)", coords: [-3.6895, -40.3481] }
+    ];
+
+    // Laço para adicionar cada ponto no mapa
+    pontos.forEach(ponto => {
+        L.marker(ponto.coords)
+         .addTo(map)
+         .bindPopup(`<div style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600;">${ponto.nome}</div>`);
+    });
+}
 
         function selecionarTab(elemento) {
             elemento.parentElement.querySelectorAll('.btn-tab').forEach(b => b.classList.remove('ativo'));
