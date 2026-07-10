@@ -1,5 +1,5 @@
 // Substitua pela URL gerada ao "Implantar" o seu Google Apps Script
-const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbxta1KgBk1nVvvDpAdr7oFmD82e7YAv_V63_vXbHYjuJIhSzX-vMWZxmu_CcfQkTWA/exec";
+const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbx-Q8FqTPmStWEWhZlBMPBYaXCyPJYkRCvVCsg9oAIGaFP9cgm2Mby4VuoS38RGv9k/exec";
 
 // Função acionada pelo Google assim que o login é feito com sucesso na janela pop-up
 function handleCredentialResponse(response) {
