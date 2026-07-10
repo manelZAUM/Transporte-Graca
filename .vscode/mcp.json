@@ -1,9 +1,14 @@
 {
-	"servers": {
-		"figma": {
-			"url": "http://127.0.0.1:3845/mcp",
-			"type": "http"
-		}
-	},
-	"inputs": []
+    "servers": {
+        "UIPro by Locofy": {
+            "args": [
+                "-y",
+                "@locofy/uipro-mcp@latest"
+            ],
+            "command": "npx",
+            "env": {
+                "IDE_SOURCE": "vscode"
+            }
+        }
+    }
 }
