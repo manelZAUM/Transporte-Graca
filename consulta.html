@@ -17,7 +17,6 @@
             --border-radius: 12px;
             --shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
             
-            /* Cores do Dashboard */
             --success: #28a745;
             --info: #17a2b8;
             --purple: #6f42c1;
@@ -46,12 +45,10 @@
             z-index: -1;
         }
 
-        /* Cabeçalho */
         .cabecalho-oficial { padding: 20px; display: flex; justify-content: center; }
         .pill-logo { background: white; padding: 10px 25px; border-radius: 50px; box-shadow: var(--shadow); }
         .pill-logo img { height: 45px; }
 
-        /* Container Principal */
         .main-container { display: flex; justify-content: center; align-items: flex-start; min-height: 80vh; padding: 20px; }
 
         .glass-card {
@@ -62,7 +59,6 @@
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Login Secção */
         .card-header { background-color: var(--dark); color: white; padding: 30px; text-align: center; }
         .card-body { padding: 30px; }
         .cpf-input { width: 100%; max-width: 320px; padding: 15px; margin: 20px auto; display: block; border: 2px solid #ddd; border-radius: 8px; font-size: 18px; text-align: center; transition: 0.3s; }
@@ -79,7 +75,6 @@
         .spinner { border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid white; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: none; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* Dashboard Secção */
         .secao-titulo { font-size: 20px; font-weight: 700; color: var(--dark); margin: 40px 0 20px; padding-bottom: 10px; border-bottom: 2px solid #eee; }
         
         .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
@@ -96,15 +91,13 @@
         .dash-card h3 { font-size: 15px; color: var(--muted); font-weight: 600; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
         .dash-card .numero { font-size: 36px; font-weight: 800; color: var(--dark); line-height: 1; }
 
-        /* Matriz de Turnos */
         .bus-table { width: 100%; margin-top: 15px; border-collapse: collapse; font-size: 13px; }
         .bus-table th { background: #f8f9fa; padding: 6px; color: var(--muted); font-weight: 600; border-bottom: 2px solid #eee; }
         .bus-table td { padding: 8px 4px; border-bottom: 1px solid #eee; font-weight: 500; }
         .bus-table .col-turno { font-weight: 700; text-align: left; }
 
-        /* Filtros e Tabela Principal */
         .filtros-container { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px; }
-        .input-filtro { flex: 1; min-width: 200px; padding: 12px 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; font-family: inherit; }
+        .input-filtro { flex: 1; min-width: 180px; padding: 12px 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; font-family: inherit; }
         
         .table-responsive { overflow-x: auto; border-radius: var(--border-radius); border: 1px solid #eee; background: white; }
         .table-geral { width: 100%; border-collapse: collapse; min-width: 700px; }
@@ -115,7 +108,6 @@
         .status-aprovado { background: #d4edda; color: #155724; }
         .status-pendente { background: #fff3cd; color: #856404; }
 
-        /* Modal / Pop-up */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px);
@@ -322,7 +314,6 @@
             feedback.style.color = "var(--info)";
 
             try {
-                // A requisição usa a acao=dashboard para buscar a base inteira
                 const response = await fetch(`${API_URL}?acao=dashboard&cpf=${cpf}`);
                 const data = await response.json();
 
@@ -332,12 +323,31 @@
                     feedback.innerText = "✅ Acesso Autorizado! A montar painel...";
                     feedback.style.color = "var(--success)";
                     
-                    // Extrai a lista que veio dentro de dadosGerais e converte para objetos fáceis de ler
+                    // Mapeador Inteligente - Lê qualquer nome de coluna e associa corretamente
                     dadosNuvem = data.dadosGerais.map(aluno => {
-                        let obj = {};
+                        let obj = {
+                            nome: "", instituicao: "", embarque: "", onibus: "", turno: "",
+                            status: "Pendente", novato: "Não", sobral: "Não", dias: ""
+                        };
+
                         for(let k in aluno) {
-                            let key = k.normalize('NFD').replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
-                            obj[key] = String(aluno[k] || "");
+                            let rawVal = String(aluno[k] || "").trim();
+                            let keyNorm = k.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+
+                            if (keyNorm.includes("nome")) obj.nome = rawVal;
+                            else if (keyNorm.includes("institui")) obj.instituicao = rawVal;
+                            else if (keyNorm.includes("embarque")) obj.embarque = rawVal;
+                            else if (keyNorm.includes("onibus") || keyNorm.includes("rota") || keyNorm.includes("frota")) obj.onibus = rawVal;
+                            else if (keyNorm.includes("turno")) obj.turno = rawVal;
+                            else if (keyNorm.includes("novato")) obj.novato = rawVal;
+                            else if (keyNorm.includes("sobral") || keyNorm.includes("reside")) obj.sobral = rawVal;
+                            else if (keyNorm.includes("dia")) obj.dias = rawVal;
+                            else if (keyNorm.includes("status") || keyNorm.includes("situacao")) {
+                                let s = rawVal.toLowerCase();
+                                if (s.includes("aprovado")) obj.status = "Aprovado";
+                                else if (s.includes("pendente") || s.includes("análise") || s.includes("analise")) obj.status = "Pendente";
+                                else obj.status = rawVal || "Pendente";
+                            }
                         }
                         return obj;
                     });
@@ -360,10 +370,10 @@
 
         // Descobre o ônibus baseado na instituição se a coluna estiver vazia
         function getOnibus(aluno) {
-            const inst = (aluno.instituicao || "").toUpperCase();
-            if (aluno.onibus && aluno.onibus.toUpperCase().includes('AMARELO')) return 'AMARELO';
-            if (aluno.onibus && aluno.onibus.toUpperCase().includes('AZUL')) return 'AZUL';
-            const vaiAmarelo = ["UNINTA", "FLF", "LUCIANO FEIJÃO", "ANHANGUERA", "GRAU", "UVA-CCS"].some(i => inst.includes(i));
+            const inst = aluno.instituicao.toUpperCase();
+            if (aluno.onibus.toUpperCase().includes('AMARELO')) return 'AMARELO';
+            if (aluno.onibus.toUpperCase().includes('AZUL')) return 'AZUL';
+            const vaiAmarelo = ["UNINTA", "FLF", "LUCIANO FEIJÃO", "LUCIANO FEIJAO", "ANHANGUERA", "GRAU", "UVA-CCS"].some(i => inst.includes(i));
             return vaiAmarelo ? 'AMARELO' : 'AZUL';
         }
 
@@ -371,13 +381,16 @@
             const aprovados = dadosNuvem.filter(a => a.status === 'Aprovado');
             
             document.getElementById('total-alunos').innerText = dadosNuvem.length;
-            document.getElementById('total-novatos').innerText = dadosNuvem.filter(a => a.novato === 'Sim').length;
-            document.getElementById('total-residentes').innerText = dadosNuvem.filter(a => a.sobral === 'Sim').length;
+            
+            // Filtros robustos para Sim (ignora maiúscula/minúscula)
+            document.getElementById('total-novatos').innerText = dadosNuvem.filter(a => a.novato.toLowerCase().includes('sim')).length;
+            document.getElementById('total-residentes').innerText = dadosNuvem.filter(a => a.sobral.toLowerCase().includes('sim')).length;
 
-            document.getElementById('emb-sede').innerText = aprovados.filter(a => (a.embarque || "").toUpperCase().trim() === 'SEDE').length;
-            document.getElementById('emb-barro').innerText = aprovados.filter(a => (a.embarque || "").toUpperCase().trim() === 'BARRO VERMELHO').length;
-            document.getElementById('emb-lapa').innerText = aprovados.filter(a => (a.embarque || "").toUpperCase().trim() === 'LAPA').length;
-            document.getElementById('emb-vila').innerText = aprovados.filter(a => (a.embarque || "").toUpperCase().trim() === 'VILA').length;
+            // Filtros robustos para os pontos de embarque (usa includes para pegar variações como "01 - SEDE" ou "Lapa")
+            document.getElementById('emb-sede').innerText = aprovados.filter(a => a.embarque.toUpperCase().includes('SEDE')).length;
+            document.getElementById('emb-barro').innerText = aprovados.filter(a => a.embarque.toUpperCase().includes('BARRO')).length;
+            document.getElementById('emb-lapa').innerText = aprovados.filter(a => a.embarque.toUpperCase().includes('LAPA')).length;
+            document.getElementById('emb-vila').innerText = aprovados.filter(a => a.embarque.toUpperCase().includes('VILA')).length;
 
             const contagemInst = {};
             const contagemFrota = {
@@ -386,11 +399,11 @@
             };
 
             aprovados.forEach(a => {
-                const inst = (a.instituicao || "").trim();
-                const turno = (a.turno || "").toUpperCase().trim();
+                const inst = a.instituicao.trim();
+                const turno = a.turno.toUpperCase().trim();
                 let tManha = turno.includes("MANHÃ") || turno.includes("MANHA");
                 let tNoite = turno.includes("NOITE");
-                const diasStr = (a.dias || "").toUpperCase();
+                const diasStr = a.dias.toUpperCase();
                 const viajaDia = (dia) => diasStr.includes(dia);
 
                 const onibus = getOnibus(a);
@@ -465,45 +478,43 @@
 
         function abrirModalOnibus(busName) {
             const lista = document.getElementById('lista-alunos-modal');
-            const alunos = dadosNuvem.filter(a => getOnibus(a) === busName && a.status === 'Aprovado').sort((a, b) => (a.nome || "").localeCompare(b.nome || ""));
+            const alunos = dadosNuvem.filter(a => getOnibus(a) === busName && a.status === 'Aprovado').sort((a, b) => a.nome.localeCompare(b.nome));
 
             document.getElementById('modal-titulo-inst').innerText = `${busName === 'AMARELO' ? '🟡' : '🔵'} Frota ${busName}`;
             document.getElementById('modal-subtitulo').innerText = `${alunos.length} alunos vinculados`;
-            lista.innerHTML = alunos.map(a => `<li><strong>${(a.nome || "").toUpperCase()}</strong> <span style="color:var(--muted); font-size:13px">🏫 ${a.instituicao} | 🕒 ${a.turno}</span></li>`).join('');
+            lista.innerHTML = alunos.map(a => `<li><strong>${a.nome.toUpperCase()}</strong> <span style="color:var(--muted); font-size:13px">🏫 ${a.instituicao} | 🕒 ${a.turno}</span></li>`).join('');
             document.getElementById('modal-alunos').style.display = 'flex';
         }
 
         function abrirModalAlunos(inst) {
             const lista = document.getElementById('lista-alunos-modal');
-            const alunos = dadosNuvem.filter(a => (a.instituicao || "").trim() === inst && a.status === 'Aprovado').sort((a, b) => (a.nome || "").localeCompare(b.nome || ""));
+            const alunos = dadosNuvem.filter(a => a.instituicao === inst && a.status === 'Aprovado').sort((a, b) => a.nome.localeCompare(b.nome));
 
             document.getElementById('modal-titulo-inst').innerText = inst;
             document.getElementById('modal-subtitulo').innerText = `${alunos.length} alunos matriculados`;
-            lista.innerHTML = alunos.map(a => `<li><strong>${(a.nome || "").toUpperCase()}</strong> <span style="color:var(--muted); font-size:13px">📍 Embarque: ${a.embarque} | 🕒 ${a.turno}</span></li>`).join('');
+            lista.innerHTML = alunos.map(a => `<li><strong>${a.nome.toUpperCase()}</strong> <span style="color:var(--muted); font-size:13px">📍 Embarque: ${a.embarque} | 🕒 ${a.turno}</span></li>`).join('');
             document.getElementById('modal-alunos').style.display = 'flex';
         }
 
         function abrirModalEmbarque(ponto) {
             const lista = document.getElementById('lista-alunos-modal');
-            const alunos = dadosNuvem.filter(a => (a.embarque || "").toUpperCase().trim() === ponto && a.status === 'Aprovado').sort((a, b) => (a.nome || "").localeCompare(b.nome || ""));
+            const alunos = dadosNuvem.filter(a => a.embarque.toUpperCase().includes(ponto) && a.status === 'Aprovado').sort((a, b) => a.nome.localeCompare(b.nome));
 
             document.getElementById('modal-titulo-inst').innerText = `Ponto: ${ponto}`;
             document.getElementById('modal-subtitulo').innerText = `${alunos.length} passageiros`;
-            lista.innerHTML = alunos.map(a => `<li><strong>${(a.nome || "").toUpperCase()}</strong> <span style="color:var(--muted); font-size:13px">🏫 ${a.instituicao} | 🕒 ${a.turno}</span></li>`).join('');
+            lista.innerHTML = alunos.map(a => `<li><strong>${a.nome.toUpperCase()}</strong> <span style="color:var(--muted); font-size:13px">🏫 ${a.instituicao} | 🕒 ${a.turno}</span></li>`).join('');
             document.getElementById('modal-alunos').style.display = 'flex';
         }
 
         function fecharModal() { document.getElementById('modal-alunos').style.display = 'none'; }
 
         function popularFiltros() {
-            // Popula Instituições
             const selInst = document.getElementById('filtroInstituicao');
-            const insts = [...new Set(dadosNuvem.map(a => (a.instituicao || "").trim()))].filter(i => i).sort();
+            const insts = [...new Set(dadosNuvem.map(a => a.instituicao))].filter(i => i).sort();
             insts.forEach(i => selInst.innerHTML += `<option value="${i}">${i}</option>`);
 
-            // Popula Embarques dinamicamente (baseado no que vem da planilha)
             const selEmb = document.getElementById('filtroEmbarque');
-            const embarques = [...new Set(dadosNuvem.map(a => (a.embarque || "").trim()))].filter(e => e).sort();
+            const embarques = [...new Set(dadosNuvem.map(a => a.embarque))].filter(e => e).sort();
             embarques.forEach(e => selEmb.innerHTML += `<option value="${e}">${e}</option>`);
         }
 
@@ -518,31 +529,28 @@
             const tbody = document.getElementById('lista');
             tbody.innerHTML = '';
 
-            // Proteção na ordenação caso o nome esteja vazio
-            let dadosOrdenados = [...dadosNuvem].sort((a, b) => (a.nome || "").localeCompare(b.nome || ""));
+            let dadosOrdenados = [...dadosNuvem].sort((a, b) => a.nome.localeCompare(b.nome));
 
             dadosOrdenados.filter(a => {
-                // Aplicação de fallback e trim em todas as variáveis para evitar quebras por formatação da planilha
-                const bN = (a.nome || "").toLowerCase().includes(busca);
-                const bI = !instF || (a.instituicao || "").trim() === instF;
+                const bN = a.nome.toLowerCase().includes(busca);
+                const bI = !instF || a.instituicao === instF;
                 const bO = !busF || getOnibus(a) === busF;
-                const bE = !embF || (a.embarque || "").trim() === embF;
-                const bT = !turnoF || (a.turno || "").toUpperCase().includes(turnoF);
-                const bS = !statusF || (a.status || "").trim() === statusF;
+                const bE = !embF || a.embarque === embF;
+                const bT = !turnoF || a.turno.toUpperCase().includes(turnoF);
+                const bS = !statusF || a.status === statusF;
                 
-                // Só retorna o aluno se ele passar em TODOS os filtros simultaneamente
                 return bN && bI && bO && bE && bT && bS;
             }).forEach(aluno => {
                 let onibusStr = getOnibus(aluno) === 'AMARELO' ? '🟡 Amarelo' : '🔵 Azul';
                 let classeStatus = aluno.status === 'Pendente' ? 'status-pendente' : 'status-aprovado';
-                let textoStatus = aluno.status === 'Pendente' ? 'Em Análise' : (aluno.status || "");
+                let textoStatus = aluno.status === 'Pendente' ? 'Em Análise' : aluno.status;
 
                 tbody.innerHTML += `<tr>
-                    <td><strong>${aluno.nome || ""}</strong></td>
-                    <td>${aluno.instituicao || ""}</td>
-                    <td>${aluno.embarque || ""}</td>
+                    <td><strong>${aluno.nome}</strong></td>
+                    <td>${aluno.instituicao}</td>
+                    <td>${aluno.embarque}</td>
                     <td>${onibusStr}</td>
-                    <td>${aluno.turno || ""}</td>
+                    <td>${aluno.turno}</td>
                     <td><span class="status-badge ${classeStatus}">${textoStatus}</span></td>
                 </tr>`;
             });
