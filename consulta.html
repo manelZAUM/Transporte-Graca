@@ -30,7 +30,7 @@
 
         body { 
             font-family: 'Inter', sans-serif;
-            background-image: url('fundo-login.jpg'); /* Se quiser pode trocar para as fotos do Arco aqui também! */
+            background-image: url('fundo-login.jpg'); 
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -227,6 +227,7 @@
                 <div class="dashboard-grid" id="cards-instituicoes"></div>
 
                 <h3 class="secao-titulo">🔍 Tabela Geral de Passageiros</h3>
+                
                 <div class="filtros-container">
                     <input type="text" id="buscaGeral" class="input-filtro" placeholder="Buscar por nome..." onkeyup="renderizarTabela()">
                     <select id="filtroInstituicao" class="input-filtro" onchange="renderizarTabela()">
@@ -236,6 +237,19 @@
                         <option value="">Todos os Ônibus</option>
                         <option value="AMARELO">🟡 Amarelo</option>
                         <option value="AZUL">🔵 Azul</option>
+                    </select>
+                    <select id="filtroEmbarque" class="input-filtro" onchange="renderizarTabela()">
+                        <option value="">Todos os Embarques</option>
+                    </select>
+                    <select id="filtroTurno" class="input-filtro" onchange="renderizarTabela()">
+                        <option value="">Todos os Turnos</option>
+                        <option value="MANHÃ">Manhã</option>
+                        <option value="NOITE">Noite</option>
+                    </select>
+                    <select id="filtroStatus" class="input-filtro" onchange="renderizarTabela()">
+                        <option value="">Todos os Status</option>
+                        <option value="Aprovado">Aprovado</option>
+                        <option value="Pendente">Em Análise</option>
                     </select>
                 </div>
 
@@ -360,10 +374,10 @@
             document.getElementById('total-novatos').innerText = dadosNuvem.filter(a => a.novato === 'Sim').length;
             document.getElementById('total-residentes').innerText = dadosNuvem.filter(a => a.sobral === 'Sim').length;
 
-            document.getElementById('emb-sede').innerText = aprovados.filter(a => a.embarque.toUpperCase().trim() === 'SEDE').length;
-            document.getElementById('emb-barro').innerText = aprovados.filter(a => a.embarque.toUpperCase().trim() === 'BARRO VERMELHO').length;
-            document.getElementById('emb-lapa').innerText = aprovados.filter(a => a.embarque.toUpperCase().trim() === 'LAPA').length;
-            document.getElementById('emb-vila').innerText = aprovados.filter(a => a.embarque.toUpperCase().trim() === 'VILA').length;
+            document.getElementById('emb-sede').innerText = aprovados.filter(a => (a.embarque || "").toUpperCase().trim() === 'SEDE').length;
+            document.getElementById('emb-barro').innerText = aprovados.filter(a => (a.embarque || "").toUpperCase().trim() === 'BARRO VERMELHO').length;
+            document.getElementById('emb-lapa').innerText = aprovados.filter(a => (a.embarque || "").toUpperCase().trim() === 'LAPA').length;
+            document.getElementById('emb-vila').innerText = aprovados.filter(a => (a.embarque || "").toUpperCase().trim() === 'VILA').length;
 
             const contagemInst = {};
             const contagemFrota = {
@@ -372,7 +386,7 @@
             };
 
             aprovados.forEach(a => {
-                const inst = a.instituicao.trim();
+                const inst = (a.instituicao || "").trim();
                 const turno = (a.turno || "").toUpperCase().trim();
                 let tManha = turno.includes("MANHÃ") || turno.includes("MANHA");
                 let tNoite = turno.includes("NOITE");
@@ -451,56 +465,73 @@
 
         function abrirModalOnibus(busName) {
             const lista = document.getElementById('lista-alunos-modal');
-            const alunos = dadosNuvem.filter(a => getOnibus(a) === busName && a.status === 'Aprovado').sort((a, b) => a.nome.localeCompare(b.nome));
+            const alunos = dadosNuvem.filter(a => getOnibus(a) === busName && a.status === 'Aprovado').sort((a, b) => (a.nome || "").localeCompare(b.nome || ""));
 
             document.getElementById('modal-titulo-inst').innerText = `${busName === 'AMARELO' ? '🟡' : '🔵'} Frota ${busName}`;
             document.getElementById('modal-subtitulo').innerText = `${alunos.length} alunos vinculados`;
-            lista.innerHTML = alunos.map(a => `<li><strong>${a.nome.toUpperCase()}</strong> <span style="color:var(--muted); font-size:13px">🏫 ${a.instituicao} | 🕒 ${a.turno}</span></li>`).join('');
+            lista.innerHTML = alunos.map(a => `<li><strong>${(a.nome || "").toUpperCase()}</strong> <span style="color:var(--muted); font-size:13px">🏫 ${a.instituicao} | 🕒 ${a.turno}</span></li>`).join('');
             document.getElementById('modal-alunos').style.display = 'flex';
         }
 
         function abrirModalAlunos(inst) {
             const lista = document.getElementById('lista-alunos-modal');
-            const alunos = dadosNuvem.filter(a => a.instituicao.trim() === inst && a.status === 'Aprovado').sort((a, b) => a.nome.localeCompare(b.nome));
+            const alunos = dadosNuvem.filter(a => (a.instituicao || "").trim() === inst && a.status === 'Aprovado').sort((a, b) => (a.nome || "").localeCompare(b.nome || ""));
 
             document.getElementById('modal-titulo-inst').innerText = inst;
             document.getElementById('modal-subtitulo').innerText = `${alunos.length} alunos matriculados`;
-            lista.innerHTML = alunos.map(a => `<li><strong>${a.nome.toUpperCase()}</strong> <span style="color:var(--muted); font-size:13px">📍 Embarque: ${a.embarque} | 🕒 ${a.turno}</span></li>`).join('');
+            lista.innerHTML = alunos.map(a => `<li><strong>${(a.nome || "").toUpperCase()}</strong> <span style="color:var(--muted); font-size:13px">📍 Embarque: ${a.embarque} | 🕒 ${a.turno}</span></li>`).join('');
             document.getElementById('modal-alunos').style.display = 'flex';
         }
 
         function abrirModalEmbarque(ponto) {
             const lista = document.getElementById('lista-alunos-modal');
-            const alunos = dadosNuvem.filter(a => a.embarque.toUpperCase().trim() === ponto && a.status === 'Aprovado').sort((a, b) => a.nome.localeCompare(b.nome));
+            const alunos = dadosNuvem.filter(a => (a.embarque || "").toUpperCase().trim() === ponto && a.status === 'Aprovado').sort((a, b) => (a.nome || "").localeCompare(b.nome || ""));
 
             document.getElementById('modal-titulo-inst').innerText = `Ponto: ${ponto}`;
             document.getElementById('modal-subtitulo').innerText = `${alunos.length} passageiros`;
-            lista.innerHTML = alunos.map(a => `<li><strong>${a.nome.toUpperCase()}</strong> <span style="color:var(--muted); font-size:13px">🏫 ${a.instituicao} | 🕒 ${a.turno}</span></li>`).join('');
+            lista.innerHTML = alunos.map(a => `<li><strong>${(a.nome || "").toUpperCase()}</strong> <span style="color:var(--muted); font-size:13px">🏫 ${a.instituicao} | 🕒 ${a.turno}</span></li>`).join('');
             document.getElementById('modal-alunos').style.display = 'flex';
         }
 
         function fecharModal() { document.getElementById('modal-alunos').style.display = 'none'; }
 
         function popularFiltros() {
-            const sel = document.getElementById('filtroInstituicao');
-            const insts = [...new Set(dadosNuvem.map(a => a.instituicao.trim()))].filter(i => i).sort();
-            insts.forEach(i => sel.innerHTML += `<option value="${i}">${i}</option>`);
+            // Popula Instituições
+            const selInst = document.getElementById('filtroInstituicao');
+            const insts = [...new Set(dadosNuvem.map(a => (a.instituicao || "").trim()))].filter(i => i).sort();
+            insts.forEach(i => selInst.innerHTML += `<option value="${i}">${i}</option>`);
+
+            // Popula Embarques dinamicamente (baseado no que vem da planilha)
+            const selEmb = document.getElementById('filtroEmbarque');
+            const embarques = [...new Set(dadosNuvem.map(a => (a.embarque || "").trim()))].filter(e => e).sort();
+            embarques.forEach(e => selEmb.innerHTML += `<option value="${e}">${e}</option>`);
         }
 
         function renderizarTabela() {
-            const busca = document.getElementById('buscaGeral').value.toLowerCase();
+            const busca = document.getElementById('buscaGeral').value.toLowerCase().trim();
             const instF = document.getElementById('filtroInstituicao').value;
             const busF = document.getElementById('filtroOnibus').value;
+            const embF = document.getElementById('filtroEmbarque').value;
+            const turnoF = document.getElementById('filtroTurno').value;
+            const statusF = document.getElementById('filtroStatus').value;
+            
             const tbody = document.getElementById('lista');
             tbody.innerHTML = '';
 
-            let dadosOrdenados = [...dadosNuvem].sort((a, b) => a.nome.localeCompare(b.nome));
+            // Proteção na ordenação caso o nome esteja vazio
+            let dadosOrdenados = [...dadosNuvem].sort((a, b) => (a.nome || "").localeCompare(b.nome || ""));
 
             dadosOrdenados.filter(a => {
+                // Aplicação de fallback e trim em todas as variáveis para evitar quebras por formatação da planilha
                 const bN = (a.nome || "").toLowerCase().includes(busca);
-                const bI = !instF || a.instituicao === instF;
+                const bI = !instF || (a.instituicao || "").trim() === instF;
                 const bO = !busF || getOnibus(a) === busF;
-                return bN && bI && bO;
+                const bE = !embF || (a.embarque || "").trim() === embF;
+                const bT = !turnoF || (a.turno || "").toUpperCase().includes(turnoF);
+                const bS = !statusF || (a.status || "").trim() === statusF;
+                
+                // Só retorna o aluno se ele passar em TODOS os filtros simultaneamente
+                return bN && bI && bO && bE && bT && bS;
             }).forEach(aluno => {
                 let onibusStr = getOnibus(aluno) === 'AMARELO' ? '🟡 Amarelo' : '🔵 Azul';
                 let classeStatus = aluno.status === 'Pendente' ? 'status-pendente' : 'status-aprovado';
