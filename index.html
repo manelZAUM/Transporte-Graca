@@ -8,11 +8,31 @@
 </head>
 <body>
 
-    <header class="cabecalho-oficial">
+    <!-- Cabeçalho atualizado com flexbox para agrupar as ações à direita -->
+    <header class="cabecalho-oficial" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 20px; padding: 20px;">
+        
         <div class="pill-logo">
             <img src="Logo prefeitura.png" alt="Logo Prefeitura de Graça">
         </div>
-        <a href="admin.html" class="botaosec btn bg-verde">Área da Secretaria de Educação</a>
+        
+        <!-- Container que segura o botão da secretaria e o aviso de veteranos -->
+        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 15px; max-width: 380px; width: 100%;">
+            
+            <a href="admin.html" class="botaosec btn bg-verde" style="margin: 0;">Área da Secretaria de Educação</a>
+            
+            <!-- ====== AVISO PARA VETERANOS ====== -->
+            <div class="aviso-veteranos" style="background-color: #fff3cd; border-left: 5px solid #ffc107; padding: 15px; border-radius: 8px; text-align: left; box-shadow: 0 4px 10px rgba(0,0,0,0.05); width: 100%; box-sizing: border-box;">
+                <h3 style="color: #856404; margin-top: 0; margin-bottom: 8px; font-size: 16px;">⚠️ Atenção, Veteranos!</h3>
+                <p style="color: #856404; font-size: 13px; margin-top: 0; margin-bottom: 15px; line-height: 1.4;">
+                    O período de atualização cadastral já está aberto. É obrigatório renovar seus dados e enviar a documentação atualizada para garantir o acesso ao transporte no novo semestre.
+                </p>
+                <a href="atualizacao-cadastro.html" class="btn" style="background-color: #ffc107; color: #000; font-weight: 700; border: none; display: flex; justify-content: center; transition: 0.3s; padding: 10px; text-decoration: none; border-radius: 6px;">
+                    📝 Realizar Atualização Cadastral
+                </a>
+            </div>
+            <!-- ====== FIM DO AVISO ====== -->
+
+        </div>
     </header>
 
     <main class="area-portal">
@@ -20,18 +40,6 @@
             <h2>Portal do Universitário</h2>
             <p>Selecione sua rota ou consulte a lista geral</p>
             
-            <!-- ====== INÍCIO DO AVISO PARA VETERANOS ====== -->
-            <div class="aviso-veteranos" style="background-color: #fff3cd; border-left: 5px solid #ffc107; padding: 18px; margin: 25px 0; border-radius: 8px; text-align: left; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
-                <h3 style="color: #856404; margin-bottom: 8px; font-size: 18px;">⚠️ Atenção, Veteranos!</h3>
-                <p style="color: #856404; font-size: 14px; margin-bottom: 15px; line-height: 1.5;">
-                    O período de atualização cadastral já está aberto. É obrigatório renovar seus dados e enviar a documentação atualizada para garantir o acesso ao transporte no novo semestre.
-                </p>
-                <a href="atualizacao-cadastro.html" class="btn" style="background-color: #ffc107; color: #000; font-weight: 700; border: none; display: flex; justify-content: center; transition: 0.3s; box-shadow: none;">
-                    📝 Realizar Atualização Cadastral
-                </a>
-            </div>
-            <!-- ====== FIM DO AVISO ====== -->
-
             <div class="btn-group">
                 <a href="onibus-azul.html" class="btn bg-azul">🚌 Rota - Ônibus Azul</a>
                 <a href="onibus-amarelo.html" class="btn bg-amarelo">🚌 Rota - Ônibus Amarelo</a>
