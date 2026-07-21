@@ -336,12 +336,14 @@
 
                             if (keyNorm.includes("nome")) obj.nome = rawVal;
                             else if (keyNorm.includes("institui")) obj.instituicao = rawVal;
-                            else if (keyNorm.includes("embarque")) obj.embarque = rawVal;
+                            // Aceita 'embarque', 'ponto', 'local' ou 'bairro'
+                            else if (keyNorm.includes("embarque") || keyNorm.includes("ponto") || keyNorm.includes("local") || keyNorm.includes("bairro")) obj.embarque = rawVal;
                             else if (keyNorm.includes("onibus") || keyNorm.includes("rota") || keyNorm.includes("frota")) obj.onibus = rawVal;
                             else if (keyNorm.includes("turno")) obj.turno = rawVal;
                             else if (keyNorm.includes("novato")) obj.novato = rawVal;
                             else if (keyNorm.includes("sobral") || keyNorm.includes("reside")) obj.sobral = rawVal;
-                            else if (keyNorm.includes("dia")) obj.dias = rawVal;
+                            // Aceita 'dia' ou 'frequencia'
+                            else if (keyNorm.includes("dia") || keyNorm.includes("frequencia")) obj.dias = rawVal;
                             else if (keyNorm.includes("status") || keyNorm.includes("situacao")) {
                                 let s = rawVal.toLowerCase();
                                 if (s.includes("aprovado")) obj.status = "Aprovado";
@@ -381,12 +383,10 @@
             const aprovados = dadosNuvem.filter(a => a.status === 'Aprovado');
             
             document.getElementById('total-alunos').innerText = dadosNuvem.length;
-            
-            // Filtros robustos para Sim (ignora maiúscula/minúscula)
             document.getElementById('total-novatos').innerText = dadosNuvem.filter(a => a.novato.toLowerCase().includes('sim')).length;
             document.getElementById('total-residentes').innerText = dadosNuvem.filter(a => a.sobral.toLowerCase().includes('sim')).length;
 
-            // Filtros robustos para os pontos de embarque (usa includes para pegar variações como "01 - SEDE" ou "Lapa")
+            // Contagem dos Pontos de Embarque
             document.getElementById('emb-sede').innerText = aprovados.filter(a => a.embarque.toUpperCase().includes('SEDE')).length;
             document.getElementById('emb-barro').innerText = aprovados.filter(a => a.embarque.toUpperCase().includes('BARRO')).length;
             document.getElementById('emb-lapa').innerText = aprovados.filter(a => a.embarque.toUpperCase().includes('LAPA')).length;
@@ -401,19 +401,30 @@
             aprovados.forEach(a => {
                 const inst = a.instituicao.trim();
                 const turno = a.turno.toUpperCase().trim();
-                let tManha = turno.includes("MANHÃ") || turno.includes("MANHA");
-                let tNoite = turno.includes("NOITE");
+
+                // Detecta turno por M, Manhã, Matutino / N, Noite, Noturno
+                let tManha = turno.includes("MANHÃ") || turno.includes("MANHA") || turno.includes("MATUTINO") || turno === "M";
+                let tNoite = turno.includes("NOITE") || turno.includes("NOTURNO") || turno === "N";
+
                 const diasStr = a.dias.toUpperCase();
-                const viajaDia = (dia) => diasStr.includes(dia);
+
+                // Helper para verificar dia (aceita 'SEG' e 'SEGUNDA', etc.)
+                const viajaDia = (sigla, extenso) => diasStr.includes(sigla) || diasStr.includes(extenso);
+
+                const eSeg = viajaDia("SEG", "SEGUNDA");
+                const eTer = viajaDia("TER", "TERCA") || viajaDia("TER", "TERÇA");
+                const eQua = viajaDia("QUA", "QUARTA");
+                const eQui = viajaDia("QUI", "QUINTA");
+                const eSex = viajaDia("SEX", "SEXTA");
 
                 const onibus = getOnibus(a);
                 if (onibus === 'AMARELO' || onibus === 'AZUL') {
                     contagemFrota[onibus].total++;
-                    if (viajaDia("SEGUNDA")) { if (tManha) contagemFrota[onibus].dias.seg.M++; if (tNoite) contagemFrota[onibus].dias.seg.N++; }
-                    if (viajaDia("TERÇA") || viajaDia("TERCA")) { if (tManha) contagemFrota[onibus].dias.ter.M++; if (tNoite) contagemFrota[onibus].dias.ter.N++; }
-                    if (viajaDia("QUARTA")) { if (tManha) contagemFrota[onibus].dias.qua.M++; if (tNoite) contagemFrota[onibus].dias.qua.N++; }
-                    if (viajaDia("QUINTA")) { if (tManha) contagemFrota[onibus].dias.qui.M++; if (tNoite) contagemFrota[onibus].dias.qui.N++; }
-                    if (viajaDia("SEXTA")) { if (tManha) contagemFrota[onibus].dias.sex.M++; if (tNoite) contagemFrota[onibus].dias.sex.N++; }
+                    if (eSeg) { if (tManha) contagemFrota[onibus].dias.seg.M++; if (tNoite) contagemFrota[onibus].dias.seg.N++; }
+                    if (eTer) { if (tManha) contagemFrota[onibus].dias.ter.M++; if (tNoite) contagemFrota[onibus].dias.ter.N++; }
+                    if (eQua) { if (tManha) contagemFrota[onibus].dias.qua.M++; if (tNoite) contagemFrota[onibus].dias.qua.N++; }
+                    if (eQui) { if (tManha) contagemFrota[onibus].dias.qui.M++; if (tNoite) contagemFrota[onibus].dias.qui.N++; }
+                    if (eSex) { if (tManha) contagemFrota[onibus].dias.sex.M++; if (tNoite) contagemFrota[onibus].dias.sex.N++; }
                 }
 
                 if (!inst) return;
@@ -426,11 +437,11 @@
                 
                 contagemInst[inst].total++;
 
-                if (viajaDia("SEGUNDA")) { if (tManha) contagemInst[inst].dias.seg.M++; if (tNoite) contagemInst[inst].dias.seg.N++; }
-                if (viajaDia("TERÇA") || viajaDia("TERCA")) { if (tManha) contagemInst[inst].dias.ter.M++; if (tNoite) contagemInst[inst].dias.ter.N++; }
-                if (viajaDia("QUARTA")) { if (tManha) contagemInst[inst].dias.qua.M++; if (tNoite) contagemInst[inst].dias.qua.N++; }
-                if (viajaDia("QUINTA")) { if (tManha) contagemInst[inst].dias.qui.M++; if (tNoite) contagemInst[inst].dias.qui.N++; }
-                if (viajaDia("SEXTA")) { if (tManha) contagemInst[inst].dias.sex.M++; if (tNoite) contagemInst[inst].dias.sex.N++; }
+                if (eSeg) { if (tManha) contagemInst[inst].dias.seg.M++; if (tNoite) contagemInst[inst].dias.seg.N++; }
+                if (eTer) { if (tManha) contagemInst[inst].dias.ter.M++; if (tNoite) contagemInst[inst].dias.ter.N++; }
+                if (eQua) { if (tManha) contagemInst[inst].dias.qua.M++; if (tNoite) contagemInst[inst].dias.qua.N++; }
+                if (eQui) { if (tManha) contagemInst[inst].dias.qui.M++; if (tNoite) contagemInst[inst].dias.qui.N++; }
+                if (eSex) { if (tManha) contagemInst[inst].dias.sex.M++; if (tNoite) contagemInst[inst].dias.sex.N++; }
             });
 
             const gridFrota = document.getElementById('cards-frota');
@@ -438,7 +449,6 @@
             ['AMARELO', 'AZUL'].forEach(bus => {
                 const f = contagemFrota[bus];
                 const cor = bus === 'AMARELO' ? 'var(--primary-yellow)' : 'var(--primary-blue)';
-                const textCor = bus === 'AMARELO' ? 'var(--dark)' : '#fff';
                 const icone = bus === 'AMARELO' ? '🟡' : '🔵';
                 
                 gridFrota.innerHTML += `
