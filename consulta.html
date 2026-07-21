@@ -336,13 +336,11 @@
 
                             if (keyNorm.includes("nome")) obj.nome = rawVal;
                             else if (keyNorm.includes("institui")) obj.instituicao = rawVal;
-                            // Aceita 'embarque', 'ponto', 'local' ou 'bairro'
                             else if (keyNorm.includes("embarque") || keyNorm.includes("ponto") || keyNorm.includes("local") || keyNorm.includes("bairro")) obj.embarque = rawVal;
                             else if (keyNorm.includes("onibus") || keyNorm.includes("rota") || keyNorm.includes("frota")) obj.onibus = rawVal;
                             else if (keyNorm.includes("turno")) obj.turno = rawVal;
                             else if (keyNorm.includes("novato")) obj.novato = rawVal;
                             else if (keyNorm.includes("sobral") || keyNorm.includes("reside")) obj.sobral = rawVal;
-                            // Aceita 'dia' ou 'frequencia'
                             else if (keyNorm.includes("dia") || keyNorm.includes("frequencia")) obj.dias = rawVal;
                             else if (keyNorm.includes("status") || keyNorm.includes("situacao")) {
                                 let s = rawVal.toLowerCase();
@@ -380,14 +378,19 @@
         }
 
         function gerarDashboard() {
+            // DEBUG: Aperte F12 no navegador e veja como os dados estão chegando!
+            console.log("🔍 Inspecionando dados mapeados:", dadosNuvem);
+
             const aprovados = dadosNuvem.filter(a => a.status === 'Aprovado');
             
             document.getElementById('total-alunos').innerText = dadosNuvem.length;
             document.getElementById('total-novatos').innerText = dadosNuvem.filter(a => a.novato.toLowerCase().includes('sim')).length;
             document.getElementById('total-residentes').innerText = dadosNuvem.filter(a => a.sobral.toLowerCase().includes('sim')).length;
 
-            // Contagem dos Pontos de Embarque
-            document.getElementById('emb-sede').innerText = aprovados.filter(a => a.embarque.toUpperCase().includes('SEDE')).length;
+            // Contagem dos Pontos de Embarque (Filtro ampliado)
+            document.getElementById('emb-sede').innerText = aprovados.filter(a => {
+                let e = a.embarque.toUpperCase(); return e.includes('SEDE') || e.includes('CENTRO') || e.includes('MATRIZ');
+            }).length;
             document.getElementById('emb-barro').innerText = aprovados.filter(a => a.embarque.toUpperCase().includes('BARRO')).length;
             document.getElementById('emb-lapa').innerText = aprovados.filter(a => a.embarque.toUpperCase().includes('LAPA')).length;
             document.getElementById('emb-vila').innerText = aprovados.filter(a => a.embarque.toUpperCase().includes('VILA')).length;
@@ -402,20 +405,21 @@
                 const inst = a.instituicao.trim();
                 const turno = a.turno.toUpperCase().trim();
 
-                // Detecta turno por M, Manhã, Matutino / N, Noite, Noturno
-                let tManha = turno.includes("MANHÃ") || turno.includes("MANHA") || turno.includes("MATUTINO") || turno === "M";
+                // Interpretador flexível de Turno
+                let tManha = turno.includes("MANHÃ") || turno.includes("MANHA") || turno.includes("MATUTINO") || turno === "M" || turno.includes("INTEGRAL");
                 let tNoite = turno.includes("NOITE") || turno.includes("NOTURNO") || turno === "N";
 
                 const diasStr = a.dias.toUpperCase();
+                
+                // A grande sacada: se o aluno preencheu um período completo
+                const todosOsDias = diasStr.includes("TODOS") || diasStr.includes("DIARIA") || diasStr.includes("SEGUNDA A SEXTA") || diasStr.includes("SEG A SEX");
 
-                // Helper para verificar dia (aceita 'SEG' e 'SEGUNDA', etc.)
-                const viajaDia = (sigla, extenso) => diasStr.includes(sigla) || diasStr.includes(extenso);
-
-                const eSeg = viajaDia("SEG", "SEGUNDA");
-                const eTer = viajaDia("TER", "TERCA") || viajaDia("TER", "TERÇA");
-                const eQua = viajaDia("QUA", "QUARTA");
-                const eQui = viajaDia("QUI", "QUINTA");
-                const eSex = viajaDia("SEX", "SEXTA");
+                // Checagem individual
+                const eSeg = todosOsDias || diasStr.includes("SEG") || diasStr.includes("SEGUNDA");
+                const eTer = todosOsDias || diasStr.includes("TER") || diasStr.includes("TERÇA") || diasStr.includes("TERCA");
+                const eQua = todosOsDias || diasStr.includes("QUA") || diasStr.includes("QUARTA");
+                const eQui = todosOsDias || diasStr.includes("QUI") || diasStr.includes("QUINTA");
+                const eSex = todosOsDias || diasStr.includes("SEX") || diasStr.includes("SEXTA");
 
                 const onibus = getOnibus(a);
                 if (onibus === 'AMARELO' || onibus === 'AZUL') {
