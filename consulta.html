@@ -277,12 +277,10 @@
     </div>
 
     <script>
-        // ATENÇÃO: MANTENHA SUA URL DA API AQUI
         const API_URL = "https://script.google.com/macros/s/AKfycbx-Q8FqTPmStWEWhZlBMPBYaXCyPJYkRCvVCsg9oAIGaFP9cgm2Mby4VuoS38RGv9k/exec"; 
         
         let dadosNuvem = [];
 
-        // Máscara de CPF
         document.getElementById('cpf-input').addEventListener('input', function(e) {
             let value = e.target.value.replace(/\D/g, '');
             if (value.length > 3) value = value.replace(/^(\d{3})(\d)/, '$1.$2');
@@ -294,6 +292,12 @@
         document.getElementById("cpf-input").addEventListener("keypress", function(event) {
             if (event.key === "Enter") tentarAcesso();
         });
+
+        // Helper para checar sim/não/true de forma segura
+        function valorPositivo(val) {
+            let v = String(val).toLowerCase().trim();
+            return v === 'sim' || v === 'true' || v === 'verdadeiro' || v === '1' || v === 'v' || v.includes('sim');
+        }
 
         async function tentarAcesso() {
             const cpf = document.getElementById('cpf-input').value.trim().replace(/\D/g, '');
@@ -307,10 +311,8 @@
                 return;
             }
 
-            btn.disabled = true; 
-            spinner.style.display = "block";
-            btnText.innerText = "A consultar...";
-            feedback.innerText = "Validando permissão de acesso...";
+            btn.disabled = true; spinner.style.display = "block";
+            btnText.innerText = "A consultar..."; feedback.innerText = "Validando permissão de acesso...";
             feedback.style.color = "var(--info)";
 
             try {
@@ -323,7 +325,7 @@
                     feedback.innerText = "✅ Acesso Autorizado! A montar painel...";
                     feedback.style.color = "var(--success)";
                     
-                    // Mapeador Blindado - Busca os nomes EXATOS das suas colunas
+                    // Mapeador Ultra Flexível (Resolve nomes de colunas ocultos ou mal formatados)
                     dadosNuvem = data.dadosGerais.map(aluno => {
                         let obj = {
                             nome: "", instituicao: "", embarque: "", onibus: "", turno: "",
@@ -332,18 +334,17 @@
 
                         for(let k in aluno) {
                             let rawVal = String(aluno[k] || "").trim();
-                            // Normaliza a chave para minúscula e sem acento
                             let keyNorm = k.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "").trim();
 
-                            if (keyNorm === "nome") obj.nome = rawVal;
-                            else if (keyNorm === "instituicao") obj.instituicao = rawVal;
-                            else if (keyNorm === "embarque") obj.embarque = rawVal;
-                            else if (keyNorm === "onibus") obj.onibus = rawVal;
-                            else if (keyNorm === "turno") obj.turno = rawVal;
-                            else if (keyNorm === "novato") obj.novato = rawVal;
-                            else if (keyNorm === "sobral") obj.sobral = rawVal;
-                            else if (keyNorm === "dias") obj.dias = rawVal;
-                            else if (keyNorm === "status") {
+                            if (keyNorm.includes("nome")) obj.nome = rawVal;
+                            else if (keyNorm.includes("institu")) obj.instituicao = rawVal;
+                            else if (keyNorm.includes("embarque") || keyNorm.includes("ponto") || keyNorm.includes("local") || keyNorm.includes("comunidade") || keyNorm.includes("origem")) obj.embarque = rawVal;
+                            else if (keyNorm.includes("onibus") || keyNorm.includes("rota") || keyNorm.includes("veiculo")) obj.onibus = rawVal;
+                            else if (keyNorm.includes("turno") || keyNorm.includes("periodo") || keyNorm.includes("horario")) obj.turno = rawVal;
+                            else if (keyNorm.includes("novato") || keyNorm.includes("novo") || keyNorm.includes("primeira")) obj.novato = rawVal;
+                            else if (keyNorm.includes("sobral") || keyNorm.includes("reside") || keyNorm.includes("mora")) obj.sobral = rawVal;
+                            else if (keyNorm.includes("dia") || keyNorm.includes("freq")) obj.dias = rawVal;
+                            else if (keyNorm.includes("status") || keyNorm.includes("situacao")) {
                                 let s = rawVal.toLowerCase();
                                 if (s.includes("aprovado")) obj.status = "Aprovado";
                                 else if (s.includes("pendente") || s.includes("analise")) obj.status = "Pendente";
@@ -363,13 +364,10 @@
             } catch (e) { 
                 feedback.innerText = "❌ Erro ao conectar ao servidor."; feedback.style.color = "var(--danger)";
             } finally {
-                btn.disabled = false; 
-                spinner.style.display = "none";
-                btnText.innerText = "Carregar Sistema";
+                btn.disabled = false; spinner.style.display = "none"; btnText.innerText = "Carregar Sistema";
             }
         }
 
-        // Descobre o ônibus baseado na instituição se a coluna estiver vazia
         function getOnibus(aluno) {
             const inst = aluno.instituicao.toUpperCase();
             if (aluno.onibus.toUpperCase().includes('AMARELO')) return 'AMARELO';
@@ -382,19 +380,11 @@
             const aprovados = dadosNuvem.filter(a => a.status === 'Aprovado');
             
             document.getElementById('total-alunos').innerText = dadosNuvem.length;
-            
-            // Corrige leitura de checkbox do Google Sheets (recebe "true" em vez de "sim")
-            document.getElementById('total-novatos').innerText = dadosNuvem.filter(a => {
-                let v = a.novato.toLowerCase(); return v.includes('sim') || v === 'true' || v === 'verdadeiro';
-            }).length;
+            document.getElementById('total-novatos').innerText = dadosNuvem.filter(a => valorPositivo(a.novato)).length;
+            document.getElementById('total-residentes').innerText = dadosNuvem.filter(a => valorPositivo(a.sobral)).length;
 
-            document.getElementById('total-residentes').innerText = dadosNuvem.filter(a => {
-                let v = a.sobral.toLowerCase(); return v.includes('sim') || v === 'true' || v === 'verdadeiro';
-            }).length;
-
-            // Filtros amplos para Ponto de Embarque
             document.getElementById('emb-sede').innerText = aprovados.filter(a => {
-                let e = a.embarque.toUpperCase(); return e.includes('SEDE') || e.includes('CENTRO') || e === '1';
+                let e = a.embarque.toUpperCase(); return e.includes('SEDE') || e.includes('CENTRO') || e.includes('MATRIZ') || e === '1';
             }).length;
             document.getElementById('emb-barro').innerText = aprovados.filter(a => {
                 let e = a.embarque.toUpperCase(); return e.includes('BARRO') || e === '2';
@@ -414,16 +404,17 @@
 
             aprovados.forEach(a => {
                 const inst = (a.instituicao || "NÃO INFORMADA").trim();
-                const turno = a.turno.toUpperCase().trim();
+                const turno = (a.turno || "").toUpperCase().trim();
 
-                // Lida com variações de texto ou checkbox
-                let tManha = turno.includes("MANHÃ") || turno.includes("MANHA") || turno.includes("MATUTINO") || turno.includes("INTEGRAL") || turno === "M" || turno === "TRUE" || turno === "1";
-                let tNoite = turno.includes("NOITE") || turno.includes("NOTURNO") || turno === "N" || turno === "2";
+                // LÓGICA DE FALLBACK INFALÍVEL
+                // Se detectar Noite/Noturno, joga pra noite. Se não detectar, joga pra MANHÃ por padrão para NUNCA zerar.
+                let tNoite = turno.includes("NOITE") || turno.includes("NOT") || turno === "N" || turno === "2";
+                let tManha = !tNoite; 
 
-                const diasStr = a.dias.toUpperCase().trim();
+                const diasStr = (a.dias || "").toUpperCase().trim();
                 
-                // FALLBACK: Se o aluno não preencheu a coluna "dias" na planilha (vazio), o sistema assume que ele viaja todos os dias.
-                const todosOsDias = diasStr === "" || diasStr.includes("TODOS") || diasStr.includes("DIARIA") || diasStr.includes("SEGUNDA A SEXTA") || diasStr.includes("SEG A SEX");
+                // Se a coluna de dias estiver em branco, assume que o aluno viaja a semana toda
+                const todosOsDias = diasStr === "" || diasStr.includes("TODOS") || diasStr.includes("DIARIA") || diasStr.includes("SEG A SEX");
 
                 const eSeg = todosOsDias || diasStr.includes("SEG") || diasStr.includes("1");
                 const eTer = todosOsDias || diasStr.includes("TER") || diasStr.includes("2");
