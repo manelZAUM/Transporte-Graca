@@ -56,9 +56,20 @@
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-        .card-header { background-color: var(--dark); color: white; padding: 30px; text-align: center; }
+        /* MUDANÇA DA COR AQUI: Amarelo em vez de Preto no cabeçalho do login */
+        .card-header-yellow { 
+            background-color: var(--primary-yellow); 
+            color: var(--dark); 
+            padding: 30px; 
+            text-align: center; 
+        }
+
         .card-body { padding: 30px; }
-        .cpf-input { width: 100%; max-width: 320px; padding: 15px; margin: 20px auto; display: block; border: 2px solid #ddd; border-radius: 8px; font-size: 18px; text-align: center; transition: 0.3s; }
+        
+        .cpf-input { 
+            width: 100%; max-width: 320px; padding: 15px; margin: 20px auto; display: block; 
+            border: 2px solid #ddd; border-radius: 8px; font-size: 18px; text-align: center; transition: 0.3s; 
+        }
         .cpf-input:focus { outline: none; border-color: var(--dark); }
         
         .btn-primary {
@@ -69,7 +80,12 @@
         .btn-primary:hover { background-color: #000; transform: scale(1.02); }
         .btn-primary:disabled { background-color: #777; cursor: not-allowed; transform: none; }
 
-        .spinner { border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid white; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: none; }
+        .input-filtro { 
+            width: 100%; margin-top: 5px; padding: 12px; border-radius: 8px; 
+            border: 1px solid #ddd; background: #fff; font-family: inherit; font-size: 14px;
+        }
+
+        .spinner { border: 3px solid rgba(0,0,0,0.1); border-top: 3px solid var(--dark); border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: none; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
@@ -83,11 +99,11 @@
 
     <div class="main-container">
         
-        <!-- PASSO 1: TELA DE LOGIN DO CPF -->
+        <!-- PASSO 1: TELA DE LOGIN DO CPF (COM COR AMARELA NO TOPO) -->
         <section id="login-wrapper" class="glass-card" style="max-width: 450px;">
-            <div class="card-header">
+            <div class="card-header-yellow">
                 <h2 style="font-size: 24px;">📝 Atualização Cadastral</h2>
-                <p style="opacity: 0.9; font-size: 14px; margin-top: 5px;">Exclusivo para veteranos</p>
+                <p style="opacity: 0.85; font-size: 14px; margin-top: 5px; font-weight: 600;">Exclusivo para veteranos</p>
             </div>
             <div class="card-body" style="text-align: center;">
                 <p style="color: var(--muted);">Informe seu CPF para iniciar a atualização dos seus dados.</p>
@@ -105,26 +121,87 @@
             </div>
         </section>
 
-        <!-- PASSO 2: FORMULÁRIO (OCULTO INICIALMENTE) -->
-        <section id="form-wrapper" class="glass-card" style="display: none; max-width: 800px;">
-            <div class="card-header" style="background-color: var(--primary-yellow); color: var(--dark);">
+        <!-- PASSO 2: FORMULÁRIO DE ATUALIZAÇÃO -->
+        <section id="form-wrapper" class="glass-card" style="display: none; max-width: 600px; margin: 0 auto;">
+            <div class="card-header-yellow">
                 <h2 style="font-size: 24px;">✅ Cadastro Encontrado</h2>
-                <p style="opacity: 0.9; font-size: 14px; margin-top: 5px;">Bem-vindo de volta, <strong id="nome-aluno-span">Aluno</strong></p>
+                <p style="opacity: 0.85; font-size: 14px; margin-top: 5px;">Bem-vindo de volta, <strong id="nome-aluno-span">Aluno</strong></p>
             </div>
-            <div class="card-body">
-                <p>Aqui entrará o formulário para você atualizar seus dados (Instituição, Turno, PDF, etc).</p>
-                <br>
-                <button onclick="window.location.reload()" class="btn-primary" style="background-color: var(--danger);">Sair</button>
+            
+            <div class="card-body" style="text-align: left;">
+                <p style="color: var(--muted); margin-bottom: 25px; text-align: center; font-size: 14px;">Atualize as informações abaixo para o novo semestre letivo.</p>
+                
+                <form id="form-atualizacao" onsubmit="enviarAtualizacao(event)">
+                    
+                    <div style="margin-bottom: 15px;">
+                        <label style="font-weight: 600; font-size: 14px; color: var(--dark);">🏫 Instituição de Ensino</label>
+                        <select id="update-instituicao" required class="input-filtro">
+                            <option value="">Selecione sua instituição...</option>
+                            <option value="ANHANGUERA">Anhanguera</option>
+                            <option value="FLF">FLF</option>
+                            <option value="IFCE">IFCE</option>
+                            <option value="UNINTA">UNINTA</option>
+                            <option value="UVA">UVA</option>
+                            <option value="LUCIANO FEIJÃO">Luciano Feijão</option>
+                            <option value="FARIAS BRITO">Farias Brito</option>
+                        </select>
+                    </div>
+
+                    <div style="margin-bottom: 15px;">
+                        <label style="font-weight: 600; font-size: 14px; color: var(--dark);">📍 Ponto de Embarque</label>
+                        <select id="update-embarque" required class="input-filtro">
+                            <option value="">Selecione o ponto...</option>
+                            <option value="SEDE">Sede</option>
+                            <option value="BARRO VERMELHO">Barro Vermelho</option>
+                            <option value="LAPA">Lapa</option>
+                            <option value="VILA">Vila</option>
+                        </select>
+                    </div>
+
+                    <div style="margin-bottom: 15px;">
+                        <label style="font-weight: 600; font-size: 14px; color: var(--dark);">🕒 Turno</label>
+                        <select id="update-turno" required class="input-filtro">
+                            <option value="">Selecione o turno...</option>
+                            <option value="MANHÃ">Manhã</option>
+                            <option value="NOITE">Noite</option>
+                        </select>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <label style="font-weight: 600; font-size: 14px; color: var(--dark);">📅 Dias da semana (Marque os dias que irá viajar)</label>
+                        <div style="display: flex; gap: 15px; margin-top: 10px; flex-wrap: wrap;">
+                            <label style="cursor: pointer;"><input type="checkbox" name="dias" value="Segunda"> Seg</label>
+                            <label style="cursor: pointer;"><input type="checkbox" name="dias" value="Terça"> Ter</label>
+                            <label style="cursor: pointer;"><input type="checkbox" name="dias" value="Quarta"> Qua</label>
+                            <label style="cursor: pointer;"><input type="checkbox" name="dias" value="Quinta"> Qui</label>
+                            <label style="cursor: pointer;"><input type="checkbox" name="dias" value="Sexta"> Sex</label>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 30px;">
+                        <label style="font-weight: 600; font-size: 14px; color: var(--dark);">📄 Comprovante de Matrícula (PDF)</label>
+                        <input type="file" id="update-pdf" accept=".pdf" required style="width: 100%; margin-top: 5px; padding: 10px; border-radius: 8px; border: 1px solid #ddd; background: #f8f9fa;">
+                        <p style="font-size: 12px; color: var(--muted); margin-top: 5px;">Anexe o arquivo em formato PDF atualizado.</p>
+                    </div>
+
+                    <button type="submit" id="btn-enviar-update" class="btn-primary" style="background-color: var(--success); width: 100%; max-width: 100%;">
+                        <div id="spinner-update" class="spinner" style="border-top-color: white;"></div>
+                        <span id="texto-btn-update">🚀 Enviar Atualização Cadastral</span>
+                    </button>
+                    
+                    <button type="button" onclick="window.location.reload()" class="btn-primary" style="background-color: var(--danger); width: 100%; max-width: 100%; margin-top: 10px;">
+                        <span>❌ Cancelar e Sair</span>
+                    </button>
+                </form>
             </div>
         </section>
 
     </div>
 
     <script>
-        // Mesma API que usamos no Painel de Consulta
         const API_URL = "https://script.google.com/macros/s/AKfycbx-Q8FqTPmStWEWhZlBMPBYaXCyPJYkRCvVCsg9oAIGaFP9cgm2Mby4VuoS38RGv9k/exec"; 
         
-        let dadosAlunoAtual = {};
+        let dadosNuvem = [];
 
         // Máscara de CPF
         document.getElementById('cpf-input').addEventListener('input', function(e) {
@@ -155,7 +232,7 @@
             spinner.style.display = "block";
             btnText.innerText = "Buscando...";
             feedback.innerText = "Verificando se você está na base...";
-            feedback.style.color = "var(--info)";
+            feedback.style.color = "var(--dark)";
 
             try {
                 const response = await fetch(`${API_URL}?acao=dashboard&cpf=${cpf}`);
@@ -166,24 +243,27 @@
                     feedback.style.color = "var(--danger)";
                 } else if (data.sucesso) {
                     feedback.innerText = "✅ Cadastro localizado!";
-                    feedback.style.color = "var(--success)";
+                    feedback.style.color = "#155724";
                     
-                    // Como é um aluno só acessando o PRÓPRIO cpf, ele retorna a matriz toda, 
-                    // mas o aluno dele é o primeiro da lista filtrada.
+                    // Mapeia para pegar o nome
+                    dadosNuvem = data.dadosGerais.map(aluno => {
+                        let obj = { nome: "" };
+                        for(let k in aluno) {
+                            let keyNorm = k.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "").trim();
+                            if (keyNorm.includes("nome")) obj.nome = String(aluno[k]).trim();
+                        }
+                        return obj;
+                    });
                     
-                    // Pegando os dados brutões para preencher o form depois
-                    // (Isso será muito útil para auto-preencher os campos na próxima etapa)
-                    console.log("Dados recebidos da API:", data.dadosGerais);
-                    
-                    // Esconde o Login e mostra a tela do formulário
                     setTimeout(() => {
                         document.getElementById('login-wrapper').style.display = 'none';
                         document.getElementById('form-wrapper').style.display = 'block';
                         
-                        // Uma brincadeira pra mostrar o nome do aluno no cabeçalho amarelo
-                        // Se a API retornar o nome do usuário que logou, podemos colocar aqui!
-                        // document.getElementById('nome-aluno-span').innerText = "...";
-                    }, 1000);
+                        // Atualiza o nome do aluno no título
+                        if(dadosNuvem.length > 0 && dadosNuvem[0].nome) {
+                            document.getElementById('nome-aluno-span').innerText = dadosNuvem[0].nome.toUpperCase();
+                        }
+                    }, 800);
                 }
             } catch (e) { 
                 feedback.innerText = "❌ Erro de conexão com o servidor."; feedback.style.color = "var(--danger)";
@@ -192,6 +272,21 @@
                 spinner.style.display = "none";
                 btnText.innerText = "Consultar Cadastro";
             }
+        }
+
+        async function enviarAtualizacao(event) {
+            event.preventDefault();
+            
+            const btn = document.getElementById('btn-enviar-update');
+            const spinner = document.getElementById('spinner-update');
+            const btnText = document.getElementById('texto-btn-update');
+            
+            btn.disabled = true;
+            spinner.style.display = "block";
+            btnText.innerText = "Enviando dados...";
+            
+            // A lógica de envio para o Google Sheets entrará aqui na próxima etapa!
+            console.log("Formulário pronto para integração de envio.");
         }
     </script>
 </body>
