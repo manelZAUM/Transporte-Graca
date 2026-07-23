@@ -23,19 +23,18 @@
 
         body { 
             font-family: 'Inter', sans-serif;
-            /* A imagem padrão ao abrir será a de dia */
             background-image: url('Arco_de_Nossa_Senhora_de_Fátima,_Sobral,_CE.jpg');
-            background-size: cover; /* Preenche a tela toda padronizada */
-            background-position: center center; /* Centraliza no Arco */
+            background-size: cover; 
+            background-position: center center; 
             background-attachment: fixed;
             background-repeat: no-repeat;
             color: var(--text-dark);
-            transition: background-image 0.6s ease-in-out; /* Transição suave na troca */
+            transition: background-image 0.6s ease-in-out; 
         }
 
         body::before {
             content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.2); /* Reduzimos de 0.5 para 0.2 para a imagem brilhar mais! */
+            background: rgba(0, 0, 0, 0.2); 
             z-index: -1;
         }
 
@@ -68,7 +67,6 @@
         .btn-primary:hover { background-color: var(--dark-blue); }
         .btn-primary:disabled { background-color: #ccc; cursor: not-allowed; }
 
-        /* Abas (Turnos e Dias) */
         .tabs-label { font-weight: 600; color: var(--primary-blue); margin: 20px 0 10px; text-align: center; }
         .tabs-container { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
 
@@ -78,7 +76,6 @@
         }
         .btn-tab.ativo { background-color: var(--primary-blue); color: white; border-color: var(--primary-blue); }
 
-        /* Mapa e Tabela */
         #mapa-rota { width: 100%; height: 250px; border-radius: var(--border-radius); margin: 15px 0; border: 1px solid #eee; }
         .table-wrapper { overflow-x: auto; margin-top: 20px; border-radius: 8px; border: 1px solid #eee; }
         table { width: 100%; border-collapse: collapse; min-width: 500px; }
@@ -102,9 +99,9 @@
                 <p style="opacity: 0.9; font-size: 14px;">Portal do Passageiro</p>
             </div>
             <div class="card-body">
-                <p style="color: var(--text-muted); text-align: center;">Informe o seu CPF para aceder à sua rota.</p>
+                <p style="color: var(--text-muted); text-align: center;">Informe o seu CPF para acessar à sua rota.</p>
                 <input type="text" id="cpfInput" class="cpf-input" placeholder="000.000.000-00" maxlength="14">
-                <button id="btnEntrar" class="btn-primary" onclick="verificarAcesso()">Aceder ao Painel</button>
+                <button id="btnEntrar" class="btn-primary" onclick="verificarAcesso()">Acessar Painel</button>
                 <div id="msgBox" class="msg-erro"></div>
                 <div style="margin-top: 25px; text-align: center;">
                     <a href="index.html" style="color: var(--text-muted); font-size: 14px; text-decoration: none;">← Voltar ao Início</a>
@@ -152,9 +149,7 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // ATENÇÃO: COLOQUE AQUI O SEU LINK DA API (WEB APP) DO GOOGLE
-// ATENÇÃO: COLOQUE AQUI O SEU LINK DA API (WEB APP) DO GOOGLE
-        const API_URL = "https://script.google.com/macros/s/AKfycbyQIqvSJXiH0CHjRa1sDsJr2WWl4QEhmzEaoQ1eEQXWcm0hH5A2vX12jQIjnaq9DmI/exec";
+        const API_URL = "https://script.google.com/macros/s/AKfycbx0OLGG5cYih5HDAqPzPnBOp_SvbhsL_9MF9na7ln1PRXY1UmtLEVnZuzA3_cjllA/execc";
         
         let passageirosRota = []; 
         let mapaCarregado = false;
@@ -179,83 +174,74 @@
             
             if (cpfDigitado.length !== 11) { mostrarMensagem('⚠️ Informe o CPF completo.', '#fff3cd', '#856404'); return; }
 
-            btn.innerHTML = '🔄 A consultar servidor...'; btn.disabled = true;
-            mostrarMensagem('📡 A conectar à base de dados...', '#e7f1ff', '#003d80');
+            btn.innerHTML = '🔄 Consultando servidor...'; btn.disabled = true;
+            mostrarMensagem('📡 Conectando à base de dados...', '#e7f1ff', '#003d80');
 
             try {
-                // Requisição pedindo os dados da Rota AZUL
                 const response = await fetch(`${API_URL}?acao=login_rota&rota=AZUL&cpf=${cpfDigitado}`);
                 const data = await response.json();
 
                 if (data.erro) {
                     mostrarMensagem(data.erro, '#f8d7da', '#721c24');
-                    btn.innerHTML = 'Aceder ao Painel'; btn.disabled = false; return;
+                    btn.innerHTML = 'Acessar Painel'; btn.disabled = false; return;
                 }
 
                 if (data.sucesso) {
                     document.getElementById('msgBox').style.display = 'none';
                     document.getElementById('nomeAlunoLogado').innerText = data.dados.nome;
                     
-                    // Esconde login e mostra o painel principal
                     document.getElementById('login-section').style.display = 'none';
                     document.getElementById('main-section').style.display = 'block';
                     
                     passageirosRota = data.passageiros;
                     
-                    // Inicia o mapa apenas quando o ecrã for visível
                     if (!mapaCarregado) { carregarMapa(); mapaCarregado = true; }
                     
-                    // Desenha a tabela com as abas ativas
                     atualizarPainel(); 
                 }
             } catch (erro) {
                 mostrarMensagem('❌ Servidor indisponível no momento.', '#f8d7da', '#721c24');
-                btn.innerHTML = 'Aceder ao Painel'; btn.disabled = false;
+                btn.innerHTML = 'Acessar Painel'; btn.disabled = false;
             }
         }
 
-function carregarMapa() {
-    // Centralizando o mapa numa visão geral do trajeto entre Graça e Sobral
-    const map = L.map('mapa-rota').setView([-3.86, -40.54], 10);
-    
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap'
-    }).addTo(map);
+        function carregarMapa() {
+            const map = L.map('mapa-rota').setView([-3.86, -40.54], 10);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap'
+            }).addTo(map);
 
-    // Lista de pontos de embarque (Você pode ajustar as coordenadas exatas depois)
-    const pontos = [
-        { nome: "🏢 Sede (Graça)", coords: [-4.044379847241413, -40.752178191448145] },
-        { nome: "🔴 Barro Vermelho", coords: [-4.006311948847917, -40.7493451337771] }, // Coordenada aproximada
-        { nome: "⛪ Lapa", coords: [-4.085158077152727, -40.823890239252734] },           // Coordenada aproximada
-        { nome: "🏘️ Vila", coords: [-4.046357260374837, -40.7565734779549] },           // Coordenada aproximada
-        { nome: "🎓 UFC-MUCAMBINHO", coords: [-3.693083887820786, -40.35496839213788] },
-        { nome: "🎓 IFCE ", coords: [-3.682983962746156, -40.341368462616025] },
-        { nome: "🎓 UVA (BETÂNIA) ", coords: [-3.6769517815465877, -40.33992217610919] },
-        { nome: "🎓 UVA (CCH) ", coords: [-3.6721931767097815, -40.37053236971561] },
-        { nome: "🎓 UVA (CIDAO) ", coords: [-3.6834589486766114, -40.34224876848731] }
-    ];
+            const pontos = [
+                { nome: "🏢 Sede (Graça)", coords: [-4.044379847241413, -40.752178191448145] },
+                { nome: "🔴 Barro Vermelho", coords: [-4.006311948847917, -40.7493451337771] },
+                { nome: "⛪ Lapa", coords: [-4.085158077152727, -40.823890239252734] },
+                { nome: "🏘️ Vila", coords: [-4.046357260374837, -40.7565734779549] },
+                { nome: "🎓 UFC-MUCAMBINHO", coords: [-3.693083887820786, -40.35496839213788] },
+                { nome: "🎓 IFCE ", coords: [-3.682983962746156, -40.341368462616025] },
+                { nome: "🎓 UVA (BETÂNIA) ", coords: [-3.6769517815465877, -40.33992217610919] },
+                { nome: "🎓 UVA (CCH) ", coords: [-3.6721931767097815, -40.37053236971561] },
+                { nome: "🎓 UVA (CIDAO) ", coords: [-3.6834589486766114, -40.34224876848731] }
+            ];
 
-    // Laço para adicionar cada ponto no mapa
-    pontos.forEach(ponto => {
-        L.marker(ponto.coords)
-         .addTo(map)
-         .bindPopup(`<div style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600;">${ponto.nome}</div>`);
-    });
-}
+            pontos.forEach(ponto => {
+                L.marker(ponto.coords)
+                 .addTo(map)
+                 .bindPopup(`<div style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600;">${ponto.nome}</div>`);
+            });
+        }
 
         function selecionarTab(elemento) {
             elemento.parentElement.querySelectorAll('.btn-tab').forEach(b => b.classList.remove('ativo'));
             elemento.classList.add('ativo');
             atualizarPainel();
         }
-    function atualizarPainel() {
+
+        function atualizarPainel() {
             const container = document.getElementById('conteudo-rota');
             const turnoSelecionado = document.querySelector('#filtro-turno .ativo').innerText.trim().toUpperCase();
             const diaSelecionado = document.querySelector('#filtro-dia .ativo').innerText.trim().toUpperCase();
 
-            // ==========================================
-            // MÁGICA DO FUNDO: Troca a imagem pelo turno
-            // ==========================================
             if (turnoSelecionado === "MANHÃ") {
                 document.body.style.backgroundImage = "url('Arco_de_Nossa_Senhora_de_Fátima,_Sobral,_CE.jpg')";
             } else if (turnoSelecionado === "NOITE") {
@@ -270,11 +256,18 @@ function carregarMapa() {
                 const diasAluno = (aluno.dias || "").toUpperCase();
 
                 let bateTurno = false;
-                if (turnoSelecionado === "MANHÃ" && (turnoAluno.includes("MANHÃ") || turnoAluno.includes("MANHA"))) bateTurno = true;
-                if (turnoSelecionado === "NOITE" && turnoAluno.includes("NOITE")) bateTurno = true;
+                if (turnoSelecionado === "MANHÃ") {
+                    bateTurno = turnoAluno.includes("MANHÃ") || turnoAluno.includes("MANHA") || turnoAluno.includes("INTEGRAL") || diasAluno.includes("MANHÃ");
+                } else if (turnoSelecionado === "NOITE") {
+                    bateTurno = turnoAluno.includes("NOITE") || turnoAluno.includes("INTEGRAL") || diasAluno.includes("NOITE");
+                }
 
                 let bateDia = false;
-                if (diaDaPlanilha === "TERÇA") {
+                const todosOsDias = diasAluno === "" || diasAluno.includes("TODOS") || diasAluno.includes("DIARIA") || diasAluno.includes("SEG A SEX");
+                
+                if (todosOsDias) {
+                    bateDia = true;
+                } else if (diaDaPlanilha === "TERÇA") {
                     bateDia = diasAluno.includes("TERÇA") || diasAluno.includes("TERCA");
                 } else {
                     bateDia = diasAluno.includes(diaDaPlanilha);
@@ -304,12 +297,13 @@ function carregarMapa() {
             `;
 
             filtrados.forEach((aluno, index) => {
+                let localEmbarque = aluno.embarque ? aluno.embarque : "Não Informado";
                 tabelaHTML += `
                     <tr>
                         <td style="color: var(--text-muted);"><strong>${index + 1}</strong></td>
                         <td style="font-weight: 600;">${aluno.nome}</td>
                         <td>${aluno.instituicao}</td>
-                        <td><span style="background: #eee; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">📍 ${aluno.embarque}</span></td>
+                        <td><span style="background: #eee; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">📍 ${localEmbarque}</span></td>
                     </tr>
                 `;
             });
