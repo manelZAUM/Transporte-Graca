@@ -56,7 +56,6 @@
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* MUDANÇA DA COR AQUI: Amarelo em vez de Preto no cabeçalho do login */
         .card-header-yellow { 
             background-color: var(--primary-yellow); 
             color: var(--dark); 
@@ -99,7 +98,7 @@
 
     <div class="main-container">
         
-        <!-- PASSO 1: TELA DE LOGIN DO CPF (COM COR AMARELA NO TOPO) -->
+        <!-- PASSO 1: TELA DE LOGIN DO CPF -->
         <section id="login-wrapper" class="glass-card" style="max-width: 450px;">
             <div class="card-header-yellow">
                 <h2 style="font-size: 24px;">📝 Atualização Cadastral</h2>
@@ -124,12 +123,12 @@
         <!-- PASSO 2: FORMULÁRIO DE ATUALIZAÇÃO -->
         <section id="form-wrapper" class="glass-card" style="display: none; max-width: 600px; margin: 0 auto;">
             <div class="card-header-yellow">
-                <h2 style="font-size: 24px;">✅ Cadastro Encontrado</h2>
-                <p style="opacity: 0.85; font-size: 14px; margin-top: 5px;">Bem-vindo de volta </p>
+                <h2 style="font-size: 24px;">✅ Cadastro Localizado</h2>
+                <p style="opacity: 0.85; font-size: 14px; margin-top: 5px;">Bem-vindo(a) de volta, <strong id="nome-aluno-span"></strong>!</p>
             </div>
             
             <div class="card-body" style="text-align: left;">
-                <p style="color: var(--muted); margin-bottom: 25px; text-align: center; font-size: 14px;">Atualize as informações abaixo para o novo semestre letivo.</p>
+                <p style="color: var(--muted); margin-bottom: 25px; text-align: center; font-size: 14px;">Seus dados atuais foram carregados. Atualize o que for necessário para o novo semestre.</p>
                 
                 <form id="form-atualizacao" onsubmit="enviarAtualizacao(event)">
                     
@@ -159,11 +158,12 @@
                     </div>
 
                     <div style="margin-bottom: 15px;">
-                        <label style="font-weight: 600; font-size: 14px; color: var(--dark);">🕒 Turno</label>
+                        <label style="font-weight: 600; font-size: 14px; color: var(--dark);">🕒 Turno (Trajeto de Ida e Volta)</label>
                         <select id="update-turno" required class="input-filtro">
-                            <option value="">Selecione o turno...</option>
-                            <option value="MANHÃ">Manhã</option>
-                            <option value="NOITE">Noite</option>
+                            <option value="">Selecione o seu trajeto...</option>
+                            <option value="MANHÃ">Manhã (Vai e volta pela manhã)</option>
+                            <option value="NOITE">Noite (Vai e volta pela noite)</option>
+                            <option value="INTEGRAL">Integral (Vai pela manhã e volta à noite)</option>
                         </select>
                     </div>
 
@@ -199,6 +199,7 @@
     </div>
 
     <script>
+        // Mantenha o seu link correto do Apps Script
         const API_URL = "https://script.google.com/macros/s/AKfycbx0OLGG5cYih5HDAqPzPnBOp_SvbhsL_9MF9na7ln1PRXY1UmtLEVnZuzA3_cjllA/exec"; 
         
         let dadosNuvem = [];
@@ -245,12 +246,16 @@
                     feedback.innerText = "✅ Cadastro localizado!";
                     feedback.style.color = "#155724";
                     
-                    // Mapeia para pegar o nome
+                    // Extrai TODOS os dados necessários da planilha
                     dadosNuvem = data.dadosGerais.map(aluno => {
-                        let obj = { nome: "" };
+                        let obj = { nome: "", instituicao: "", embarque: "", turno: "", dias: "" };
                         for(let k in aluno) {
                             let keyNorm = k.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "").trim();
                             if (keyNorm.includes("nome")) obj.nome = String(aluno[k]).trim();
+                            if (keyNorm.includes("institu")) obj.instituicao = String(aluno[k]).trim();
+                            if (keyNorm.includes("embarque") || keyNorm.includes("ponto") || keyNorm.includes("local")) obj.embarque = String(aluno[k]).trim();
+                            if (keyNorm.includes("turno") || keyNorm.includes("periodo")) obj.turno = String(aluno[k]).trim();
+                            if (keyNorm.includes("dia")) obj.dias = String(aluno[k]).trim();
                         }
                         return obj;
                     });
@@ -259,9 +264,68 @@
                         document.getElementById('login-wrapper').style.display = 'none';
                         document.getElementById('form-wrapper').style.display = 'block';
                         
-                        // Atualiza o nome do aluno no título
-                        if(dadosNuvem.length > 0 && dadosNuvem[0].nome) {
-                            document.getElementById('nome-aluno-span').innerText = dadosNuvem[0].nome.toUpperCase();
+                        // LÓGICA DE PREENCHIMENTO AUTOMÁTICO (A PONTE)
+                        if(dadosNuvem.length > 0) {
+                            let aluno = dadosNuvem[0];
+                            
+                            // 1. Preenche o Nome no título
+                            if (aluno.nome) {
+                                document.getElementById('nome-aluno-span').innerText = aluno.nome.toUpperCase();
+                            }
+                            
+                            // 2. Pré-seleciona a Instituição
+                            if (aluno.instituicao) {
+                                let selInst = document.getElementById('update-instituicao');
+                                for(let i = 0; i < selInst.options.length; i++) {
+                                    if (selInst.options[i].value !== "" && aluno.instituicao.toUpperCase().includes(selInst.options[i].value.toUpperCase())) {
+                                        selInst.value = selInst.options[i].value;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            // 3. Pré-seleciona o Ponto de Embarque
+                            if (aluno.embarque) {
+                                let selEmb = document.getElementById('update-embarque');
+                                for(let i = 0; i < selEmb.options.length; i++) {
+                                    if (selEmb.options[i].value !== "" && aluno.embarque.toUpperCase().includes(selEmb.options[i].value.toUpperCase())) {
+                                        selEmb.value = selEmb.options[i].value;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            // 4. Pré-seleciona o Turno e Trajeto (Ida e Volta)
+                            if (aluno.turno) {
+                                let t = aluno.turno.toUpperCase();
+                                let selTurno = document.getElementById('update-turno');
+                                
+                                if (t.includes("INTEGRAL") || (t.includes("MANHÃ") && t.includes("NOITE"))) {
+                                    selTurno.value = "INTEGRAL";
+                                } else if (t.includes("MANHÃ") || t.includes("MANHA")) {
+                                    selTurno.value = "MANHÃ";
+                                } else if (t.includes("NOITE")) {
+                                    selTurno.value = "NOITE";
+                                }
+                            }
+
+                            // 5. Marca os checkboxes dos dias da semana
+                            if (aluno.dias) {
+                                let diasStr = aluno.dias.toUpperCase();
+                                let checkboxes = document.querySelectorAll('input[name="dias"]');
+                                
+                                // Se estiver vazio ou escrito "todos", marca todos os dias
+                                let todosOsDias = diasStr === "" || diasStr.includes("TODOS") || diasStr.includes("DIARIA") || diasStr.includes("SEG A SEX");
+                                
+                                checkboxes.forEach(cb => {
+                                    let val = cb.value.toUpperCase(); // Ex: "SEGUNDA", "TERÇA"
+                                    if (todosOsDias || diasStr.includes(val) || (val === "TERÇA" && diasStr.includes("TERCA"))) {
+                                        cb.checked = true;
+                                    } else {
+                                        cb.checked = false;
+                                    }
+                                });
+                            }
                         }
                     }, 800);
                 }
@@ -285,7 +349,7 @@
             spinner.style.display = "block";
             btnText.innerText = "Enviando dados...";
             
-            // A lógica de envio para o Google Sheets entrará aqui na próxima etapa!
+            // A lógica de envio com o PDF para o Google Sheets entrará aqui na próxima etapa!
             console.log("Formulário pronto para integração de envio.");
         }
     </script>
