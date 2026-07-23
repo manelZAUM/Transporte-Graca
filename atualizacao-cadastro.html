@@ -87,10 +87,13 @@
         .spinner { border: 3px solid rgba(0,0,0,0.1); border-top: 3px solid var(--dark); border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: none; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        /* Estilo do Card de Perfil */
         .perfil-card {
             background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 25px; 
             border-left: 4px solid var(--primary-blue); text-align: left;
+        }
+        
+        .bloco-dias {
+            background: #fdfdfd; border: 1px solid #eee; padding: 15px; border-radius: 8px; margin-bottom: 15px;
         }
     </style>
 </head>
@@ -169,7 +172,7 @@
                     
                     <div style="margin-bottom: 15px;">
                         <label style="font-weight: 600; font-size: 14px; color: var(--dark);">🏫 Instituição de Ensino</label>
-                        <select id="update-instituicao" required class="input-filtro">
+                        <select id="update-instituicao" required class="input-filtro" onchange="verificarInstituicaoOutros()">
                             <option value="">Selecione sua instituição...</option>
                             <option value="ANHANGUERA">Anhanguera</option>
                             <option value="UFC">UFC</option>
@@ -179,10 +182,12 @@
                             <option value="UVA">UVA</option>
                             <option value="LUCIANO FEIJÃO">Luciano Feijão</option>
                             <option value="FARIAS BRITO">Farias Brito</option>
+                            <option value="OUTROS">Outros (Digitar manualmente)</option>
                         </select>
+                        <input type="text" id="update-instituicao-outros" class="input-filtro" style="display: none; margin-top: 10px;" placeholder="Digite o nome da sua instituição...">
                     </div>
 
-                    <div style="margin-bottom: 15px;">
+                    <div style="margin-bottom: 25px;">
                         <label style="font-weight: 600; font-size: 14px; color: var(--dark);">📍 Ponto de Embarque</label>
                         <select id="update-embarque" required class="input-filtro">
                             <option value="">Selecione o ponto...</option>
@@ -194,27 +199,41 @@
                     </div>
 
                     <div style="margin-bottom: 15px;">
-                        <label style="font-weight: 600; font-size: 14px; color: var(--dark);">🕒 Turno (Trajeto de Ida e Volta)</label>
-                        <select id="update-turno" required class="input-filtro">
-                            <option value="">Selecione o seu trajeto...</option>
-                            <option value="MANHÃ">Manhã (Vai e volta pela manhã)</option>
-                            <option value="NOITE">Noite (Vai e volta pela noite)</option>
-                            <option value="INTEGRAL">Integral (Vai pela manhã e volta à noite)</option>
-                        </select>
-                    </div>
+                        <h4 style="font-weight: 700; font-size: 15px; color: var(--dark); border-bottom: 2px solid #eee; padding-bottom: 5px; margin-bottom: 15px;">🕒 Rotina de Viagens</h4>
+                        
+                        <!-- BLOCO DA MANHÃ -->
+                        <div class="bloco-dias">
+                            <label style="font-weight: 600; font-size: 14px; color: var(--primary-blue);">☀️ Turno da MANHÃ (De Segunda a Sexta)</label>
+                            <div style="display: flex; gap: 12px; margin-top: 10px; flex-wrap: wrap; font-size: 14px;">
+                                <label style="cursor: pointer;"><input type="checkbox" name="dias-manha" value="Segunda"> Seg</label>
+                                <label style="cursor: pointer;"><input type="checkbox" name="dias-manha" value="Terça"> Ter</label>
+                                <label style="cursor: pointer;"><input type="checkbox" name="dias-manha" value="Quarta"> Qua</label>
+                                <label style="cursor: pointer;"><input type="checkbox" name="dias-manha" value="Quinta"> Qui</label>
+                                <label style="cursor: pointer;"><input type="checkbox" name="dias-manha" value="Sexta"> Sex</label>
+                            </div>
+                        </div>
 
-                    <div style="margin-bottom: 30px;">
-                        <label style="font-weight: 600; font-size: 14px; color: var(--dark);">📅 Dias da semana (Marque os dias que irá viajar)</label>
-                        <div style="display: flex; gap: 15px; margin-top: 10px; flex-wrap: wrap;">
-                            <label style="cursor: pointer;"><input type="checkbox" name="dias" value="Segunda"> Seg</label>
-                            <label style="cursor: pointer;"><input type="checkbox" name="dias" value="Terça"> Ter</label>
-                            <label style="cursor: pointer;"><input type="checkbox" name="dias" value="Quarta"> Qua</label>
-                            <label style="cursor: pointer;"><input type="checkbox" name="dias" value="Quinta"> Qui</label>
-                            <label style="cursor: pointer;"><input type="checkbox" name="dias" value="Sexta"> Sex</label>
+                        <!-- BLOCO DA NOITE -->
+                        <div class="bloco-dias">
+                            <label style="font-weight: 600; font-size: 14px; color: var(--dark);">🌙 Turno da NOITE (De Segunda a Sexta)</label>
+                            <div style="display: flex; gap: 12px; margin-top: 10px; flex-wrap: wrap; font-size: 14px;">
+                                <label style="cursor: pointer;"><input type="checkbox" name="dias-noite" value="Segunda"> Seg</label>
+                                <label style="cursor: pointer;"><input type="checkbox" name="dias-noite" value="Terça"> Ter</label>
+                                <label style="cursor: pointer;"><input type="checkbox" name="dias-noite" value="Quarta"> Qua</label>
+                                <label style="cursor: pointer;"><input type="checkbox" name="dias-noite" value="Quinta"> Qui</label>
+                                <label style="cursor: pointer;"><input type="checkbox" name="dias-noite" value="Sexta"> Sex</label>
+                            </div>
+                            
+                            <!-- OPÇÃO APENAS RETORNO -->
+                            <div style="margin-top: 15px; padding-top: 10px; border-top: 1px dashed #ccc;">
+                                <label style="cursor: pointer; font-size: 13px; font-weight: 600; color: var(--info);">
+                                    <input type="checkbox" id="apenas-retorno-noite" value="Sim"> 🚌 Apenas Retorno (Vou por outros meios, mas volto no ônibus da noite)
+                                </label>
+                            </div>
                         </div>
                     </div>
 
-                    <button type="submit" id="btn-enviar-update" class="btn-primary" style="background-color: var(--success); width: 100%; max-width: 100%;">
+                    <button type="submit" id="btn-enviar-update" class="btn-primary" style="background-color: var(--success); width: 100%; max-width: 100%; margin-top: 20px;">
                         <div id="spinner-update" class="spinner" style="border-top-color: white;"></div>
                         <span id="texto-btn-update">🚀 Enviar Atualização Cadastral</span>
                     </button>
@@ -229,7 +248,6 @@
     </div>
 
     <script>
-        // Mantenha o seu link correto do Apps Script
         const API_URL = "https://script.google.com/macros/s/AKfycbx0OLGG5cYih5HDAqPzPnBOp_SvbhsL_9MF9na7ln1PRXY1UmtLEVnZuzA3_cjllA/exec"; 
         
         let dadosNuvem = [];
@@ -246,6 +264,19 @@
         document.getElementById("cpf-input").addEventListener("keypress", function(event) {
             if (event.key === "Enter") tentarAcesso();
         });
+
+        function verificarInstituicaoOutros() {
+            const select = document.getElementById('update-instituicao');
+            const inputOutros = document.getElementById('update-instituicao-outros');
+            if (select.value === 'OUTROS') {
+                inputOutros.style.display = 'block';
+                inputOutros.required = true;
+            } else {
+                inputOutros.style.display = 'none';
+                inputOutros.required = false;
+                inputOutros.value = '';
+            }
+        }
 
         async function tentarAcesso() {
             const cpf = document.getElementById('cpf-input').value.trim().replace(/\D/g, '');
@@ -289,7 +320,6 @@
                             if (keyNorm.includes("dia")) obj.dias = valNorm;
                             if (keyNorm.includes("status") || keyNorm.includes("situacao")) obj.status = valNorm;
                             
-                            // Lógica para detectar se ele já atualizou (busca palavra 'atualizado', 'renovado' ou 'enviado' nas colunas da planilha)
                             if (keyNorm.includes("atualizado") || keyNorm.includes("renovado") || keyNorm.includes("enviado")) {
                                 obj.jaEnviou = valNorm.toLowerCase();
                             }
@@ -305,12 +335,9 @@
                             let nomeExibicao = aluno.nome ? aluno.nome.toUpperCase() : "NOME NÃO INFORMADO";
                             let instExibicao = aluno.instituicao ? "🎓 " + aluno.instituicao.toUpperCase() : "🎓 INSTITUIÇÃO NÃO INFORMADA";
                             
-                            // Verifica se o aluno já enviou. 
-                            // Considera "enviado" se o status for "Pendente" (que é o padrão de quem acabou de enviar) OU se a coluna 'atualizado' for sim.
                             let jaEnviou = aluno.jaEnviou.includes('sim') || aluno.jaEnviou.includes('true') || aluno.status.toLowerCase().includes('pendente') || aluno.status.toLowerCase().includes('análise');
 
                             if (jaEnviou) {
-                                // MOSTRA TELA DE STATUS
                                 document.getElementById('status-wrapper').style.display = 'block';
                                 document.getElementById('status-info-nome').innerText = nomeExibicao;
                                 document.getElementById('status-info-inst').innerText = instExibicao;
@@ -327,19 +354,28 @@
                                 }
 
                             } else {
-                                // MOSTRA O FORMULÁRIO PARA PREENCHER
                                 document.getElementById('form-wrapper').style.display = 'block';
                                 document.getElementById('form-info-nome').innerText = nomeExibicao;
                                 document.getElementById('form-info-inst').innerText = instExibicao;
                                 
-                                // Pré-seleciona a Instituição
+                                // Pré-seleciona a Instituição (com lógica para "Outros")
                                 if (aluno.instituicao) {
                                     let selInst = document.getElementById('update-instituicao');
+                                    let encontrouInst = false;
+                                    
                                     for(let i = 0; i < selInst.options.length; i++) {
-                                        if (selInst.options[i].value !== "" && aluno.instituicao.toUpperCase().includes(selInst.options[i].value.toUpperCase())) {
-                                            selInst.value = selInst.options[i].value;
+                                        let opVal = selInst.options[i].value;
+                                        if (opVal !== "" && opVal !== "OUTROS" && aluno.instituicao.toUpperCase().includes(opVal.toUpperCase())) {
+                                            selInst.value = opVal;
+                                            encontrouInst = true;
                                             break;
                                         }
+                                    }
+                                    
+                                    if (!encontrouInst) {
+                                        selInst.value = "OUTROS";
+                                        verificarInstituicaoOutros();
+                                        document.getElementById('update-instituicao-outros').value = aluno.instituicao;
                                     }
                                 }
 
@@ -354,34 +390,37 @@
                                     }
                                 }
 
-                                // Pré-seleciona o Turno e Trajeto
-                                if (aluno.turno) {
-                                    let t = aluno.turno.toUpperCase();
-                                    let selTurno = document.getElementById('update-turno');
-                                    
-                                    if (t.includes("INTEGRAL") || (t.includes("MANHÃ") && t.includes("NOITE"))) {
-                                        selTurno.value = "INTEGRAL";
-                                    } else if (t.includes("MANHÃ") || t.includes("MANHA")) {
-                                        selTurno.value = "MANHÃ";
-                                    } else if (t.includes("NOITE")) {
-                                        selTurno.value = "NOITE";
-                                    }
-                                }
-
-                                // Marca os checkboxes dos dias da semana
-                                if (aluno.dias) {
-                                    let diasStr = aluno.dias.toUpperCase();
-                                    let checkboxes = document.querySelectorAll('input[name="dias"]');
-                                    let todosOsDias = diasStr === "" || diasStr.includes("TODOS") || diasStr.includes("DIARIA") || diasStr.includes("SEG A SEX");
-                                    
-                                    checkboxes.forEach(cb => {
+                                // Pré-seleciona os Turnos e Dias de forma separada
+                                let t = (aluno.turno || "").toUpperCase();
+                                let diasStr = (aluno.dias || "").toUpperCase();
+                                let todosOsDias = diasStr === "" || diasStr.includes("TODOS") || diasStr.includes("DIARIA") || diasStr.includes("SEG A SEX");
+                                
+                                let cbManha = document.querySelectorAll('input[name="dias-manha"]');
+                                let cbNoite = document.querySelectorAll('input[name="dias-noite"]');
+                                
+                                // Verifica a manhã
+                                if (t.includes("MANHÃ") || t.includes("MANHA") || t.includes("INTEGRAL")) {
+                                    cbManha.forEach(cb => {
                                         let val = cb.value.toUpperCase();
                                         if (todosOsDias || diasStr.includes(val) || (val === "TERÇA" && diasStr.includes("TERCA"))) {
                                             cb.checked = true;
-                                        } else {
-                                            cb.checked = false;
                                         }
                                     });
+                                }
+                                
+                                // Verifica a noite
+                                if (t.includes("NOITE") || t.includes("INTEGRAL")) {
+                                    cbNoite.forEach(cb => {
+                                        let val = cb.value.toUpperCase();
+                                        if (todosOsDias || diasStr.includes(val) || (val === "TERÇA" && diasStr.includes("TERCA"))) {
+                                            cb.checked = true;
+                                        }
+                                    });
+                                    
+                                    // Verifica se na base antiga estava marcado como "apenas retorno"
+                                    if (t.includes("APENAS RETORNO") || t.includes("SÓ RETORNO")) {
+                                        document.getElementById('apenas-retorno-noite').checked = true;
+                                    }
                                 }
                             }
                         }
@@ -407,7 +446,7 @@
             spinner.style.display = "block";
             btnText.innerText = "Enviando dados...";
             
-            // A lógica de envio para o Google Sheets entrará aqui na próxima etapa!
+            // Aqui capturaremos os novos dias marcados da manhã e da noite na próxima etapa.
             console.log("Formulário pronto para integração de envio.");
         }
     </script>
