@@ -8,10 +8,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIINfQ3ynlcN9bYtYU8IhPZ3dYJ2JfGF0go=" crossorigin="">
+  <link rel="stylesheet" href="leaflet.css">
   <link rel="stylesheet" href="rotas.css">
   <link rel="stylesheet" href="consulta.css">
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body class="consulta-body">
   <header class="site-header">
@@ -27,17 +26,15 @@
       <div class="hero">
         <p class="hero-kicker">Planejamento de transporte</p>
         <h1 id="titulo-login">Painel geral de demanda</h1>
-        <p>Consulte a ocupação semanal, os pontos de embarque e a distribuição por rota. Acesso exclusivo da Secretaria.</p>
+        <p>Consulte a demanda semanal, os pontos de embarque e a distribuição por rota. Acesso para alunos cadastrados.</p>
       </div>
       <div class="login-body">
-        <p class="login-explanation">Entre com a mesma conta Google autorizada no Painel da Secretaria.</p>
-        <div class="google-login-wrap">
-          <div id="g_id_onload"
-               data-client_id="138368767568-pev4pjotvo2j0h5iibt0q71m3gdoqb6d.apps.googleusercontent.com"
-               data-callback="handleDemandCredential"
-               data-auto_prompt="false"></div>
-          <div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline" data-text="sign_in_with" data-shape="rectangular" data-logo_alignment="left"></div>
-        </div>
+        <p class="login-explanation">Informe seu CPF. O acesso é liberado quando o CPF consta no banco de dados, independentemente do status do cadastro.</p>
+        <form id="form-acesso-demanda" novalidate>
+          <label for="cpf-acesso">CPF</label>
+          <input id="cpf-acesso" name="cpf" type="text" inputmode="numeric" autocomplete="off" maxlength="14" placeholder="000.000.000-00" required>
+          <button id="btn-acessar" class="primary-button" type="submit">Consultar demanda</button>
+        </form>
         <div id="msgBox" class="message" role="status" aria-live="polite"></div>
       </div>
     </section>
@@ -65,7 +62,7 @@
         <div class="dashboard-layout">
           <section class="section-card">
             <div class="section-head">
-              <div><h2>Mapa da demanda</h2><p>Volume de passageiros aprovados por ponto de embarque.</p></div>
+              <div><h2>Mapa da demanda</h2><p>Volume potencial de passageiros cadastrados por ponto de embarque.</p></div>
               <div class="map-legend"><span><i class="legend-dot"></i> Embarque</span><span><i class="legend-dot destination"></i> Destino</span></div>
             </div>
             <div id="mapa-demanda" aria-label="Mapa dos pontos de embarque e destino em Sobral"></div>
@@ -73,12 +70,12 @@
           </section>
 
           <section class="section-card">
-            <div class="section-head"><div><h2>Pontos de embarque</h2><p>Distribuição dos passageiros aprovados.</p></div></div>
+            <div class="section-head"><div><h2>Pontos de embarque</h2><p>Distribuição dos cadastros ativos, incluindo os que estão em análise.</p></div></div>
             <div id="grafico-embarque" class="chart-list"></div>
           </section>
 
           <section class="section-card span-2">
-            <div class="section-head"><div><h2>Demanda semanal por ônibus</h2><p>Quantidade prevista por dia e turno. São considerados os status Aprovado e Prioridade.</p></div></div>
+            <div class="section-head"><div><h2>Demanda semanal por ônibus</h2><p>Quantidade potencial por dia e turno. Cadastros reprovados não entram na projeção.</p></div></div>
             <div id="cards-frota" class="fleet-grid"></div>
           </section>
 
@@ -90,7 +87,7 @@
           <section class="section-card span-2">
             <div class="section-head"><div><h2>Cadastros consultados</h2><p>Use os filtros para conferir a distribuição registrada na planilha.</p></div></div>
             <div class="filter-toolbar">
-              <input id="filtroBusca" type="search" placeholder="Buscar aluno ou instituição">
+              <input id="filtroBusca" type="search" placeholder="Buscar instituição">
               <select id="filtroInstituicao" aria-label="Filtrar instituição"><option value="">Todas as instituições</option></select>
               <select id="filtroOnibus" aria-label="Filtrar ônibus"><option value="">Todos os ônibus</option><option value="AZUL">Ônibus azul</option><option value="AMARELO">Ônibus amarelo</option></select>
               <select id="filtroEmbarque" aria-label="Filtrar embarque"><option value="">Todos os embarques</option></select>
@@ -100,7 +97,7 @@
             <p id="resultado-contagem" class="result-count">0 resultados</p>
             <div class="table-wrap">
               <table>
-                <thead><tr><th>Aluno</th><th>Instituição</th><th>Embarque</th><th>Ônibus</th><th>Turno</th><th>Status</th></tr></thead>
+                <thead><tr><th>Registro</th><th>Instituição</th><th>Embarque</th><th>Ônibus</th><th>Turno</th><th>Status</th></tr></thead>
                 <tbody id="lista-geral"></tbody>
               </table>
             </div>
@@ -110,7 +107,7 @@
     </main>
   </div>
 
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="leaflet.js"></script>
   <script src="config.js"></script>
   <script src="portal-api.js"></script>
   <script src="consulta.js"></script>

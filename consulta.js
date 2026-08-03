@@ -11,11 +11,11 @@ const PONTOS_DEMANDA = [
 const SOBRAL = { nome: 'Instituições em Sobral', coords: [-3.6906, -40.3482] };
 let cadastros = [];
 let mapaDemanda;
+let observadorMapa;
 
 const $ = (id) => document.getElementById(id);
-const positivo = (valor) => ['SIM', 'S', 'TRUE', '1'].includes(PortalAPI.normalizar(valor));
 const statusNormalizado = (aluno) => PortalAPI.normalizar(aluno.status || 'Pendente');
-const aprovado = (aluno) => ['APROVADO', 'PRIORIDADE'].includes(statusNormalizado(aluno));
+const demandaAtiva = (aluno) => statusNormalizado(aluno) !== 'REPROVADO';
 
 function mostrarMensagem(texto, tipo = 'info') {
   const box = $('msgBox');
@@ -51,7 +51,7 @@ function renderizarBarras(id, itens) {
 }
 
 function matrizDaRota(rota) {
-  const passageiros = cadastros.filter((aluno) => aprovado(aluno) && PortalAPI.normalizar(aluno.onibus) === rota);
+  const passageiros = cadastros.filter((aluno) => demandaAtiva(aluno) && PortalAPI.normalizar(aluno.onibus) === rota);
   const matriz = { MANHA: {}, NOITE: {} };
   ['MANHA', 'NOITE'].forEach((turno) => DIAS_CONSULTA.forEach((dia) => {
     matriz[turno][dia] = passageiros.filter((aluno) => PortalAPI.diasDoAluno(aluno, turno).includes(dia)).length;
@@ -66,7 +66,7 @@ function renderizarFrota() {
     const card = document.createElement('article'); card.className = 'fleet-card';
     card.style.setProperty('--bus-color', rota === 'AZUL' ? '#1565c0' : '#e0a800');
     const titulo = document.createElement('h3'); titulo.textContent = `Ônibus ${rota.toLowerCase()}`;
-    const resumo = document.createElement('p'); resumo.textContent = `${dados.passageiros.length} passageiros aprovados ou prioritários`;
+    const resumo = document.createElement('p'); resumo.textContent = `${dados.passageiros.length} cadastros na demanda potencial`;
     const tabela = document.createElement('table'); tabela.className = 'mini-matrix';
     const thead = document.createElement('thead'); const trh = document.createElement('tr');
     ['Turno', ...DIAS_CONSULTA.map((dia) => DIAS_CURTOS[dia])].forEach((texto) => { const th = document.createElement('th'); th.textContent = texto; trh.appendChild(th); });
@@ -87,9 +87,10 @@ function pontoDoAluno(aluno) {
 
 function carregarMapa() {
   if (mapaDemanda) mapaDemanda.remove();
+  if (observadorMapa) observadorMapa.disconnect();
   mapaDemanda = L.map('mapa-demanda', { scrollWheelZoom: false });
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap', maxZoom: 18 }).addTo(mapaDemanda);
-  const passageiros = cadastros.filter(aprovado);
+  const passageiros = cadastros.filter(demandaAtiva);
   const pontosComDemanda = PONTOS_DEMANDA.map((ponto) => ({
     ...ponto,
     quantidade: passageiros.filter((aluno) => pontoDoAluno(aluno) === ponto).length
@@ -97,13 +98,17 @@ function carregarMapa() {
   pontosComDemanda.forEach((ponto) => {
     const raio = Math.max(9, Math.min(25, 8 + ponto.quantidade * .7));
     L.circleMarker(ponto.coords, { radius: raio, color: '#fff', weight: 3, fillColor: '#0a7b69', fillOpacity: .9 })
-      .addTo(mapaDemanda).bindPopup(`<strong>${ponto.nome}</strong><br>${ponto.quantidade} passageiro(s) aprovado(s)`);
+      .addTo(mapaDemanda).bindPopup(`<strong>${ponto.nome}</strong><br>${ponto.quantidade} cadastro(s) na demanda`);
     L.polyline([ponto.coords, SOBRAL.coords], { color: '#0a7b69', weight: 2, opacity: .38, dashArray: '7 8' }).addTo(mapaDemanda);
   });
   L.circleMarker(SOBRAL.coords, { radius: 12, color: '#fff', weight: 3, fillColor: '#6d4c9f', fillOpacity: .95 })
     .addTo(mapaDemanda).bindPopup(`<strong>${SOBRAL.nome}</strong><br>Destino universitário`);
   const limites = [...PONTOS_DEMANDA.map((ponto) => ponto.coords), SOBRAL.coords];
   mapaDemanda.fitBounds(L.latLngBounds(limites), { padding: [26, 26] });
+  const container = $('mapa-demanda');
+  observadorMapa = new ResizeObserver(() => mapaDemanda && mapaDemanda.invalidateSize({ pan: false }));
+  observadorMapa.observe(container);
+  requestAnimationFrame(() => mapaDemanda.invalidateSize({ pan: false }));
 }
 
 function popularSelect(id, valores) {
@@ -132,7 +137,7 @@ function renderizarTabela() {
   const turno = $('filtroTurno').value;
   const status = $('filtroStatus').value;
   const filtrados = cadastros.filter((aluno) => {
-    const correspondeBusca = !busca || PortalAPI.normalizar(`${aluno.nome} ${aluno.instituicao}`).includes(busca);
+    const correspondeBusca = !busca || PortalAPI.normalizar(aluno.instituicao).includes(busca);
     return correspondeBusca && (!instituicao || aluno.instituicao === instituicao) &&
       (!onibus || PortalAPI.normalizar(aluno.onibus) === onibus) && (!embarque || aluno.embarque === embarque) &&
       (!turno || PortalAPI.normalizar(aluno.turno).includes(turno)) && (!status || aluno.status === status);
@@ -142,9 +147,9 @@ function renderizarTabela() {
   if (!filtrados.length) {
     const tr = document.createElement('tr'); const td = document.createElement('td'); td.colSpan = 6; td.className = 'empty'; td.textContent = 'Nenhum cadastro corresponde aos filtros.'; tr.appendChild(td); tbody.appendChild(tr); return;
   }
-  filtrados.forEach((aluno) => {
+  filtrados.forEach((aluno, indiceRegistro) => {
     const tr = document.createElement('tr');
-    [aluno.nome || 'Não informado', aluno.instituicao || 'Não informada', aluno.embarque || 'Não informado'].forEach((texto, indice) => {
+    [`Cadastro ${String(indiceRegistro + 1).padStart(3, '0')}`, aluno.instituicao || 'Não informada', aluno.embarque || 'Não informado'].forEach((texto, indice) => {
       const td = document.createElement('td'); td.textContent = texto; if (indice === 0) td.style.fontWeight = '750'; tr.appendChild(td);
     });
     const rotaTd = document.createElement('td'); const rota = document.createElement('span'); rota.className = 'route-chip';
@@ -155,38 +160,45 @@ function renderizarTabela() {
   });
 }
 
-function renderizarDashboard() {
-  const aprovados = cadastros.filter(aprovado);
-  $('kpi-total').textContent = cadastros.length;
-  $('kpi-aprovados').textContent = cadastros.filter((aluno) => statusNormalizado(aluno) === 'APROVADO').length;
-  $('kpi-analise').textContent = cadastros.filter((aluno) => ['PENDENTE', 'EM ANALISE'].includes(statusNormalizado(aluno))).length;
-  $('kpi-prioridade').textContent = cadastros.filter((aluno) => statusNormalizado(aluno) === 'PRIORIDADE').length;
-  $('kpi-novatos').textContent = cadastros.filter((aluno) => positivo(aluno.novato)).length;
-  $('kpi-sobral').textContent = cadastros.filter((aluno) => positivo(aluno.sobral)).length;
+function renderizarDashboard(resumo = {}) {
+  const demanda = cadastros.filter(demandaAtiva);
+  $('kpi-total').textContent = Number(resumo.total ?? cadastros.length);
+  $('kpi-aprovados').textContent = Number(resumo.aprovados ?? cadastros.filter((aluno) => statusNormalizado(aluno) === 'APROVADO').length);
+  $('kpi-analise').textContent = Number(resumo.em_analise ?? cadastros.filter((aluno) => ['PENDENTE', 'EM ANALISE'].includes(statusNormalizado(aluno))).length);
+  $('kpi-prioridade').textContent = Number(resumo.prioridade ?? cadastros.filter((aluno) => statusNormalizado(aluno) === 'PRIORIDADE').length);
+  $('kpi-novatos').textContent = Number(resumo.novatos ?? 0);
+  $('kpi-sobral').textContent = Number(resumo.sobral ?? 0);
   renderizarFrota();
-  renderizarBarras('grafico-embarque', contarPor(aprovados, 'embarque', 'Não informado'));
-  renderizarBarras('grafico-instituicoes', contarPor(aprovados, 'instituicao', 'Não informada'));
+  renderizarBarras('grafico-embarque', contarPor(demanda, 'embarque', 'Não informado'));
+  renderizarBarras('grafico-instituicoes', contarPor(demanda, 'instituicao', 'Não informada'));
   popularSelect('filtroInstituicao', [...new Set(cadastros.map((aluno) => aluno.instituicao))]);
   popularSelect('filtroEmbarque', [...new Set(cadastros.map((aluno) => aluno.embarque))]);
   popularSelect('filtroStatus', [...new Set(cadastros.map((aluno) => aluno.status || 'Pendente'))]);
-  renderizarTabela(); carregarMapa(); setTimeout(() => mapaDemanda.invalidateSize(), 100);
+  renderizarTabela(); carregarMapa();
 }
 
-async function verificarAcesso(token) {
+async function verificarAcesso(cpf) {
   mostrarMensagem('Validando seu cadastro e reunindo a demanda...', 'info');
   try {
-    const resposta = await PortalAPI.requisicao({ acao: 'consulta_demanda', token });
+    const resposta = await PortalAPI.requisicao({ acao: 'consulta_demanda', cpf });
     cadastros = Array.isArray(resposta.dadosGerais) ? resposta.dadosGerais : [];
-    $('nomeAlunoLogado').textContent = resposta.acesso && resposta.acesso.nome ? resposta.acesso.nome : 'Secretaria';
-    $('login-section').classList.add('hidden'); $('main-section').classList.remove('hidden'); renderizarDashboard();
+    $('nomeAlunoLogado').textContent = resposta.acesso && resposta.acesso.nome ? resposta.acesso.nome : 'Aluno cadastrado';
+    $('login-section').classList.add('hidden'); $('main-section').classList.remove('hidden'); renderizarDashboard(resposta.resumo);
   } catch (erro) {
     mostrarMensagem(erro.name === 'AbortError' ? 'O servidor demorou para responder. Tente novamente.' : erro.message, 'error');
   }
 }
 
-window.handleDemandCredential = function handleDemandCredential(resposta) {
-  if (!resposta || !resposta.credential) { mostrarMensagem('O Google não retornou uma credencial válida.', 'error'); return; }
-  verificarAcesso(resposta.credential);
-};
+$('cpf-acesso').addEventListener('input', (evento) => {
+  evento.target.value = PortalAPI.formatarCpf(evento.target.value);
+});
+$('form-acesso-demanda').addEventListener('submit', async (evento) => {
+  evento.preventDefault();
+  const cpf = PortalAPI.somenteDigitos($('cpf-acesso').value);
+  if (cpf.length !== 11) { mostrarMensagem('Informe um CPF com 11 dígitos.', 'error'); return; }
+  const botao = $('btn-acessar'); const textoOriginal = botao.textContent;
+  botao.disabled = true; botao.textContent = 'Consultando...';
+  try { await verificarAcesso(cpf); } finally { botao.disabled = false; botao.textContent = textoOriginal; }
+});
 $('btnSair').addEventListener('click', () => location.reload());
 ['filtroBusca', 'filtroInstituicao', 'filtroOnibus', 'filtroEmbarque', 'filtroTurno', 'filtroStatus'].forEach((id) => $(id).addEventListener(id === 'filtroBusca' ? 'input' : 'change', renderizarTabela));
