@@ -1,45 +1,37 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Área Restrita - Secretaria</title>
-    <link rel="stylesheet" href="style.css">
-    
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Area Restrita - Secretaria</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
-
-    <header class="cabecalho-oficial">
-        <a href="index.html" class="botaosec btn bg-verde">Voltar ao Início</a>
-    </header>
-
-    <main class="area-portal">
-        <div class="card" style="text-align: center;">
-            <h2>Painel da Secretaria</h2>
-            <p>Faça login com seu e-mail institucional (@gmail.com) para gerenciar o transporte universitário.</p>
-            
-            <div style="display: flex; justify-content: center; margin-top: 20px;">
-                <div id="g_id_onload"
-                     data-client_id="138368767568-pev4pjotvo2j0h5iibt0q71m3gdoqb6d.apps.googleusercontent.com"
-                     data-callback="handleCredentialResponse"
-                     data-auto_prompt="false">
-                </div>
-                
-                <div class="g_id_signin"
-                     data-type="standard"
-                     data-size="large"
-                     data-theme="outline"
-                     data-text="sign_in_with"
-                     data-shape="rectangular"
-                     data-logo_alignment="left">
-                </div>
-            </div>
-
-            <p id="mensagem-sistema" style="display: none; font-weight: bold; margin-top: 15px;"></p>
-        </div>
-    </main>
-
-    <script src="auth.js"></script>
+  <header class="cabecalho-oficial">
+    <a href="index.html" class="botaosec btn bg-verde">Voltar ao inicio</a>
+  </header>
+  <main class="area-portal">
+    <div class="card" style="text-align:center">
+      <h2>Painel da Secretaria</h2>
+      <p>Entre com uma conta Google autorizada para gerenciar o transporte.</p>
+      <div style="display:flex;justify-content:center;margin-top:20px">
+        <div id="g_id_onload"
+             data-client_id="138368767568-pev4pjotvo2j0h5iibt0q71m3gdoqb6d.apps.googleusercontent.com"
+             data-callback="handleCredentialResponse"
+             data-auto_prompt="false"></div>
+        <div class="g_id_signin"
+             data-type="standard"
+             data-size="large"
+             data-theme="outline"
+             data-text="sign_in_with"
+             data-shape="rectangular"
+             data-logo_alignment="left"></div>
+      </div>
+      <p id="mensagem-sistema" role="status" aria-live="polite" style="display:none;font-weight:bold;margin-top:15px"></p>
+    </div>
+  </main>
+  <script src="config.js"></script>
+  <script src="auth-seguro.js"></script>
 </body>
 </html>

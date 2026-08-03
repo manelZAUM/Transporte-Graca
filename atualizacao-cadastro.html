@@ -1,454 +1,339 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Atualização Cadastral - Transporte Graça/CE</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <style>
-        :root {
-            --primary-blue: #0056b3;
-            --primary-yellow: #f1c40f;
-            --dark: #2d3436;
-            --muted: #636e72;
-            --bg-glass: rgba(255, 255, 255, 0.95);
-            --border-radius: 12px;
-            --shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-            
-            --success: #28a745;
-            --info: #17a2b8;
-            --danger: #dc3545;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body { 
-            font-family: 'Inter', sans-serif;
-            background-image: url('fundo-login.jpg'); 
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            color: var(--dark);
-            min-height: 100vh;
-        }
-
-        body::before {
-            content: "";
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: -1;
-        }
-
-        .cabecalho-oficial { padding: 20px; display: flex; justify-content: center; }
-        .pill-logo { background: white; padding: 10px 25px; border-radius: 50px; box-shadow: var(--shadow); }
-        .pill-logo img { height: 45px; }
-
-        .main-container { display: flex; justify-content: center; align-items: flex-start; min-height: 80vh; padding: 20px; }
-
-        .glass-card {
-            background: var(--bg-glass); backdrop-filter: blur(10px); width: 100%;
-            border-radius: var(--border-radius); box-shadow: var(--shadow); overflow: hidden;
-            animation: fadeIn 0.5s ease;
-        }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-
-        .card-header-yellow { 
-            background-color: var(--primary-yellow); 
-            color: var(--dark); 
-            padding: 30px; 
-            text-align: center; 
-        }
-
-        .card-body { padding: 30px; }
-        
-        .cpf-input { 
-            width: 100%; max-width: 320px; padding: 15px; margin: 20px auto; display: block; 
-            border: 2px solid #ddd; border-radius: 8px; font-size: 18px; text-align: center; transition: 0.3s; 
-        }
-        .cpf-input:focus { outline: none; border-color: var(--dark); }
-        
-        .btn-primary {
-            background-color: var(--dark); color: white; border: none; padding: 15px 35px;
-            font-size: 16px; font-weight: 700; border-radius: 8px; cursor: pointer;
-            width: 100%; max-width: 320px; display: flex; justify-content: center; align-items: center; gap: 10px; margin: 0 auto; transition: 0.3s;
-        }
-        .btn-primary:hover { background-color: #000; transform: scale(1.02); }
-        .btn-primary:disabled { background-color: #777; cursor: not-allowed; transform: none; }
-
-        .input-filtro { 
-            width: 100%; margin-top: 5px; padding: 12px; border-radius: 8px; 
-            border: 1px solid #ddd; background: #fff; font-family: inherit; font-size: 14px;
-        }
-
-        .spinner { border: 3px solid rgba(0,0,0,0.1); border-top: 3px solid var(--dark); border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: none; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
-        .perfil-card {
-            background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 25px; 
-            border-left: 4px solid var(--primary-blue); text-align: left;
-        }
-        
-        .bloco-dias {
-            background: #fdfdfd; border: 1px solid #eee; padding: 15px; border-radius: 8px; margin-bottom: 15px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Atualizacao Cadastral - Transporte Graca/CE</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --blue:#0056b3; --yellow:#f1c40f; --dark:#2d3436; --muted:#636e72;
+      --success:#218838; --danger:#c82333; --info:#0c5460; --card:rgba(255,255,255,.97);
+    }
+    * { box-sizing:border-box; }
+    body {
+      margin:0; min-height:100vh; font-family:Inter,Arial,sans-serif; color:var(--dark);
+      background:linear-gradient(rgba(0,0,0,.5),rgba(0,0,0,.5)),url('fundo-login.jpg') center/cover fixed;
+    }
+    header { display:flex; justify-content:center; padding:20px; }
+    header img { height:45px; background:white; padding:8px 20px; border-radius:999px; }
+    main { width:min(620px,calc(100% - 28px)); margin:0 auto 40px; }
+    .card { background:var(--card); border-radius:14px; overflow:hidden; box-shadow:0 10px 32px rgba(0,0,0,.25); }
+    .card-header { padding:24px; text-align:center; background:var(--yellow); }
+    .card-header h1 { margin:0; font-size:1.5rem; }
+    .card-body { padding:26px; }
+    .hidden { display:none !important; }
+    .perfil { background:#f5f7f8; padding:16px; border-radius:10px; margin-bottom:20px; }
+    .perfil h2,.perfil p { margin:0; }
+    .perfil p { margin-top:5px; color:var(--muted); }
+    .field { margin-bottom:18px; }
+    label,legend { display:block; margin-bottom:7px; font-weight:700; font-size:.92rem; }
+    input,select {
+      width:100%; padding:13px; border:1px solid #cfd4d8; border-radius:8px;
+      background:#fff; color:var(--dark); font:inherit;
+    }
+    input:focus,select:focus,button:focus-visible { outline:3px solid rgba(0,86,179,.28); outline-offset:2px; }
+    fieldset { margin:0 0 18px; padding:15px; border:1px solid #d9dee2; border-radius:10px; }
+    .checks { display:flex; flex-wrap:wrap; gap:12px; }
+    .checks label { display:flex; align-items:center; gap:5px; margin:0; font-weight:500; }
+    .checks input { width:auto; }
+    .help { color:var(--muted); font-size:.8rem; margin-top:6px; }
+    .feedback { min-height:24px; margin:14px 0; text-align:center; font-weight:700; }
+    .feedback.error { color:var(--danger); }
+    .feedback.success { color:var(--success); }
+    button,.link-button {
+      width:100%; padding:14px 18px; border:0; border-radius:8px; cursor:pointer;
+      color:white; background:var(--dark); font:700 1rem Inter,Arial,sans-serif;
+    }
+    button:hover { filter:brightness(.92); }
+    button:disabled { cursor:not-allowed; opacity:.65; }
+    .submit { background:var(--success); }
+    .cancel { margin-top:10px; background:var(--danger); }
+    .back { display:block; margin-top:20px; text-align:center; color:var(--muted); text-decoration:none; }
+    .spinner { display:inline-block; width:16px; height:16px; margin-right:8px; border:2px solid #ffffff55; border-top-color:#fff; border-radius:50%; animation:spin .8s linear infinite; vertical-align:-3px; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    @media (prefers-reduced-motion:reduce) { .spinner { animation:none; } }
+  </style>
 </head>
 <body>
-
-    <header class="cabecalho-oficial">
-        <div class="pill-logo">
-            <img src="Logo prefeitura.png" alt="LOGO Governo Municipal de Graça">
+  <header><img src="Logo prefeitura.png" alt="Governo Municipal de Graca"></header>
+  <main>
+    <section id="acesso" class="card" aria-labelledby="titulo-acesso">
+      <div class="card-header">
+        <h1 id="titulo-acesso">Atualizacao cadastral</h1>
+        <p>Exclusivo para veteranos</p>
+      </div>
+      <div class="card-body">
+        <p>Informe o CPF e o codigo temporario fornecido pela Secretaria.</p>
+        <div class="field">
+          <label for="cpf">CPF</label>
+          <input id="cpf" type="text" inputmode="numeric" maxlength="14" autocomplete="off" placeholder="000.000.000-00">
         </div>
-    </header>
+        <div class="field">
+          <label for="codigo">Codigo temporario</label>
+          <input id="codigo" type="text" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="000000">
+          <p class="help">O codigo possui 6 digitos e tem prazo de validade.</p>
+        </div>
+        <button id="consultar" type="button">Consultar cadastro</button>
+        <div id="feedback-acesso" class="feedback" aria-live="polite"></div>
+        <a href="index.html" class="back">Voltar ao inicio</a>
+      </div>
+    </section>
 
-    <div class="main-container">
-        
-        <!-- PASSO 1: TELA DE LOGIN DO CPF -->
-        <section id="login-wrapper" class="glass-card" style="max-width: 450px;">
-            <div class="card-header-yellow">
-                <h2 style="font-size: 24px;">📝 Atualização Cadastral</h2>
-                <p style="opacity: 0.85; font-size: 14px; margin-top: 5px; font-weight: 600;">Exclusivo para veteranos</p>
+    <section id="formulario" class="card hidden" aria-labelledby="titulo-formulario">
+      <div class="card-header"><h1 id="titulo-formulario">Nova atualizacao</h1></div>
+      <div class="card-body">
+        <div class="perfil">
+          <h2 id="nome-aluno">Aluno</h2>
+          <p id="instituicao-atual"></p>
+        </div>
+        <form id="form-atualizacao">
+          <div class="field">
+            <label for="instituicao">Instituicao de ensino</label>
+            <select id="instituicao" required>
+              <option value="">Selecione...</option>
+              <option value="ANHANGUERA">Anhanguera</option>
+              <option value="UFC">UFC</option>
+              <option value="FLF">FLF</option>
+              <option value="IFCE">IFCE</option>
+              <option value="UNINTA">UNINTA</option>
+              <option value="UVA">UVA</option>
+              <option value="LUCIANO FEIJAO">Luciano Feijao</option>
+              <option value="FARIAS BRITO">Farias Brito</option>
+              <option value="OUTROS">Outra</option>
+            </select>
+          </div>
+          <div id="instituicao-outra-box" class="field hidden">
+            <label for="instituicao-outra">Nome da instituicao</label>
+            <input id="instituicao-outra" type="text" maxlength="120" autocomplete="organization">
+          </div>
+          <div class="field">
+            <label for="embarque">Ponto de embarque</label>
+            <select id="embarque" required>
+              <option value="">Selecione...</option>
+              <option value="SEDE">Sede</option>
+              <option value="BARRO VERMELHO">Barro Vermelho</option>
+              <option value="LAPA">Lapa</option>
+              <option value="VILA">Vila</option>
+            </select>
+          </div>
+
+          <fieldset>
+            <legend>Dias no turno da manha</legend>
+            <div class="checks">
+              <label><input type="checkbox" name="dias-manha" value="Segunda">Seg</label>
+              <label><input type="checkbox" name="dias-manha" value="Terca">Ter</label>
+              <label><input type="checkbox" name="dias-manha" value="Quarta">Qua</label>
+              <label><input type="checkbox" name="dias-manha" value="Quinta">Qui</label>
+              <label><input type="checkbox" name="dias-manha" value="Sexta">Sex</label>
             </div>
-            <div class="card-body" style="text-align: center;">
-                <p style="color: var(--muted);">Informe seu CPF para iniciar a atualização dos seus dados.</p>
-                <input type="text" id="cpf-input" class="cpf-input" placeholder="000.000.000-00" maxlength="14">
-                
-                <button onclick="tentarAcesso()" id="btn-entrar" class="btn-primary">
-                    <div id="spinner" class="spinner"></div>
-                    <span>Consultar Cadastro</span>
-                </button>
-                
-                <div id="feedback-login" style="margin-top:15px; font-size: 14px; font-weight: 600;"></div>
-                <div style="margin-top: 25px;">
-                    <a href="index.html" style="color: var(--muted); font-size: 14px; text-decoration: none;">← Voltar ao Início</a>
-                </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Dias no turno da noite</legend>
+            <div class="checks">
+              <label><input type="checkbox" name="dias-noite" value="Segunda">Seg</label>
+              <label><input type="checkbox" name="dias-noite" value="Terca">Ter</label>
+              <label><input type="checkbox" name="dias-noite" value="Quarta">Qua</label>
+              <label><input type="checkbox" name="dias-noite" value="Quinta">Qui</label>
+              <label><input type="checkbox" name="dias-noite" value="Sexta">Sex</label>
             </div>
-        </section>
-
-        <!-- PASSO 2: TELA DE STATUS (JÁ ENVIOU) -->
-        <section id="status-wrapper" class="glass-card" style="display: none; max-width: 500px; margin: 0 auto;">
-            <div class="card-header-yellow">
-                <h2 style="font-size: 24px;">✅ Atualização Recebida</h2>
+            <div class="checks" style="margin-top:15px;padding-top:12px;border-top:1px dashed #bbb">
+              <label><input id="apenas-retorno" type="checkbox">Apenas retorno no onibus da noite</label>
             </div>
-            <div class="card-body" style="text-align: center;">
-                
-                <div class="perfil-card">
-                    <h3 style="font-size: 18px; color: var(--dark); margin-bottom: 5px;" id="status-info-nome">Nome</h3>
-                    <p style="font-size: 14px; color: var(--muted);" id="status-info-inst">Instituição</p>
-                </div>
+          </fieldset>
 
-                <h3 style="margin-bottom: 15px; color: var(--dark);">Você já enviou esse formulário!</h3>
-                <p style="color: var(--muted); margin-bottom: 25px; font-size: 14px;">Os seus dados para o novo semestre já constam na nossa base. Acompanhe a situação do seu cadastro abaixo:</p>
-                
-                <div style="margin-bottom: 30px;">
-                    <span id="badge-status" style="padding: 10px 20px; border-radius: 50px; font-weight: 700; font-size: 15px; display: inline-block;">Aguardando...</span>
-                </div>
-                
-                <button onclick="window.location.reload()" class="btn-primary">← Sair</button>
-            </div>
-        </section>
+          <div id="feedback-envio" class="feedback" aria-live="polite"></div>
+          <button id="enviar" class="submit" type="submit">Enviar atualizacao</button>
+          <button class="cancel" type="button" id="cancelar">Cancelar e sair</button>
+        </form>
+      </div>
+    </section>
 
-        <!-- PASSO 3: FORMULÁRIO DE ATUALIZAÇÃO (AINDA NÃO ENVIOU) -->
-        <section id="form-wrapper" class="glass-card" style="display: none; max-width: 600px; margin: 0 auto;">
-            <div class="card-header-yellow">
-                <h2 style="font-size: 24px;">📝 Nova Atualização</h2>
-                <p style="opacity: 0.85; font-size: 14px; margin-top: 5px;">Semestre Letivo Atual</p>
-            </div>
-            
-            <div class="card-body" style="text-align: left;">
-                
-                <div class="perfil-card">
-                    <h3 style="font-size: 18px; color: var(--dark); margin-bottom: 5px;" id="form-info-nome">Nome</h3>
-                    <p style="font-size: 14px; color: var(--muted);" id="form-info-inst">Instituição</p>
-                </div>
+    <section id="sucesso" class="card hidden" aria-labelledby="titulo-sucesso">
+      <div class="card-header"><h1 id="titulo-sucesso">Atualizacao recebida</h1></div>
+      <div class="card-body" style="text-align:center">
+        <p>Os dados foram enviados e aguardam analise da Secretaria.</p>
+        <button type="button" id="sair">Sair</button>
+      </div>
+    </section>
+  </main>
 
-                <p style="color: var(--muted); margin-bottom: 25px; font-size: 14px;">Os seus dados antigos foram carregados. Atualize o que for necessário e confirme o envio.</p>
-                
-                <form id="form-atualizacao" onsubmit="enviarAtualizacao(event)">
-                    
-                    <div style="margin-bottom: 15px;">
-                        <label style="font-weight: 600; font-size: 14px; color: var(--dark);">🏫 Instituição de Ensino</label>
-                        <select id="update-instituicao" required class="input-filtro" onchange="verificarInstituicaoOutros()">
-                            <option value="">Selecione sua instituição...</option>
-                            <option value="ANHANGUERA">Anhanguera</option>
-                            <option value="UFC">UFC</option>
-                            <option value="FLF">FLF</option>
-                            <option value="IFCE">IFCE</option>
-                            <option value="UNINTA">UNINTA</option>
-                            <option value="UVA">UVA</option>
-                            <option value="LUCIANO FEIJÃO">Luciano Feijão</option>
-                            <option value="FARIAS BRITO">Farias Brito</option>
-                            <option value="OUTROS">Outros (Digitar manualmente)</option>
-                        </select>
-                        <input type="text" id="update-instituicao-outros" class="input-filtro" style="display: none; margin-top: 10px;" placeholder="Digite o nome da sua instituição...">
-                    </div>
+  <script src="config.js"></script>
+  <script>
+    'use strict';
 
-                    <div style="margin-bottom: 25px;">
-                        <label style="font-weight: 600; font-size: 14px; color: var(--dark);">📍 Ponto de Embarque</label>
-                        <select id="update-embarque" required class="input-filtro">
-                            <option value="">Selecione o ponto...</option>
-                            <option value="SEDE">Sede</option>
-                            <option value="BARRO VERMELHO">Barro Vermelho</option>
-                            <option value="LAPA">Lapa</option>
-                            <option value="VILA">Vila</option>
-                        </select>
-                    </div>
+    const API_URL = window.APP_CONFIG && window.APP_CONFIG.API_URL;
+    let updateToken = '';
 
-                    <div style="margin-bottom: 15px;">
-                        <h4 style="font-weight: 700; font-size: 15px; color: var(--dark); border-bottom: 2px solid #eee; padding-bottom: 5px; margin-bottom: 15px;">🕒 Rotina de Viagens</h4>
-                        
-                        <!-- BLOCO DA MANHÃ -->
-                        <div class="bloco-dias">
-                            <label style="font-weight: 600; font-size: 14px; color: var(--primary-blue);">☀️ Turno da MANHÃ (De Segunda a Sexta)</label>
-                            <div style="display: flex; gap: 12px; margin-top: 10px; flex-wrap: wrap; font-size: 14px;">
-                                <label style="cursor: pointer;"><input type="checkbox" name="dias-manha" value="Segunda"> Seg</label>
-                                <label style="cursor: pointer;"><input type="checkbox" name="dias-manha" value="Terça"> Ter</label>
-                                <label style="cursor: pointer;"><input type="checkbox" name="dias-manha" value="Quarta"> Qua</label>
-                                <label style="cursor: pointer;"><input type="checkbox" name="dias-manha" value="Quinta"> Qui</label>
-                                <label style="cursor: pointer;"><input type="checkbox" name="dias-manha" value="Sexta"> Sex</label>
-                            </div>
-                        </div>
+    const $ = (id) => document.getElementById(id);
+    const normalizar = (valor) => String(valor || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().trim();
 
-                        <!-- BLOCO DA NOITE -->
-                        <div class="bloco-dias">
-                            <label style="font-weight: 600; font-size: 14px; color: var(--dark);">🌙 Turno da NOITE (De Segunda a Sexta)</label>
-                            <div style="display: flex; gap: 12px; margin-top: 10px; flex-wrap: wrap; font-size: 14px;">
-                                <label style="cursor: pointer;"><input type="checkbox" name="dias-noite" value="Segunda"> Seg</label>
-                                <label style="cursor: pointer;"><input type="checkbox" name="dias-noite" value="Terça"> Ter</label>
-                                <label style="cursor: pointer;"><input type="checkbox" name="dias-noite" value="Quarta"> Qua</label>
-                                <label style="cursor: pointer;"><input type="checkbox" name="dias-noite" value="Quinta"> Qui</label>
-                                <label style="cursor: pointer;"><input type="checkbox" name="dias-noite" value="Sexta"> Sex</label>
-                            </div>
-                            
-                            <!-- OPÇÃO APENAS RETORNO -->
-                            <div style="margin-top: 15px; padding-top: 10px; border-top: 1px dashed #ccc;">
-                                <label style="cursor: pointer; font-size: 13px; font-weight: 600; color: var(--info);">
-                                    <input type="checkbox" id="apenas-retorno-noite" value="Sim"> 🚌 Apenas Retorno (Vou por outros meios, mas volto no ônibus da noite)
-                                </label>
-                            </div>
-                        </div>
-                    </div>
+    function conferirConfiguracao() {
+      if (!API_URL || API_URL.includes('COLE_AQUI')) {
+        throw new Error('Configure a URL da implantacao no arquivo config.js.');
+      }
+    }
 
-                    <button type="submit" id="btn-enviar-update" class="btn-primary" style="background-color: var(--success); width: 100%; max-width: 100%; margin-top: 20px;">
-                        <div id="spinner-update" class="spinner" style="border-top-color: white;"></div>
-                        <span id="texto-btn-update">🚀 Enviar Atualização Cadastral</span>
-                    </button>
-                    
-                    <button type="button" onclick="window.location.reload()" class="btn-primary" style="background-color: var(--danger); width: 100%; max-width: 100%; margin-top: 10px;">
-                        <span>❌ Cancelar e Sair</span>
-                    </button>
-                </form>
-            </div>
-        </section>
-
-    </div>
-
-    <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbyhdu4wD5r7zme5Ycsv82DG7t9W2g4ZoUbdvJWlKjjQ2HblNzRIexnEdNRQNiBrmzc/exec"; 
-        
-        let dadosNuvem = [];
-
-        // Máscara de CPF
-        document.getElementById('cpf-input').addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\D/g, '');
-            if (value.length > 3) value = value.replace(/^(\d{3})(\d)/, '$1.$2');
-            if (value.length > 6) value = value.replace(/^(\d{3})\.(\d{3})(\d)/, '$1.$2.$3');
-            if (value.length > 9) value = value.replace(/^(\d{3})\.(\d{3})\.(\d{3})(\d)/, '$1.$2.$3-$4');
-            e.target.value = value;
+    async function api(payload) {
+      conferirConfiguracao();
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 20000);
+      try {
+        const resposta = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload),
+          signal: controller.signal
         });
+        const texto = await resposta.text();
+        let dados;
+        try { dados = JSON.parse(texto); }
+        catch (_) { throw new Error('O servidor nao retornou JSON. Confira a URL e a implantacao.'); }
+        if (!dados.sucesso) {
+          const erro = new Error(dados.erro || 'Nao foi possivel concluir a operacao.');
+          erro.codigo = dados.codigo;
+          throw erro;
+        }
+        return dados;
+      } finally {
+        clearTimeout(timer);
+      }
+    }
 
-        document.getElementById("cpf-input").addEventListener("keypress", function(event) {
-            if (event.key === "Enter") tentarAcesso();
+    function somenteDigitos(valor) { return String(valor || '').replace(/\D/g, ''); }
+
+    function formatarCpf(valor) {
+      return somenteDigitos(valor).slice(0, 11)
+        .replace(/(\d{3})(\d)/, '$1.$2')
+        .replace(/(\d{3})(\d)/, '$1.$2')
+        .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+    }
+
+    function feedback(id, mensagem, tipo) {
+      const elemento = $(id);
+      elemento.textContent = mensagem || '';
+      elemento.className = 'feedback' + (tipo ? ' ' + tipo : '');
+    }
+
+    function carregando(botao, ativo, textoNormal, textoAtivo) {
+      botao.disabled = ativo;
+      botao.innerHTML = ativo ? '<span class="spinner" aria-hidden="true"></span>' + textoAtivo : textoNormal;
+    }
+
+    function valoresMarcados(nome) {
+      return Array.from(document.querySelectorAll('input[name="' + nome + '"]:checked')).map((item) => item.value);
+    }
+
+    function marcarDias(nome, valor) {
+      const recebidos = normalizar(valor).split(/[,;|]/).map((item) => item.trim()).filter(Boolean);
+      document.querySelectorAll('input[name="' + nome + '"]').forEach((checkbox) => {
+        const dia = normalizar(checkbox.value);
+        checkbox.checked = recebidos.some((item) => item.includes(dia.slice(0, 3)) || dia.includes(item.slice(0, 3)));
+      });
+    }
+
+    function preencherFormulario(aluno) {
+      $('nome-aluno').textContent = aluno.nome || 'Aluno';
+      $('instituicao-atual').textContent = aluno.instituicao ? 'Cadastro atual: ' + aluno.instituicao : '';
+
+      const selectInstituicao = $('instituicao');
+      const opcoes = Array.from(selectInstituicao.options).map((opcao) => opcao.value);
+      const instituicaoNormalizada = normalizar(aluno.instituicao);
+      const encontrada = opcoes.find((valor) => valor && valor !== 'OUTROS' && instituicaoNormalizada.includes(normalizar(valor)));
+      selectInstituicao.value = encontrada || (aluno.instituicao ? 'OUTROS' : '');
+      atualizarInstituicaoOutra();
+      if (!encontrada && aluno.instituicao) $('instituicao-outra').value = aluno.instituicao;
+
+      const embarque = normalizar(aluno.embarque);
+      $('embarque').value = Array.from($('embarque').options).map((o) => o.value).find((v) => v && embarque.includes(normalizar(v))) || '';
+      marcarDias('dias-manha', aluno.dias_manha);
+      marcarDias('dias-noite', aluno.dias_noite);
+      $('apenas-retorno').checked = normalizar(aluno.apenas_retorno) === 'SIM';
+    }
+
+    function atualizarInstituicaoOutra() {
+      const outra = $('instituicao').value === 'OUTROS';
+      $('instituicao-outra-box').classList.toggle('hidden', !outra);
+      $('instituicao-outra').required = outra;
+      if (!outra) $('instituicao-outra').value = '';
+    }
+
+    async function consultarCadastro() {
+      const cpf = somenteDigitos($('cpf').value);
+      const codigo = somenteDigitos($('codigo').value);
+      if (cpf.length !== 11 || codigo.length !== 6) {
+        feedback('feedback-acesso', 'Informe o CPF completo e o codigo de 6 digitos.', 'error');
+        return;
+      }
+
+      const botao = $('consultar');
+      carregando(botao, true, 'Consultar cadastro', 'Consultando...');
+      feedback('feedback-acesso', 'Validando os dados...', '');
+      try {
+        const dados = await api({ acao: 'iniciar_atualizacao', cpf, codigo });
+        updateToken = dados.update_token;
+        preencherFormulario(dados.aluno);
+        $('acesso').classList.add('hidden');
+        $('formulario').classList.remove('hidden');
+        $('instituicao').focus();
+      } catch (erro) {
+        feedback('feedback-acesso', erro.name === 'AbortError' ? 'O servidor demorou para responder.' : erro.message, 'error');
+      } finally {
+        carregando(botao, false, 'Consultar cadastro', 'Consultando...');
+      }
+    }
+
+    async function enviarAtualizacao(evento) {
+      evento.preventDefault();
+      if (!updateToken) {
+        feedback('feedback-envio', 'A sessao expirou. Consulte novamente.', 'error');
+        return;
+      }
+
+      const instituicao = $('instituicao').value === 'OUTROS' ? $('instituicao-outra').value.trim() : $('instituicao').value;
+      const diasManha = valoresMarcados('dias-manha');
+      const diasNoite = valoresMarcados('dias-noite');
+      if (!diasManha.length && !diasNoite.length) {
+        feedback('feedback-envio', 'Selecione pelo menos um dia de viagem.', 'error');
+        return;
+      }
+      if ($('apenas-retorno').checked && !diasNoite.length) {
+        feedback('feedback-envio', 'Para marcar apenas retorno, selecione pelo menos um dia da noite.', 'error');
+        return;
+      }
+
+      const botao = $('enviar');
+      carregando(botao, true, 'Enviar atualizacao', 'Enviando...');
+      feedback('feedback-envio', '', '');
+      try {
+        await api({
+          acao: 'atualizar_aluno',
+          update_token: updateToken,
+          instituicao,
+          embarque: $('embarque').value,
+          dias_manha: diasManha,
+          dias_noite: diasNoite,
+          apenas_retorno: $('apenas-retorno').checked
         });
+        updateToken = '';
+        $('formulario').classList.add('hidden');
+        $('sucesso').classList.remove('hidden');
+      } catch (erro) {
+        feedback('feedback-envio', erro.name === 'AbortError' ? 'O servidor demorou para responder.' : erro.message, 'error');
+      } finally {
+        carregando(botao, false, 'Enviar atualizacao', 'Enviando...');
+      }
+    }
 
-        function verificarInstituicaoOutros() {
-            const select = document.getElementById('update-instituicao');
-            const inputOutros = document.getElementById('update-instituicao-outros');
-            if (select.value === 'OUTROS') {
-                inputOutros.style.display = 'block';
-                inputOutros.required = true;
-            } else {
-                inputOutros.style.display = 'none';
-                inputOutros.required = false;
-                inputOutros.value = '';
-            }
-        }
-
-        async function tentarAcesso() {
-            const cpf = document.getElementById('cpf-input').value.trim().replace(/\D/g, '');
-            const feedback = document.getElementById('feedback-login');
-            const btn = document.getElementById('btn-entrar');
-            const spinner = document.getElementById('spinner');
-            const btnText = btn.querySelector('span');
-
-            if (cpf.length !== 11) {
-                feedback.innerText = "❌ Informe um CPF válido."; feedback.style.color = "var(--danger)";
-                return;
-            }
-
-            btn.disabled = true; 
-            spinner.style.display = "block";
-            btnText.innerText = "Buscando...";
-            feedback.innerText = "Verificando a sua situação na base...";
-            feedback.style.color = "var(--dark)";
-
-            try {
-                const response = await fetch(`${API_URL}?acao=dashboard&cpf=${cpf}`);
-                const data = await response.json();
-
-                if (data.erro) {
-                    feedback.innerText = "❌ CPF não encontrado. Procure a Secretaria."; 
-                    feedback.style.color = "var(--danger)";
-                } else if (data.sucesso) {
-                    feedback.innerText = "✅ Cadastro localizado!";
-                    feedback.style.color = "#155724";
-                    
-                    dadosNuvem = data.dadosGerais.map(aluno => {
-                        let obj = { nome: "", instituicao: "", embarque: "", turno: "", dias: "", status: "Pendente", jaEnviou: "nao" };
-                        for(let k in aluno) {
-                            let keyNorm = k.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "").trim();
-                            let valNorm = String(aluno[k]).trim();
-                            
-                            if (keyNorm.includes("nome")) obj.nome = valNorm;
-                            if (keyNorm.includes("institu")) obj.instituicao = valNorm;
-                            if (keyNorm.includes("embarque") || keyNorm.includes("ponto") || keyNorm.includes("local")) obj.embarque = valNorm;
-                            if (keyNorm.includes("turno") || keyNorm.includes("periodo")) obj.turno = valNorm;
-                            if (keyNorm.includes("dia")) obj.dias = valNorm;
-                            if (keyNorm.includes("status") || keyNorm.includes("situacao")) obj.status = valNorm;
-                            
-                            if (keyNorm.includes("atualizado") || keyNorm.includes("renovado") || keyNorm.includes("enviado")) {
-                                obj.jaEnviou = valNorm.toLowerCase();
-                            }
-                        }
-                        return obj;
-                    });
-                    
-                    setTimeout(() => {
-                        document.getElementById('login-wrapper').style.display = 'none';
-                        
-                        if(dadosNuvem.length > 0) {
-                            let aluno = dadosNuvem[0];
-                            let nomeExibicao = aluno.nome ? aluno.nome.toUpperCase() : "NOME NÃO INFORMADO";
-                            let instExibicao = aluno.instituicao ? "🎓 " + aluno.instituicao.toUpperCase() : "🎓 INSTITUIÇÃO NÃO INFORMADA";
-                            
-                            let jaEnviou = aluno.jaEnviou.includes('sim') || aluno.jaEnviou.includes('true') || aluno.status.toLowerCase().includes('pendente') || aluno.status.toLowerCase().includes('análise');
-
-                            if (jaEnviou) {
-                                document.getElementById('status-wrapper').style.display = 'block';
-                                document.getElementById('status-info-nome').innerText = nomeExibicao;
-                                document.getElementById('status-info-inst').innerText = instExibicao;
-                                
-                                let badge = document.getElementById('badge-status');
-                                if (aluno.status.toLowerCase().includes('aprovado')) {
-                                    badge.innerText = "✅ Atualização Aprovada";
-                                    badge.style.backgroundColor = "#d4edda";
-                                    badge.style.color = "#155724";
-                                } else {
-                                    badge.innerText = "⏳ Em Análise (Aguardando)";
-                                    badge.style.backgroundColor = "#fff3cd";
-                                    badge.style.color = "#856404";
-                                }
-
-                            } else {
-                                document.getElementById('form-wrapper').style.display = 'block';
-                                document.getElementById('form-info-nome').innerText = nomeExibicao;
-                                document.getElementById('form-info-inst').innerText = instExibicao;
-                                
-                                // Pré-seleciona a Instituição (com lógica para "Outros")
-                                if (aluno.instituicao) {
-                                    let selInst = document.getElementById('update-instituicao');
-                                    let encontrouInst = false;
-                                    
-                                    for(let i = 0; i < selInst.options.length; i++) {
-                                        let opVal = selInst.options[i].value;
-                                        if (opVal !== "" && opVal !== "OUTROS" && aluno.instituicao.toUpperCase().includes(opVal.toUpperCase())) {
-                                            selInst.value = opVal;
-                                            encontrouInst = true;
-                                            break;
-                                        }
-                                    }
-                                    
-                                    if (!encontrouInst) {
-                                        selInst.value = "OUTROS";
-                                        verificarInstituicaoOutros();
-                                        document.getElementById('update-instituicao-outros').value = aluno.instituicao;
-                                    }
-                                }
-
-                                // Pré-seleciona o Ponto de Embarque
-                                if (aluno.embarque) {
-                                    let selEmb = document.getElementById('update-embarque');
-                                    for(let i = 0; i < selEmb.options.length; i++) {
-                                        if (selEmb.options[i].value !== "" && aluno.embarque.toUpperCase().includes(selEmb.options[i].value.toUpperCase())) {
-                                            selEmb.value = selEmb.options[i].value;
-                                            break;
-                                        }
-                                    }
-                                }
-
-                                // Pré-seleciona os Turnos e Dias de forma separada
-                                let t = (aluno.turno || "").toUpperCase();
-                                let diasStr = (aluno.dias || "").toUpperCase();
-                                let todosOsDias = diasStr === "" || diasStr.includes("TODOS") || diasStr.includes("DIARIA") || diasStr.includes("SEG A SEX");
-                                
-                                let cbManha = document.querySelectorAll('input[name="dias-manha"]');
-                                let cbNoite = document.querySelectorAll('input[name="dias-noite"]');
-                                
-                                // Verifica a manhã
-                                if (t.includes("MANHÃ") || t.includes("MANHA") || t.includes("INTEGRAL")) {
-                                    cbManha.forEach(cb => {
-                                        let val = cb.value.toUpperCase();
-                                        if (todosOsDias || diasStr.includes(val) || (val === "TERÇA" && diasStr.includes("TERCA"))) {
-                                            cb.checked = true;
-                                        }
-                                    });
-                                }
-                                
-                                // Verifica a noite
-                                if (t.includes("NOITE") || t.includes("INTEGRAL")) {
-                                    cbNoite.forEach(cb => {
-                                        let val = cb.value.toUpperCase();
-                                        if (todosOsDias || diasStr.includes(val) || (val === "TERÇA" && diasStr.includes("TERCA"))) {
-                                            cb.checked = true;
-                                        }
-                                    });
-                                    
-                                    // Verifica se na base antiga estava marcado como "apenas retorno"
-                                    if (t.includes("APENAS RETORNO") || t.includes("SÓ RETORNO")) {
-                                        document.getElementById('apenas-retorno-noite').checked = true;
-                                    }
-                                }
-                            }
-                        }
-                    }, 800);
-                }
-            } catch (e) { 
-                feedback.innerText = "❌ Erro de conexão com o servidor."; feedback.style.color = "var(--danger)";
-            } finally {
-                btn.disabled = false; 
-                spinner.style.display = "none";
-                btnText.innerText = "Consultar Cadastro";
-            }
-        }
-
-        async function enviarAtualizacao(event) {
-            event.preventDefault();
-            
-            const btn = document.getElementById('btn-enviar-update');
-            const spinner = document.getElementById('spinner-update');
-            const btnText = document.getElementById('texto-btn-update');
-            
-            btn.disabled = true;
-            spinner.style.display = "block";
-            btnText.innerText = "Enviando dados...";
-            
-            // Aqui capturaremos os novos dias marcados da manhã e da noite na próxima etapa.
-            console.log("Formulário pronto para integração de envio.");
-        }
-    </script>
+    $('cpf').addEventListener('input', (evento) => { evento.target.value = formatarCpf(evento.target.value); });
+    $('codigo').addEventListener('input', (evento) => { evento.target.value = somenteDigitos(evento.target.value).slice(0, 6); });
+    $('codigo').addEventListener('keydown', (evento) => { if (evento.key === 'Enter') consultarCadastro(); });
+    $('consultar').addEventListener('click', consultarCadastro);
+    $('instituicao').addEventListener('change', atualizarInstituicaoOutra);
+    $('form-atualizacao').addEventListener('submit', enviarAtualizacao);
+    $('cancelar').addEventListener('click', () => window.location.reload());
+    $('sair').addEventListener('click', () => { window.location.href = 'index.html'; });
+  </script>
 </body>
 </html>
