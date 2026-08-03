@@ -1,575 +1,118 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Consulta Geral - Transporte Graça/CE</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <style>
-        :root {
-            --primary-blue: #0056b3;
-            --primary-yellow: #f1c40f;
-            --dark: #2d3436;
-            --muted: #636e72;
-            --bg-glass: rgba(255, 255, 255, 0.95);
-            --border-radius: 12px;
-            --shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-            
-            --success: #28a745;
-            --info: #17a2b8;
-            --purple: #6f42c1;
-            --orange: #fd7e14;
-            --pink: #e83e8c;
-            --danger: #dc3545;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body { 
-            font-family: 'Inter', sans-serif;
-            background-image: url('fundo-login.jpg'); 
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            color: var(--dark);
-            min-height: 100vh;
-        }
-
-        body::before {
-            content: "";
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: -1;
-        }
-
-        .cabecalho-oficial { padding: 20px; display: flex; justify-content: center; }
-        .pill-logo { background: white; padding: 10px 25px; border-radius: 50px; box-shadow: var(--shadow); }
-        .pill-logo img { height: 45px; }
-
-        .main-container { display: flex; justify-content: center; align-items: flex-start; min-height: 80vh; padding: 20px; }
-
-        .glass-card {
-            background: var(--bg-glass); backdrop-filter: blur(10px); width: 100%;
-            border-radius: var(--border-radius); box-shadow: var(--shadow); overflow: hidden;
-            animation: fadeIn 0.5s ease;
-        }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-
-        .card-header { background-color: var(--dark); color: white; padding: 30px; text-align: center; }
-        .card-body { padding: 30px; }
-        .cpf-input { width: 100%; max-width: 320px; padding: 15px; margin: 20px auto; display: block; border: 2px solid #ddd; border-radius: 8px; font-size: 18px; text-align: center; transition: 0.3s; }
-        .cpf-input:focus { outline: none; border-color: var(--dark); }
-        
-        .btn-primary {
-            background-color: var(--dark); color: white; border: none; padding: 15px 35px;
-            font-size: 16px; font-weight: 700; border-radius: 8px; cursor: pointer;
-            width: 100%; max-width: 320px; display: flex; justify-content: center; align-items: center; gap: 10px; margin: 0 auto; transition: 0.3s;
-        }
-        .btn-primary:hover { background-color: #000; transform: scale(1.02); }
-        .btn-primary:disabled { background-color: #777; cursor: not-allowed; transform: none; }
-
-        .spinner { border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid white; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: none; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        .secao-titulo { font-size: 20px; font-weight: 700; color: var(--dark); margin: 40px 0 20px; padding-bottom: 10px; border-bottom: 2px solid #eee; }
-        
-        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
-
-        .dash-card {
-            background: white; padding: 25px 20px; border-radius: var(--border-radius);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; border: 1px solid #eee;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .card-clicavel { cursor: pointer; }
-        .card-clicavel:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
-
-        .dash-card h3 { font-size: 15px; color: var(--muted); font-weight: 600; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .dash-card .numero { font-size: 36px; font-weight: 800; color: var(--dark); line-height: 1; }
-
-        .bus-table { width: 100%; margin-top: 15px; border-collapse: collapse; font-size: 13px; }
-        .bus-table th { background: #f8f9fa; padding: 6px; color: var(--muted); font-weight: 600; border-bottom: 2px solid #eee; }
-        .bus-table td { padding: 8px 4px; border-bottom: 1px solid #eee; font-weight: 500; }
-        .bus-table .col-turno { font-weight: 700; text-align: left; }
-
-        .filtros-container { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px; }
-        .input-filtro { flex: 1; min-width: 180px; padding: 12px 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; font-family: inherit; }
-        
-        .table-responsive { overflow-x: auto; border-radius: var(--border-radius); border: 1px solid #eee; background: white; }
-        .table-geral { width: 100%; border-collapse: collapse; min-width: 700px; }
-        .table-geral th { background: #f8f9fa; padding: 15px; text-align: left; font-size: 14px; color: var(--muted); font-weight: 600; }
-        .table-geral td { padding: 15px; border-top: 1px solid #eee; font-size: 14px; color: var(--dark); }
-
-        .status-badge { padding: 4px 10px; border-radius: 50px; font-size: 12px; font-weight: 700; }
-        .status-aprovado { background: #d4edda; color: #155724; }
-        .status-pendente { background: #fff3cd; color: #856404; }
-
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px);
-            display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px;
-        }
-
-        .modal-content {
-            background: white; width: 100%; max-width: 500px; border-radius: var(--border-radius); padding: 30px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.2); position: relative; max-height: 85vh; display: flex; flex-direction: column;
-            animation: zoomIn 0.3s ease;
-        }
-
-        @keyframes zoomIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-
-        .modal-close { position: absolute; top: 20px; right: 20px; font-size: 24px; cursor: pointer; color: var(--muted); line-height: 1; transition: 0.3s; }
-        .modal-close:hover { color: var(--danger); }
-        
-        .modal-header { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
-        .modal-header h2 { font-size: 20px; color: var(--dark); }
-        
-        .lista-modal-alunos { list-style: none; overflow-y: auto; flex: 1; padding-right: 10px; }
-        .lista-modal-alunos li { padding: 12px; border-bottom: 1px solid #eee; display: flex; flex-direction: column; gap: 4px; }
-        .lista-modal-alunos li:last-child { border-bottom: none; }
-        .lista-modal-alunos li strong { color: var(--dark); font-size: 15px; }
-
-    </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Painel geral de demanda do Transporte Universitário de Graça.">
+  <title>Demanda do Transporte Universitário | Graça</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIINfQ3ynlcN9bYtYU8IhPZ3dYJ2JfGF0go=" crossorigin="">
+  <link rel="stylesheet" href="rotas.css">
+  <link rel="stylesheet" href="consulta.css">
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
-<body>
+<body class="consulta-body">
+  <header class="site-header">
+    <div class="brand">
+      <img src="Logo prefeitura.png" alt="Prefeitura Municipal de Graça">
+      <span>Transporte Universitário</span>
+    </div>
+    <a class="home-link" href="index.html">Voltar ao início</a>
+  </header>
 
-    <header class="cabecalho-oficial">
-        <div class="pill-logo">
-            <img src="Logo prefeitura.png" alt="LOGO Governo Municipal de Graça">
+  <div class="page-shell">
+    <section id="login-section" class="panel login-panel" aria-labelledby="titulo-login">
+      <div class="hero">
+        <p class="hero-kicker">Planejamento de transporte</p>
+        <h1 id="titulo-login">Painel geral de demanda</h1>
+        <p>Consulte a ocupação semanal, os pontos de embarque e a distribuição por rota. Acesso exclusivo da Secretaria.</p>
+      </div>
+      <div class="login-body">
+        <p class="login-explanation">Entre com a mesma conta Google autorizada no Painel da Secretaria.</p>
+        <div class="google-login-wrap">
+          <div id="g_id_onload"
+               data-client_id="138368767568-pev4pjotvo2j0h5iibt0q71m3gdoqb6d.apps.googleusercontent.com"
+               data-callback="handleDemandCredential"
+               data-auto_prompt="false"></div>
+          <div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline" data-text="sign_in_with" data-shape="rectangular" data-logo_alignment="left"></div>
         </div>
-    </header>
+        <div id="msgBox" class="message" role="status" aria-live="polite"></div>
+      </div>
+    </section>
 
-    <div class="main-container">
-        
-        <section id="login-wrapper" class="glass-card" style="max-width: 450px;">
-            <div class="card-header">
-                <h2 style="font-size: 24px;">📊 Painel Geral</h2>
-                <p style="opacity: 0.9; font-size: 14px; margin-top: 5px;">Acesso restrito à coordenação</p>
-            </div>
-            <div class="card-body" style="text-align: center;">
-                <p style="color: var(--muted);">Informe seu CPF (cadastrado na base) para carregar o sistema.</p>
-                <input type="text" id="cpf-input" class="cpf-input" placeholder="000.000.000-00" maxlength="14">
-                
-                <button onclick="tentarAcesso()" id="btn-entrar" class="btn-primary">
-                    <div id="spinner" class="spinner"></div>
-                    <span>Carregar Sistema</span>
-                </button>
-                
-                <div id="feedback-login" style="margin-top:15px; font-size: 14px; font-weight: 600;"></div>
-                <div style="margin-top: 25px;">
-                    <a href="index.html" style="color: var(--muted); font-size: 14px; text-decoration: none;">← Voltar ao Início</a>
-                </div>
-            </div>
+    <main id="main-section" class="panel consulta-panel hidden">
+      <div class="dashboard-header">
+        <div>
+          <p class="hero-kicker">Visão consolidada</p>
+          <h1>Demanda do transporte</h1>
+          <p>Acesso: <strong id="nomeAlunoLogado">Secretaria</strong>. Os números usam os cadastros da planilha.</p>
+        </div>
+        <button id="btnSair" class="ghost-button" type="button">Sair</button>
+      </div>
+
+      <div class="dashboard-body">
+        <section class="overview-grid" aria-label="Indicadores gerais">
+          <article class="kpi accent"><span>Cadastros</span><strong id="kpi-total">0</strong></article>
+          <article class="kpi"><span>Aprovados</span><strong id="kpi-aprovados">0</strong></article>
+          <article class="kpi"><span>Em análise</span><strong id="kpi-analise">0</strong></article>
+          <article class="kpi"><span>Prioridade</span><strong id="kpi-prioridade">0</strong></article>
+          <article class="kpi"><span>Novatos</span><strong id="kpi-novatos">0</strong></article>
+          <article class="kpi"><span>Residem em Sobral</span><strong id="kpi-sobral">0</strong></article>
         </section>
 
-        <main id="sistema-container" class="glass-card" style="display: none; max-width: 1200px;">
-            <div class="card-header" style="text-align: left; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
-                <div>
-                    <h2 style="font-size: 24px;">Visão Geral do Transporte</h2>
-                    <p style="opacity: 0.9; font-size: 14px; margin-top: 5px;">Acompanhamento e gestão de passageiros aprovados.</p>
-                </div>
-                <button onclick="window.location.reload()" class="btn-primary" style="margin: 0; width: auto; max-width: none; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.5);">🚪 Sair</button>
+        <div class="dashboard-layout">
+          <section class="section-card">
+            <div class="section-head">
+              <div><h2>Mapa da demanda</h2><p>Volume de passageiros aprovados por ponto de embarque.</p></div>
+              <div class="map-legend"><span><i class="legend-dot"></i> Embarque</span><span><i class="legend-dot destination"></i> Destino</span></div>
             </div>
+            <div id="mapa-demanda" aria-label="Mapa dos pontos de embarque e destino em Sobral"></div>
+            <p class="map-note">As ligações são ilustrativas para planejamento. O mapa não substitui um trajeto oficial de navegação.</p>
+          </section>
 
-            <div class="card-body">
-                
-                <div class="dashboard-grid">
-                    <div class="dash-card">
-                        <h3>Total de Cadastros</h3>
-                        <div class="numero" id="total-alunos">0</div>
-                    </div>
-                    <div class="dash-card" style="border-bottom: 4px solid var(--success);">
-                        <h3>Alunos Novatos</h3>
-                        <div class="numero" id="total-novatos" style="color:var(--success)">0</div>
-                    </div>
-                    <div class="dash-card" style="border-bottom: 4px solid var(--info);">
-                        <h3>Residem em Sobral</h3>
-                        <div class="numero" id="total-residentes" style="color:var(--info)">0</div>
-                    </div>
-                </div>
+          <section class="section-card">
+            <div class="section-head"><div><h2>Pontos de embarque</h2><p>Distribuição dos passageiros aprovados.</p></div></div>
+            <div id="grafico-embarque" class="chart-list"></div>
+          </section>
 
-                <h3 class="secao-titulo">🚍 Ocupação da Frota (Semanal)</h3>
-                <div class="dashboard-grid" id="cards-frota" style="grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));"></div>
+          <section class="section-card span-2">
+            <div class="section-head"><div><h2>Demanda semanal por ônibus</h2><p>Quantidade prevista por dia e turno. São considerados os status Aprovado e Prioridade.</p></div></div>
+            <div id="cards-frota" class="fleet-grid"></div>
+          </section>
 
-                <h3 class="secao-titulo">📍 Pontos de Embarque (Aprovados)</h3>
-                <div class="dashboard-grid">
-                    <div class="dash-card card-clicavel" style="border-top: 4px solid var(--purple);" onclick="abrirModalEmbarque('SEDE')">
-                        <h3 style="color: var(--purple);">🏢 Sede</h3>
-                        <div class="numero" id="emb-sede">0</div>
-                    </div>
-                    <div class="dash-card card-clicavel" style="border-top: 4px solid var(--orange);" onclick="abrirModalEmbarque('BARRO VERMELHO')">
-                        <h3 style="color: var(--orange);">🔴 Barro Vermelho</h3>
-                        <div class="numero" id="emb-barro">0</div>
-                    </div>
-                    <div class="dash-card card-clicavel" style="border-top: 4px solid var(--success);" onclick="abrirModalEmbarque('LAPA')">
-                        <h3 style="color: var(--success);">⛪ Lapa</h3>
-                        <div class="numero" id="emb-lapa">0</div>
-                    </div>
-                    <div class="dash-card card-clicavel" style="border-top: 4px solid var(--pink);" onclick="abrirModalEmbarque('VILA')">
-                        <h3 style="color: var(--pink);">🏘️ Vila</h3>
-                        <div class="numero" id="emb-vila">0</div>
-                    </div>
-                </div>
+          <section class="section-card span-2">
+            <div class="section-head"><div><h2>Instituições de ensino</h2><p>Concentração dos passageiros aprovados por instituição.</p></div></div>
+            <div id="grafico-instituicoes" class="chart-list"></div>
+          </section>
 
-                <h3 class="secao-titulo">🏫 Ocupação por Instituição</h3>
-                <div class="dashboard-grid" id="cards-instituicoes"></div>
-
-                <h3 class="secao-titulo">🔍 Tabela Geral de Passageiros</h3>
-                
-                <div class="filtros-container">
-                    <input type="text" id="buscaGeral" class="input-filtro" placeholder="Buscar por nome..." onkeyup="renderizarTabela()">
-                    <select id="filtroInstituicao" class="input-filtro" onchange="renderizarTabela()">
-                        <option value="">Todas Instituições</option>
-                    </select>
-                    <select id="filtroOnibus" class="input-filtro" onchange="renderizarTabela()">
-                        <option value="">Todos os Ônibus</option>
-                        <option value="AMARELO">🟡 Amarelo</option>
-                        <option value="AZUL">🔵 Azul</option>
-                    </select>
-                    <select id="filtroEmbarque" class="input-filtro" onchange="renderizarTabela()">
-                        <option value="">Todos os Embarques</option>
-                    </select>
-                    <select id="filtroTurno" class="input-filtro" onchange="renderizarTabela()">
-                        <option value="">Todos os Turnos</option>
-                        <option value="MANHÃ">Manhã</option>
-                        <option value="NOITE">Noite</option>
-                    </select>
-                    <select id="filtroStatus" class="input-filtro" onchange="renderizarTabela()">
-                        <option value="">Todos os Status</option>
-                        <option value="Aprovado">Aprovado</option>
-                        <option value="Pendente">Em Análise</option>
-                    </select>
-                </div>
-
-                <div class="table-responsive">
-                    <table class="table-geral">
-                        <thead>
-                            <tr>
-                                <th>Nome do Aluno</th>
-                                <th>Instituição</th>
-                                <th>Embarque</th>
-                                <th>Ônibus</th>
-                                <th>Turno</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="lista"></tbody>
-                    </table>
-                </div>
-
+          <section class="section-card span-2">
+            <div class="section-head"><div><h2>Cadastros consultados</h2><p>Use os filtros para conferir a distribuição registrada na planilha.</p></div></div>
+            <div class="filter-toolbar">
+              <input id="filtroBusca" type="search" placeholder="Buscar aluno ou instituição">
+              <select id="filtroInstituicao" aria-label="Filtrar instituição"><option value="">Todas as instituições</option></select>
+              <select id="filtroOnibus" aria-label="Filtrar ônibus"><option value="">Todos os ônibus</option><option value="AZUL">Ônibus azul</option><option value="AMARELO">Ônibus amarelo</option></select>
+              <select id="filtroEmbarque" aria-label="Filtrar embarque"><option value="">Todos os embarques</option></select>
+              <select id="filtroTurno" aria-label="Filtrar turno"><option value="">Todos os turnos</option><option value="MANHA">Manhã</option><option value="NOITE">Noite</option><option value="INTEGRAL">Integral</option></select>
+              <select id="filtroStatus" aria-label="Filtrar status"><option value="">Todos os status</option></select>
             </div>
-        </main>
-    </div>
-
-    <div id="modal-alunos" class="modal-overlay" onclick="fecharModal()">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <span class="modal-close" onclick="fecharModal()">&times;</span>
-            <div class="modal-header">
-                <h2 id="modal-titulo-inst">Título</h2>
-                <span id="modal-subtitulo" style="color:var(--muted); font-size: 14px; font-weight: 500;"></span>
+            <p id="resultado-contagem" class="result-count">0 resultados</p>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Aluno</th><th>Instituição</th><th>Embarque</th><th>Ônibus</th><th>Turno</th><th>Status</th></tr></thead>
+                <tbody id="lista-geral"></tbody>
+              </table>
             </div>
-            <ul id="lista-alunos-modal" class="lista-modal-alunos"></ul>
+          </section>
         </div>
-    </div>
+      </div>
+    </main>
+  </div>
 
-    <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbyhdu4wD5r7zme5Ycsv82DG7t9W2g4ZoUbdvJWlKjjQ2HblNzRIexnEdNRQNiBrmzc/exec"; 
-        
-        let dadosNuvem = [];
-
-        document.getElementById('cpf-input').addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\D/g, '');
-            if (value.length > 3) value = value.replace(/^(\d{3})(\d)/, '$1.$2');
-            if (value.length > 6) value = value.replace(/^(\d{3})\.(\d{3})(\d)/, '$1.$2.$3');
-            if (value.length > 9) value = value.replace(/^(\d{3})\.(\d{3})\.(\d{3})(\d)/, '$1.$2.$3-$4');
-            e.target.value = value;
-        });
-
-        document.getElementById("cpf-input").addEventListener("keypress", function(event) {
-            if (event.key === "Enter") tentarAcesso();
-        });
-
-        // Helper para checar sim/não/true de forma segura
-        function valorPositivo(val) {
-            let v = String(val).toLowerCase().trim();
-            return v === 'sim' || v === 'true' || v === 'verdadeiro' || v === '1' || v === 'v' || v.includes('sim');
-        }
-
-        async function tentarAcesso() {
-            const cpf = document.getElementById('cpf-input').value.trim().replace(/\D/g, '');
-            const feedback = document.getElementById('feedback-login');
-            const btn = document.getElementById('btn-entrar');
-            const spinner = document.getElementById('spinner');
-            const btnText = btn.querySelector('span');
-
-            if (cpf.length !== 11) {
-                feedback.innerText = "❌ Informe um CPF válido."; feedback.style.color = "var(--danger)";
-                return;
-            }
-
-            btn.disabled = true; spinner.style.display = "block";
-            btnText.innerText = "A consultar..."; feedback.innerText = "Validando permissão de acesso...";
-            feedback.style.color = "var(--info)";
-
-            try {
-                const response = await fetch(`${API_URL}?acao=dashboard&cpf=${cpf}`);
-                const data = await response.json();
-
-                if (data.erro) {
-                    feedback.innerText = "❌ " + data.erro; feedback.style.color = "var(--danger)";
-                } else if (data.sucesso) {
-                    feedback.innerText = "✅ Acesso Autorizado! A montar painel...";
-                    feedback.style.color = "var(--success)";
-                    
-                    // Mapeador Ultra Flexível (Resolve nomes de colunas ocultos ou mal formatados)
-                    dadosNuvem = data.dadosGerais.map(aluno => {
-                        let obj = {
-                            nome: "", instituicao: "", embarque: "", onibus: "", turno: "",
-                            status: "Pendente", novato: "Não", sobral: "Não", dias: ""
-                        };
-
-                        for(let k in aluno) {
-                            let rawVal = String(aluno[k] || "").trim();
-                            let keyNorm = k.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "").trim();
-
-                            if (keyNorm.includes("nome")) obj.nome = rawVal;
-                            else if (keyNorm.includes("institu")) obj.instituicao = rawVal;
-                            else if (keyNorm.includes("embarque") || keyNorm.includes("ponto") || keyNorm.includes("local") || keyNorm.includes("comunidade") || keyNorm.includes("origem")) obj.embarque = rawVal;
-                            else if (keyNorm.includes("onibus") || keyNorm.includes("rota") || keyNorm.includes("veiculo")) obj.onibus = rawVal;
-                            else if (keyNorm.includes("turno") || keyNorm.includes("periodo") || keyNorm.includes("horario")) obj.turno = rawVal;
-                            else if (keyNorm.includes("novato") || keyNorm.includes("novo") || keyNorm.includes("primeira")) obj.novato = rawVal;
-                            else if (keyNorm.includes("sobral") || keyNorm.includes("reside") || keyNorm.includes("mora")) obj.sobral = rawVal;
-                            else if (keyNorm.includes("dia") || keyNorm.includes("freq")) obj.dias = rawVal;
-                            else if (keyNorm.includes("status") || keyNorm.includes("situacao")) {
-                                let s = rawVal.toLowerCase();
-                                if (s.includes("aprovado")) obj.status = "Aprovado";
-                                else if (s.includes("pendente") || s.includes("analise")) obj.status = "Pendente";
-                                else obj.status = rawVal || "Aprovado";
-                            }
-                        }
-                        return obj;
-                    });
-                    
-                    document.getElementById('login-wrapper').style.display = 'none';
-                    document.getElementById('sistema-container').style.display = 'block';
-                    
-                    gerarDashboard();
-                    popularFiltros();
-                    renderizarTabela();
-                }
-            } catch (e) { 
-                feedback.innerText = "❌ Erro ao conectar ao servidor."; feedback.style.color = "var(--danger)";
-            } finally {
-                btn.disabled = false; spinner.style.display = "none"; btnText.innerText = "Carregar Sistema";
-            }
-        }
-
-        function getOnibus(aluno) {
-            const inst = aluno.instituicao.toUpperCase();
-            if (aluno.onibus.toUpperCase().includes('AMARELO')) return 'AMARELO';
-            if (aluno.onibus.toUpperCase().includes('AZUL')) return 'AZUL';
-            const vaiAmarelo = ["UNINTA", "FLF", "LUCIANO FEIJÃO", "LUCIANO FEIJAO", "ANHANGUERA", "GRAU", "UVA-CCS"].some(i => inst.includes(i));
-            return vaiAmarelo ? 'AMARELO' : 'AZUL';
-        }
-
-        function gerarDashboard() {
-            const aprovados = dadosNuvem.filter(a => a.status === 'Aprovado');
-            
-            document.getElementById('total-alunos').innerText = dadosNuvem.length;
-            document.getElementById('total-novatos').innerText = dadosNuvem.filter(a => valorPositivo(a.novato)).length;
-            document.getElementById('total-residentes').innerText = dadosNuvem.filter(a => valorPositivo(a.sobral)).length;
-
-            document.getElementById('emb-sede').innerText = aprovados.filter(a => {
-                let e = a.embarque.toUpperCase(); return e.includes('SEDE') || e.includes('CENTRO') || e.includes('MATRIZ') || e === '1';
-            }).length;
-            document.getElementById('emb-barro').innerText = aprovados.filter(a => {
-                let e = a.embarque.toUpperCase(); return e.includes('BARRO') || e === '2';
-            }).length;
-            document.getElementById('emb-lapa').innerText = aprovados.filter(a => {
-                let e = a.embarque.toUpperCase(); return e.includes('LAPA') || e === '3';
-            }).length;
-            document.getElementById('emb-vila').innerText = aprovados.filter(a => {
-                let e = a.embarque.toUpperCase(); return e.includes('VILA') || e === '4';
-            }).length;
-
-            const contagemInst = {};
-            const contagemFrota = {
-                AMARELO: { total: 0, dias: { seg: {M:0, N:0}, ter: {M:0, N:0}, qua: {M:0, N:0}, qui: {M:0, N:0}, sex: {M:0, N:0} } },
-                AZUL: { total: 0, dias: { seg: {M:0, N:0}, ter: {M:0, N:0}, qua: {M:0, N:0}, qui: {M:0, N:0}, sex: {M:0, N:0} } }
-            };
-
-            aprovados.forEach(a => {
-                const inst = (a.instituicao || "NÃO INFORMADA").trim();
-                const turno = (a.turno || "").toUpperCase().trim();
-
-                // LÓGICA DE FALLBACK INFALÍVEL
-                // Se detectar Noite/Noturno, joga pra noite. Se não detectar, joga pra MANHÃ por padrão para NUNCA zerar.
-                let tNoite = turno.includes("NOITE") || turno.includes("NOT") || turno === "N" || turno === "2";
-                let tManha = !tNoite; 
-
-                const diasStr = (a.dias || "").toUpperCase().trim();
-                
-                // Se a coluna de dias estiver em branco, assume que o aluno viaja a semana toda
-                const todosOsDias = diasStr === "" || diasStr.includes("TODOS") || diasStr.includes("DIARIA") || diasStr.includes("SEG A SEX");
-
-                const eSeg = todosOsDias || diasStr.includes("SEG") || diasStr.includes("1");
-                const eTer = todosOsDias || diasStr.includes("TER") || diasStr.includes("2");
-                const eQua = todosOsDias || diasStr.includes("QUA") || diasStr.includes("3");
-                const eQui = todosOsDias || diasStr.includes("QUI") || diasStr.includes("4");
-                const eSex = todosOsDias || diasStr.includes("SEX") || diasStr.includes("5");
-
-                const onibus = getOnibus(a);
-                if (onibus === 'AMARELO' || onibus === 'AZUL') {
-                    contagemFrota[onibus].total++;
-                    if (eSeg) { if (tManha) contagemFrota[onibus].dias.seg.M++; if (tNoite) contagemFrota[onibus].dias.seg.N++; }
-                    if (eTer) { if (tManha) contagemFrota[onibus].dias.ter.M++; if (tNoite) contagemFrota[onibus].dias.ter.N++; }
-                    if (eQua) { if (tManha) contagemFrota[onibus].dias.qua.M++; if (tNoite) contagemFrota[onibus].dias.qua.N++; }
-                    if (eQui) { if (tManha) contagemFrota[onibus].dias.qui.M++; if (tNoite) contagemFrota[onibus].dias.qui.N++; }
-                    if (eSex) { if (tManha) contagemFrota[onibus].dias.sex.M++; if (tNoite) contagemFrota[onibus].dias.sex.N++; }
-                }
-
-                if (!inst) return;
-                if (!contagemInst[inst]) {
-                    contagemInst[inst] = { 
-                        total: 0,
-                        dias: { seg: { M: 0, N: 0 }, ter: { M: 0, N: 0 }, qua: { M: 0, N: 0 }, qui: { M: 0, N: 0 }, sex: { M: 0, N: 0 } }
-                    };
-                }
-                
-                contagemInst[inst].total++;
-
-                if (eSeg) { if (tManha) contagemInst[inst].dias.seg.M++; if (tNoite) contagemInst[inst].dias.seg.N++; }
-                if (eTer) { if (tManha) contagemInst[inst].dias.ter.M++; if (tNoite) contagemInst[inst].dias.ter.N++; }
-                if (eQua) { if (tManha) contagemInst[inst].dias.qua.M++; if (tNoite) contagemInst[inst].dias.qua.N++; }
-                if (eQui) { if (tManha) contagemInst[inst].dias.qui.M++; if (tNoite) contagemInst[inst].dias.qui.N++; }
-                if (eSex) { if (tManha) contagemInst[inst].dias.sex.M++; if (tNoite) contagemInst[inst].dias.sex.N++; }
-            });
-
-            const gridFrota = document.getElementById('cards-frota');
-            gridFrota.innerHTML = '';
-            ['AMARELO', 'AZUL'].forEach(bus => {
-                const f = contagemFrota[bus];
-                const cor = bus === 'AMARELO' ? 'var(--primary-yellow)' : 'var(--primary-blue)';
-                const icone = bus === 'AMARELO' ? '🟡' : '🔵';
-                
-                gridFrota.innerHTML += `
-                    <div class="dash-card card-clicavel" style="border-top: 5px solid ${cor};" onclick="abrirModalOnibus('${bus}')">
-                        <h3 style="color: var(--dark); font-size: 18px; margin-bottom: 5px;">${icone} Ônibus ${bus}</h3>
-                        <p style="font-size: 13px; color: var(--muted);">Passageiros únicos: <strong>${f.total}</strong></p>
-                        
-                        <table class="bus-table">
-                            <thead><tr><th>Turno</th><th>Seg</th><th>Ter</th><th>Qua</th><th>Qui</th><th>Sex</th></tr></thead>
-                            <tbody>
-                                <tr style="background-color: #f9fff9;"><td class="col-turno" style="color:var(--success)">Manhã</td><td>${f.dias.seg.M}</td><td>${f.dias.ter.M}</td><td>${f.dias.qua.M}</td><td>${f.dias.qui.M}</td><td>${f.dias.sex.M}</td></tr>
-                                <tr style="background-color: #f4f8ff;"><td class="col-turno" style="color:var(--info)">Noite</td><td>${f.dias.seg.N}</td><td>${f.dias.ter.N}</td><td>${f.dias.qua.N}</td><td>${f.dias.qui.N}</td><td>${f.dias.sex.N}</td></tr>
-                            </tbody>
-                        </table>
-                    </div>`;
-            });
-
-            const gridInst = document.getElementById('cards-instituicoes');
-            gridInst.innerHTML = '';
-            Object.keys(contagemInst).sort().forEach(inst => {
-                const d = contagemInst[inst];
-                gridInst.innerHTML += `
-                    <div class="dash-card card-clicavel" onclick="abrirModalAlunos('${inst}')">
-                        <h3 style="color: var(--dark); margin-bottom: 5px;">🎓 ${inst}</h3>
-                        <div class="numero" style="font-size: 28px; margin-bottom: 10px;">${d.total}</div>
-                        
-                        <table class="bus-table">
-                            <thead><tr><th></th><th>Seg</th><th>Ter</th><th>Qua</th><th>Qui</th><th>Sex</th></tr></thead>
-                            <tbody>
-                                <tr><td class="col-turno" style="color:var(--success)">M</td><td>${d.dias.seg.M}</td><td>${d.dias.ter.M}</td><td>${d.dias.qua.M}</td><td>${d.dias.qui.M}</td><td>${d.dias.sex.M}</td></tr>
-                                <tr><td class="col-turno" style="color:var(--info)">N</td><td>${d.dias.seg.N}</td><td>${d.dias.ter.N}</td><td>${d.dias.qua.N}</td><td>${d.dias.qui.N}</td><td>${d.dias.sex.N}</td></tr>
-                            </tbody>
-                        </table>
-                    </div>`;
-            });
-        }
-
-        function abrirModalOnibus(busName) {
-            const lista = document.getElementById('lista-alunos-modal');
-            const alunos = dadosNuvem.filter(a => getOnibus(a) === busName && a.status === 'Aprovado').sort((a, b) => a.nome.localeCompare(b.nome));
-
-            document.getElementById('modal-titulo-inst').innerText = `${busName === 'AMARELO' ? '🟡' : '🔵'} Frota ${busName}`;
-            document.getElementById('modal-subtitulo').innerText = `${alunos.length} alunos vinculados`;
-            lista.innerHTML = alunos.map(a => `<li><strong>${a.nome.toUpperCase()}</strong> <span style="color:var(--muted); font-size:13px">🏫 ${a.instituicao} | 🕒 ${a.turno}</span></li>`).join('');
-            document.getElementById('modal-alunos').style.display = 'flex';
-        }
-
-        function abrirModalAlunos(inst) {
-            const lista = document.getElementById('lista-alunos-modal');
-            const alunos = dadosNuvem.filter(a => a.instituicao === inst && a.status === 'Aprovado').sort((a, b) => a.nome.localeCompare(b.nome));
-
-            document.getElementById('modal-titulo-inst').innerText = inst;
-            document.getElementById('modal-subtitulo').innerText = `${alunos.length} alunos matriculados`;
-            lista.innerHTML = alunos.map(a => `<li><strong>${a.nome.toUpperCase()}</strong> <span style="color:var(--muted); font-size:13px">📍 Embarque: ${a.embarque} | 🕒 ${a.turno}</span></li>`).join('');
-            document.getElementById('modal-alunos').style.display = 'flex';
-        }
-
-        function abrirModalEmbarque(ponto) {
-            const lista = document.getElementById('lista-alunos-modal');
-            const alunos = dadosNuvem.filter(a => a.embarque.toUpperCase().includes(ponto) && a.status === 'Aprovado').sort((a, b) => a.nome.localeCompare(b.nome));
-
-            document.getElementById('modal-titulo-inst').innerText = `Ponto: ${ponto}`;
-            document.getElementById('modal-subtitulo').innerText = `${alunos.length} passageiros`;
-            lista.innerHTML = alunos.map(a => `<li><strong>${a.nome.toUpperCase()}</strong> <span style="color:var(--muted); font-size:13px">🏫 ${a.instituicao} | 🕒 ${a.turno}</span></li>`).join('');
-            document.getElementById('modal-alunos').style.display = 'flex';
-        }
-
-        function fecharModal() { document.getElementById('modal-alunos').style.display = 'none'; }
-
-        function popularFiltros() {
-            const selInst = document.getElementById('filtroInstituicao');
-            const insts = [...new Set(dadosNuvem.map(a => a.instituicao))].filter(i => i).sort();
-            insts.forEach(i => selInst.innerHTML += `<option value="${i}">${i}</option>`);
-
-            const selEmb = document.getElementById('filtroEmbarque');
-            const embarques = [...new Set(dadosNuvem.map(a => a.embarque))].filter(e => e).sort();
-            embarques.forEach(e => selEmb.innerHTML += `<option value="${e}">${e}</option>`);
-        }
-
-        function renderizarTabela() {
-            const busca = document.getElementById('buscaGeral').value.toLowerCase().trim();
-            const instF = document.getElementById('filtroInstituicao').value;
-            const busF = document.getElementById('filtroOnibus').value;
-            const embF = document.getElementById('filtroEmbarque').value;
-            const turnoF = document.getElementById('filtroTurno').value;
-            const statusF = document.getElementById('filtroStatus').value;
-            
-            const tbody = document.getElementById('lista');
-            tbody.innerHTML = '';
-
-            let dadosOrdenados = [...dadosNuvem].sort((a, b) => a.nome.localeCompare(b.nome));
-
-            dadosOrdenados.filter(a => {
-                const bN = a.nome.toLowerCase().includes(busca);
-                const bI = !instF || a.instituicao === instF;
-                const bO = !busF || getOnibus(a) === busF;
-                const bE = !embF || a.embarque === embF;
-                const bT = !turnoF || a.turno.toUpperCase().includes(turnoF);
-                const bS = !statusF || a.status === statusF;
-                
-                return bN && bI && bO && bE && bT && bS;
-            }).forEach(aluno => {
-                let onibusStr = getOnibus(aluno) === 'AMARELO' ? '🟡 Amarelo' : '🔵 Azul';
-                let classeStatus = aluno.status === 'Pendente' ? 'status-pendente' : 'status-aprovado';
-                let textoStatus = aluno.status === 'Pendente' ? 'Em Análise' : aluno.status;
-
-                tbody.innerHTML += `<tr>
-                    <td><strong>${aluno.nome}</strong></td>
-                    <td>${aluno.instituicao}</td>
-                    <td>${aluno.embarque}</td>
-                    <td>${onibusStr}</td>
-                    <td>${aluno.turno}</td>
-                    <td><span class="status-badge ${classeStatus}">${textoStatus}</span></td>
-                </tr>`;
-            });
-        }
-    </script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="config.js"></script>
+  <script src="portal-api.js"></script>
+  <script src="consulta.js"></script>
 </body>
 </html>
