@@ -48,45 +48,127 @@
     return aceitaTurno ? listaDias(aluno.dias) : [];
   }
 
+  function novoRequestId() {
+    const bytes = new Uint8Array(16);
+    crypto.getRandomValues(bytes);
+    return Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('');
+  }
+
+  function erroTimeout() {
+    const erro = new Error('O servidor demorou para responder. Tente novamente.');
+    erro.name = 'AbortError';
+    return erro;
+  }
+
+  let ponteFrame;
+  let ponteNonce = '';
+  let ponteOrigem = '';
+  let ponteJanela;
+  let promessaPonte;
+  let resolverPonte;
+  let rejeitarPonte;
+  const pendentes = new Map();
+
+  function origemGoogleConfiavel(origem) {
+    try {
+      const url = new URL(origem);
+      return url.protocol === 'https:' && (
+        url.hostname === 'script.google.com' ||
+        url.hostname === 'script.googleusercontent.com' ||
+        url.hostname.endsWith('.googleusercontent.com')
+      );
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function limparPonte() {
+    if (ponteFrame) ponteFrame.remove();
+    ponteFrame = undefined;
+    ponteNonce = '';
+    ponteOrigem = '';
+    ponteJanela = undefined;
+    promessaPonte = undefined;
+    resolverPonte = undefined;
+    rejeitarPonte = undefined;
+  }
+
+  window.addEventListener('message', (evento) => {
+    const dados = evento.data || {};
+    if (!origemGoogleConfiavel(evento.origin) || dados.nonce !== ponteNonce) return;
+
+    if (dados.tipo === 'TRANSPORTE_PONTE_PRONTA' && promessaPonte) {
+      ponteOrigem = evento.origin;
+      ponteJanela = evento.source;
+      if (resolverPonte) resolverPonte();
+      return;
+    }
+
+    if (dados.tipo !== 'TRANSPORTE_RESPOSTA' || evento.source !== ponteJanela || evento.origin !== ponteOrigem) return;
+    const pendente = pendentes.get(String(dados.requestId || ''));
+    if (!pendente) return;
+    clearTimeout(pendente.timer);
+    pendentes.delete(String(dados.requestId));
+    pendente.resolve(dados.resposta);
+  });
+
+  function garantirPonte(tempoLimite) {
+    if (ponteJanela && ponteOrigem) return Promise.resolve();
+    if (promessaPonte) return promessaPonte;
+    ponteNonce = novoRequestId();
+    promessaPonte = new Promise((resolve, reject) => {
+      resolverPonte = resolve;
+      rejeitarPonte = reject;
+      const timer = setTimeout(() => {
+        limparPonte();
+        reject(new Error('Nao foi possivel abrir a comunicacao segura com o servidor.'));
+      }, tempoLimite);
+      resolverPonte = () => { clearTimeout(timer); resolve(); };
+      rejeitarPonte = (erro) => { clearTimeout(timer); limparPonte(); reject(erro); };
+    });
+
+    const url = new URL(API_URL);
+    url.searchParams.set('bridge', '1');
+    url.searchParams.set('nonce', ponteNonce);
+    ponteFrame = document.createElement('iframe');
+    ponteFrame.title = 'Comunicacao segura com o servidor';
+    ponteFrame.setAttribute('aria-hidden', 'true');
+    ponteFrame.referrerPolicy = 'origin';
+    ponteFrame.style.cssText = 'position:fixed;width:1px;height:1px;left:-10px;bottom:-10px;border:0;opacity:0;pointer-events:none';
+    ponteFrame.src = url.toString();
+    ponteFrame.addEventListener('error', () => {
+      if (rejeitarPonte) rejeitarPonte(new Error('Nao foi possivel carregar a comunicacao segura.'));
+    }, { once: true });
+    document.body.appendChild(ponteFrame);
+    return promessaPonte;
+  }
+
   async function requisicao(payload, opcoes = {}) {
     if (!API_URL || API_URL.includes('COLE_AQUI')) throw new Error('A URL da API nao foi configurada.');
-    const tentativas = opcoes.tentativas || 2;
-    const tempoLimite = opcoes.tempoLimite || 60000;
-    let ultimoErro;
-
-    for (let tentativa = 1; tentativa <= tentativas; tentativa += 1) {
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), tempoLimite);
-      try {
-        const resposta = await fetch(API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify(payload),
-          signal: controller.signal
-        });
-        const texto = await resposta.text();
-        let dados;
-        try {
-          dados = JSON.parse(texto);
-        } catch (_) {
-          throw new Error('O servidor devolveu uma resposta incompleta.');
-        }
-        if (!dados.sucesso) {
-          const erro = new Error(dados.erro || 'Nao foi possivel concluir a consulta.');
-          erro.codigo = dados.codigo;
-          erro.naoRepetir = true;
-          throw erro;
-        }
-        return dados;
-      } catch (erro) {
-        ultimoErro = erro;
-        if (erro.naoRepetir || tentativa === tentativas) throw erro;
-        await new Promise((resolve) => setTimeout(resolve, 900));
-      } finally {
-        clearTimeout(timer);
-      }
+    const tempoLimite = Math.max(15000, opcoes.tempoLimite || 90000);
+    const inicio = Date.now();
+    await garantirPonte(Math.min(30000, tempoLimite));
+    const restante = Math.max(1000, tempoLimite - (Date.now() - inicio));
+    const requestId = novoRequestId();
+    const dados = await new Promise((resolve, reject) => {
+      const timer = setTimeout(() => {
+        pendentes.delete(requestId);
+        reject(erroTimeout());
+      }, restante);
+      pendentes.set(requestId, { resolve, reject, timer });
+      ponteJanela.postMessage({
+        tipo: 'TRANSPORTE_REQUISICAO',
+        nonce: ponteNonce,
+        requestId,
+        payload
+      }, ponteOrigem);
+    });
+    if (!dados.sucesso) {
+      const erro = new Error(dados.erro || 'Nao foi possivel concluir a consulta.');
+      erro.codigo = dados.codigo;
+      throw erro;
     }
-    throw ultimoErro;
+    return dados;
   }
 
   window.PortalAPI = Object.freeze({
