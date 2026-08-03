@@ -6,334 +6,84 @@
   <title>Atualizacao Cadastral - Transporte Graca/CE</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --blue:#0056b3; --yellow:#f1c40f; --dark:#2d3436; --muted:#636e72;
-      --success:#218838; --danger:#c82333; --info:#0c5460; --card:rgba(255,255,255,.97);
-    }
-    * { box-sizing:border-box; }
-    body {
-      margin:0; min-height:100vh; font-family:Inter,Arial,sans-serif; color:var(--dark);
-      background:linear-gradient(rgba(0,0,0,.5),rgba(0,0,0,.5)),url('fundo-login.jpg') center/cover fixed;
-    }
-    header { display:flex; justify-content:center; padding:20px; }
-    header img { height:45px; background:white; padding:8px 20px; border-radius:999px; }
-    main { width:min(620px,calc(100% - 28px)); margin:0 auto 40px; }
-    .card { background:var(--card); border-radius:14px; overflow:hidden; box-shadow:0 10px 32px rgba(0,0,0,.25); }
-    .card-header { padding:24px; text-align:center; background:var(--yellow); }
-    .card-header h1 { margin:0; font-size:1.5rem; }
-    .card-body { padding:26px; }
-    .hidden { display:none !important; }
-    .perfil { background:#f5f7f8; padding:16px; border-radius:10px; margin-bottom:20px; }
-    .perfil h2,.perfil p { margin:0; }
-    .perfil p { margin-top:5px; color:var(--muted); }
-    .field { margin-bottom:18px; }
-    label,legend { display:block; margin-bottom:7px; font-weight:700; font-size:.92rem; }
-    input,select {
-      width:100%; padding:13px; border:1px solid #cfd4d8; border-radius:8px;
-      background:#fff; color:var(--dark); font:inherit;
-    }
-    input:focus,select:focus,button:focus-visible { outline:3px solid rgba(0,86,179,.28); outline-offset:2px; }
-    fieldset { margin:0 0 18px; padding:15px; border:1px solid #d9dee2; border-radius:10px; }
-    .checks { display:flex; flex-wrap:wrap; gap:12px; }
-    .checks label { display:flex; align-items:center; gap:5px; margin:0; font-weight:500; }
-    .checks input { width:auto; }
-    .help { color:var(--muted); font-size:.8rem; margin-top:6px; }
-    .feedback { min-height:24px; margin:14px 0; text-align:center; font-weight:700; }
-    .feedback.error { color:var(--danger); }
-    .feedback.success { color:var(--success); }
-    button,.link-button {
-      width:100%; padding:14px 18px; border:0; border-radius:8px; cursor:pointer;
-      color:white; background:var(--dark); font:700 1rem Inter,Arial,sans-serif;
-    }
-    button:hover { filter:brightness(.92); }
-    button:disabled { cursor:not-allowed; opacity:.65; }
-    .submit { background:var(--success); }
-    .cancel { margin-top:10px; background:var(--danger); }
-    .back { display:block; margin-top:20px; text-align:center; color:var(--muted); text-decoration:none; }
-    .spinner { display:inline-block; width:16px; height:16px; margin-right:8px; border:2px solid #ffffff55; border-top-color:#fff; border-radius:50%; animation:spin .8s linear infinite; vertical-align:-3px; }
-    @keyframes spin { to { transform:rotate(360deg); } }
-    @media (prefers-reduced-motion:reduce) { .spinner { animation:none; } }
+    :root{--blue:#0056b3;--yellow:#f1c40f;--dark:#2d3436;--muted:#636e72;--success:#218838;--danger:#c82333;--card:rgba(255,255,255,.98)}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:Inter,Arial,sans-serif;color:var(--dark);background:linear-gradient(rgba(0,0,0,.5),rgba(0,0,0,.5)),url('fundo-login.jpg') center/cover fixed}
+    header{display:flex;justify-content:center;padding:20px}header img{height:50px;background:#fff;padding:8px 20px;border-radius:999px}
+    main{width:min(820px,calc(100% - 28px));margin:0 auto 40px}.card{background:var(--card);border-radius:14px;overflow:hidden;box-shadow:0 10px 32px rgba(0,0,0,.25)}
+    .card-header{padding:24px;text-align:center;background:var(--yellow)}.card-header h1{margin:0;font-size:1.5rem}.card-body{padding:26px}.hidden{display:none!important}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:0 18px}.field{margin-bottom:18px}.wide{grid-column:1/-1}label,legend{display:block;margin-bottom:7px;font-weight:700;font-size:.92rem}
+    input,select{width:100%;padding:13px;border:1px solid #cfd4d8;border-radius:8px;background:#fff;color:var(--dark);font:inherit}input:focus,select:focus,button:focus-visible{outline:3px solid rgba(0,86,179,.28);outline-offset:2px}
+    fieldset{margin:0 0 18px;padding:15px;border:1px solid #d9dee2;border-radius:10px}.checks{display:flex;flex-wrap:wrap;gap:12px}.checks label{display:flex;align-items:center;gap:5px;margin:0;font-weight:500}.checks input{width:auto}
+    .help{color:var(--muted);font-size:.84rem;margin-top:6px}.feedback{min-height:24px;margin:14px 0;text-align:center;font-weight:700}.feedback.error{color:var(--danger)}.feedback.success{color:var(--success)}
+    button{width:100%;padding:14px 18px;border:0;border-radius:8px;cursor:pointer;color:#fff;background:var(--dark);font:700 1rem Inter,Arial,sans-serif}button:disabled{opacity:.65;cursor:not-allowed}.submit{background:var(--success)}.cancel{margin-top:10px;background:var(--danger)}.back{display:block;margin-top:20px;text-align:center;color:var(--muted);text-decoration:none}
+    .aviso{padding:12px 14px;border-left:4px solid var(--blue);background:#eaf3fc;border-radius:6px;margin-bottom:20px}.spinner{display:inline-block;width:16px;height:16px;margin-right:8px;border:2px solid #ffffff55;border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;vertical-align:-3px}@keyframes spin{to{transform:rotate(360deg)}}
+    @media(max-width:650px){.grid{grid-template-columns:1fr}.wide{grid-column:auto}.card-body{padding:20px}}@media(prefers-reduced-motion:reduce){.spinner{animation:none}}
   </style>
 </head>
 <body>
   <header><img src="Logo prefeitura.png" alt="Governo Municipal de Graca"></header>
   <main>
-    <section id="acesso" class="card" aria-labelledby="titulo-acesso">
-      <div class="card-header">
-        <h1 id="titulo-acesso">Atualizacao cadastral</h1>
-        <p>Exclusivo para veteranos</p>
-      </div>
+    <section id="acesso" class="card">
+      <div class="card-header"><h1>Atualizacao cadastral</h1><p>Transporte universitario</p></div>
       <div class="card-body">
-        <p>Informe o CPF e o codigo temporario fornecido pela Secretaria.</p>
-        <div class="field">
-          <label for="cpf">CPF</label>
-          <input id="cpf" type="text" inputmode="numeric" maxlength="14" autocomplete="off" placeholder="000.000.000-00">
-        </div>
-        <div class="field">
-          <label for="codigo">Codigo temporario</label>
-          <input id="codigo" type="text" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="000000">
-          <p class="help">O codigo possui 6 digitos e tem prazo de validade.</p>
-        </div>
+        <p>Informe o CPF para localizar seu cadastro.</p>
+        <div class="aviso">Depois do envio, os dados ficarao como <strong>Em analise</strong> no painel da Secretaria.</div>
+        <div class="field"><label for="cpf-consulta">CPF</label><input id="cpf-consulta" type="text" inputmode="numeric" maxlength="14" autocomplete="off" placeholder="000.000.000-00"></div>
         <button id="consultar" type="button">Consultar cadastro</button>
         <div id="feedback-acesso" class="feedback" aria-live="polite"></div>
         <a href="index.html" class="back">Voltar ao inicio</a>
       </div>
     </section>
 
-    <section id="formulario" class="card hidden" aria-labelledby="titulo-formulario">
-      <div class="card-header"><h1 id="titulo-formulario">Nova atualizacao</h1></div>
+    <section id="formulario" class="card hidden">
+      <div class="card-header"><h1>Confira e atualize seus dados</h1></div>
       <div class="card-body">
-        <div class="perfil">
-          <h2 id="nome-aluno">Aluno</h2>
-          <p id="instituicao-atual"></p>
-        </div>
+        <div class="aviso">Preencha com atencao. A Secretaria revisara todas as alteracoes antes da confirmacao.</div>
         <form id="form-atualizacao">
-          <div class="field">
-            <label for="instituicao">Instituicao de ensino</label>
-            <select id="instituicao" required>
-              <option value="">Selecione...</option>
-              <option value="ANHANGUERA">Anhanguera</option>
-              <option value="UFC">UFC</option>
-              <option value="FLF">FLF</option>
-              <option value="IFCE">IFCE</option>
-              <option value="UNINTA">UNINTA</option>
-              <option value="UVA">UVA</option>
-              <option value="LUCIANO FEIJAO">Luciano Feijao</option>
-              <option value="FARIAS BRITO">Farias Brito</option>
-              <option value="OUTROS">Outra</option>
-            </select>
-          </div>
-          <div id="instituicao-outra-box" class="field hidden">
-            <label for="instituicao-outra">Nome da instituicao</label>
-            <input id="instituicao-outra" type="text" maxlength="120" autocomplete="organization">
-          </div>
-          <div class="field">
-            <label for="embarque">Ponto de embarque</label>
-            <select id="embarque" required>
-              <option value="">Selecione...</option>
-              <option value="SEDE">Sede</option>
-              <option value="BARRO VERMELHO">Barro Vermelho</option>
-              <option value="LAPA">Lapa</option>
-              <option value="VILA">Vila</option>
-            </select>
+          <div class="grid">
+            <div class="field wide"><label for="nome">Nome completo</label><input id="nome" maxlength="150" required autocomplete="name"></div>
+            <div class="field"><label for="nascimento">Data de nascimento</label><input id="nascimento" type="date" required autocomplete="bday"></div>
+            <div class="field"><label for="rg">RG</label><input id="rg" maxlength="30" required autocomplete="off"></div>
+            <div class="field"><label for="cpf">CPF</label><input id="cpf" inputmode="numeric" maxlength="14" required autocomplete="off"></div>
+            <div class="field"><label for="telefone">Telefone com DDD</label><input id="telefone" type="tel" maxlength="20" required autocomplete="tel"></div>
+            <div class="field wide"><label for="endereco">Endereco completo</label><input id="endereco" maxlength="200" required autocomplete="street-address"></div>
+            <div class="field"><label for="instituicao">Instituicao de ensino</label><input id="instituicao" maxlength="120" required autocomplete="organization"></div>
+            <div class="field"><label for="embarque">Ponto de embarque</label><select id="embarque" required><option value="">Selecione...</option><option>SEDE</option><option>BARRO VERMELHO</option><option>LAPA</option><option>VILA</option></select></div>
+            <div class="field"><label for="sobral">Estuda em Sobral?</label><select id="sobral" required><option value="">Selecione...</option><option value="Sim">Sim</option><option value="Nao">Nao</option></select></div>
+            <div class="field"><label for="novato">Aluno novato?</label><select id="novato" required><option value="">Selecione...</option><option value="Sim">Sim</option><option value="Nao">Nao</option></select></div>
+            <div class="field wide"><label for="comorbidade">Possui comorbidade?</label><select id="comorbidade" required><option value="">Selecione...</option><option value="Sim">Sim</option><option value="Nao">Nao</option></select></div>
           </div>
 
-          <fieldset>
-            <legend>Dias no turno da manha</legend>
-            <div class="checks">
-              <label><input type="checkbox" name="dias-manha" value="Segunda">Seg</label>
-              <label><input type="checkbox" name="dias-manha" value="Terca">Ter</label>
-              <label><input type="checkbox" name="dias-manha" value="Quarta">Qua</label>
-              <label><input type="checkbox" name="dias-manha" value="Quinta">Qui</label>
-              <label><input type="checkbox" name="dias-manha" value="Sexta">Sex</label>
-            </div>
-          </fieldset>
-
-          <fieldset>
-            <legend>Dias no turno da noite</legend>
-            <div class="checks">
-              <label><input type="checkbox" name="dias-noite" value="Segunda">Seg</label>
-              <label><input type="checkbox" name="dias-noite" value="Terca">Ter</label>
-              <label><input type="checkbox" name="dias-noite" value="Quarta">Qua</label>
-              <label><input type="checkbox" name="dias-noite" value="Quinta">Qui</label>
-              <label><input type="checkbox" name="dias-noite" value="Sexta">Sex</label>
-            </div>
-            <div class="checks" style="margin-top:15px;padding-top:12px;border-top:1px dashed #bbb">
-              <label><input id="apenas-retorno" type="checkbox">Apenas retorno no onibus da noite</label>
-            </div>
-          </fieldset>
+          <fieldset><legend>Dias no turno da manha</legend><div class="checks">
+            <label><input type="checkbox" name="dias-manha" value="Segunda">Seg</label><label><input type="checkbox" name="dias-manha" value="Terca">Ter</label><label><input type="checkbox" name="dias-manha" value="Quarta">Qua</label><label><input type="checkbox" name="dias-manha" value="Quinta">Qui</label><label><input type="checkbox" name="dias-manha" value="Sexta">Sex</label>
+          </div></fieldset>
+          <fieldset><legend>Dias no turno da noite</legend><div class="checks">
+            <label><input type="checkbox" name="dias-noite" value="Segunda">Seg</label><label><input type="checkbox" name="dias-noite" value="Terca">Ter</label><label><input type="checkbox" name="dias-noite" value="Quarta">Qua</label><label><input type="checkbox" name="dias-noite" value="Quinta">Qui</label><label><input type="checkbox" name="dias-noite" value="Sexta">Sex</label>
+          </div><div class="checks" style="margin-top:15px;padding-top:12px;border-top:1px dashed #bbb"><label><input id="apenas-retorno" type="checkbox">Apenas retorno no onibus da noite</label></div></fieldset>
 
           <div id="feedback-envio" class="feedback" aria-live="polite"></div>
-          <button id="enviar" class="submit" type="submit">Enviar atualizacao</button>
-          <button class="cancel" type="button" id="cancelar">Cancelar e sair</button>
+          <button id="enviar" class="submit" type="submit">Enviar para analise</button><button class="cancel" type="button" id="cancelar">Cancelar e sair</button>
         </form>
       </div>
     </section>
 
-    <section id="sucesso" class="card hidden" aria-labelledby="titulo-sucesso">
-      <div class="card-header"><h1 id="titulo-sucesso">Atualizacao recebida</h1></div>
-      <div class="card-body" style="text-align:center">
-        <p>Os dados foram enviados e aguardam analise da Secretaria.</p>
-        <button type="button" id="sair">Sair</button>
-      </div>
-    </section>
+    <section id="sucesso" class="card hidden"><div class="card-header"><h1>Atualizacao recebida</h1></div><div class="card-body" style="text-align:center"><p>Seus dados foram enviados e ja aparecem como <strong>Em analise</strong> para a Secretaria.</p><button type="button" id="sair">Sair</button></div></section>
   </main>
-
   <script src="config.js"></script>
   <script>
     'use strict';
-
-    const API_URL = window.APP_CONFIG && window.APP_CONFIG.API_URL;
-    let updateToken = '';
-
-    const $ = (id) => document.getElementById(id);
-    const normalizar = (valor) => String(valor || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().trim();
-
-    function conferirConfiguracao() {
-      if (!API_URL || API_URL.includes('COLE_AQUI')) {
-        throw new Error('Configure a URL da implantacao no arquivo config.js.');
-      }
-    }
-
-    async function api(payload) {
-      conferirConfiguracao();
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 20000);
-      try {
-        const resposta = await fetch(API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify(payload),
-          signal: controller.signal
-        });
-        const texto = await resposta.text();
-        let dados;
-        try { dados = JSON.parse(texto); }
-        catch (_) { throw new Error('O servidor nao retornou JSON. Confira a URL e a implantacao.'); }
-        if (!dados.sucesso) {
-          const erro = new Error(dados.erro || 'Nao foi possivel concluir a operacao.');
-          erro.codigo = dados.codigo;
-          throw erro;
-        }
-        return dados;
-      } finally {
-        clearTimeout(timer);
-      }
-    }
-
-    function somenteDigitos(valor) { return String(valor || '').replace(/\D/g, ''); }
-
-    function formatarCpf(valor) {
-      return somenteDigitos(valor).slice(0, 11)
-        .replace(/(\d{3})(\d)/, '$1.$2')
-        .replace(/(\d{3})(\d)/, '$1.$2')
-        .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-    }
-
-    function feedback(id, mensagem, tipo) {
-      const elemento = $(id);
-      elemento.textContent = mensagem || '';
-      elemento.className = 'feedback' + (tipo ? ' ' + tipo : '');
-    }
-
-    function carregando(botao, ativo, textoNormal, textoAtivo) {
-      botao.disabled = ativo;
-      botao.innerHTML = ativo ? '<span class="spinner" aria-hidden="true"></span>' + textoAtivo : textoNormal;
-    }
-
-    function valoresMarcados(nome) {
-      return Array.from(document.querySelectorAll('input[name="' + nome + '"]:checked')).map((item) => item.value);
-    }
-
-    function marcarDias(nome, valor) {
-      const recebidos = normalizar(valor).split(/[,;|]/).map((item) => item.trim()).filter(Boolean);
-      document.querySelectorAll('input[name="' + nome + '"]').forEach((checkbox) => {
-        const dia = normalizar(checkbox.value);
-        checkbox.checked = recebidos.some((item) => item.includes(dia.slice(0, 3)) || dia.includes(item.slice(0, 3)));
-      });
-    }
-
-    function preencherFormulario(aluno) {
-      $('nome-aluno').textContent = aluno.nome || 'Aluno';
-      $('instituicao-atual').textContent = aluno.instituicao ? 'Cadastro atual: ' + aluno.instituicao : '';
-
-      const selectInstituicao = $('instituicao');
-      const opcoes = Array.from(selectInstituicao.options).map((opcao) => opcao.value);
-      const instituicaoNormalizada = normalizar(aluno.instituicao);
-      const encontrada = opcoes.find((valor) => valor && valor !== 'OUTROS' && instituicaoNormalizada.includes(normalizar(valor)));
-      selectInstituicao.value = encontrada || (aluno.instituicao ? 'OUTROS' : '');
-      atualizarInstituicaoOutra();
-      if (!encontrada && aluno.instituicao) $('instituicao-outra').value = aluno.instituicao;
-
-      const embarque = normalizar(aluno.embarque);
-      $('embarque').value = Array.from($('embarque').options).map((o) => o.value).find((v) => v && embarque.includes(normalizar(v))) || '';
-      marcarDias('dias-manha', aluno.dias_manha);
-      marcarDias('dias-noite', aluno.dias_noite);
-      $('apenas-retorno').checked = normalizar(aluno.apenas_retorno) === 'SIM';
-    }
-
-    function atualizarInstituicaoOutra() {
-      const outra = $('instituicao').value === 'OUTROS';
-      $('instituicao-outra-box').classList.toggle('hidden', !outra);
-      $('instituicao-outra').required = outra;
-      if (!outra) $('instituicao-outra').value = '';
-    }
-
-    async function consultarCadastro() {
-      const cpf = somenteDigitos($('cpf').value);
-      const codigo = somenteDigitos($('codigo').value);
-      if (cpf.length !== 11 || codigo.length !== 6) {
-        feedback('feedback-acesso', 'Informe o CPF completo e o codigo de 6 digitos.', 'error');
-        return;
-      }
-
-      const botao = $('consultar');
-      carregando(botao, true, 'Consultar cadastro', 'Consultando...');
-      feedback('feedback-acesso', 'Validando os dados...', '');
-      try {
-        const dados = await api({ acao: 'iniciar_atualizacao', cpf, codigo });
-        updateToken = dados.update_token;
-        preencherFormulario(dados.aluno);
-        $('acesso').classList.add('hidden');
-        $('formulario').classList.remove('hidden');
-        $('instituicao').focus();
-      } catch (erro) {
-        feedback('feedback-acesso', erro.name === 'AbortError' ? 'O servidor demorou para responder.' : erro.message, 'error');
-      } finally {
-        carregando(botao, false, 'Consultar cadastro', 'Consultando...');
-      }
-    }
-
-    async function enviarAtualizacao(evento) {
-      evento.preventDefault();
-      if (!updateToken) {
-        feedback('feedback-envio', 'A sessao expirou. Consulte novamente.', 'error');
-        return;
-      }
-
-      const instituicao = $('instituicao').value === 'OUTROS' ? $('instituicao-outra').value.trim() : $('instituicao').value;
-      const diasManha = valoresMarcados('dias-manha');
-      const diasNoite = valoresMarcados('dias-noite');
-      if (!diasManha.length && !diasNoite.length) {
-        feedback('feedback-envio', 'Selecione pelo menos um dia de viagem.', 'error');
-        return;
-      }
-      if ($('apenas-retorno').checked && !diasNoite.length) {
-        feedback('feedback-envio', 'Para marcar apenas retorno, selecione pelo menos um dia da noite.', 'error');
-        return;
-      }
-
-      const botao = $('enviar');
-      carregando(botao, true, 'Enviar atualizacao', 'Enviando...');
-      feedback('feedback-envio', '', '');
-      try {
-        await api({
-          acao: 'atualizar_aluno',
-          update_token: updateToken,
-          instituicao,
-          embarque: $('embarque').value,
-          dias_manha: diasManha,
-          dias_noite: diasNoite,
-          apenas_retorno: $('apenas-retorno').checked
-        });
-        updateToken = '';
-        $('formulario').classList.add('hidden');
-        $('sucesso').classList.remove('hidden');
-      } catch (erro) {
-        feedback('feedback-envio', erro.name === 'AbortError' ? 'O servidor demorou para responder.' : erro.message, 'error');
-      } finally {
-        carregando(botao, false, 'Enviar atualizacao', 'Enviando...');
-      }
-    }
-
-    $('cpf').addEventListener('input', (evento) => { evento.target.value = formatarCpf(evento.target.value); });
-    $('codigo').addEventListener('input', (evento) => { evento.target.value = somenteDigitos(evento.target.value).slice(0, 6); });
-    $('codigo').addEventListener('keydown', (evento) => { if (evento.key === 'Enter') consultarCadastro(); });
-    $('consultar').addEventListener('click', consultarCadastro);
-    $('instituicao').addEventListener('change', atualizarInstituicaoOutra);
-    $('form-atualizacao').addEventListener('submit', enviarAtualizacao);
-    $('cancelar').addEventListener('click', () => window.location.reload());
-    $('sair').addEventListener('click', () => { window.location.href = 'index.html'; });
+    const API_URL=window.APP_CONFIG&&window.APP_CONFIG.API_URL;let updateToken='';const $=(id)=>document.getElementById(id);const normalizar=(v)=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().trim();
+    function conferirConfiguracao(){if(!API_URL||API_URL.includes('COLE_AQUI'))throw new Error('Configure a URL da implantacao no arquivo config.js.');}
+    async function api(payload){conferirConfiguracao();const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),20000);try{const resposta=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload),signal:controller.signal});const texto=await resposta.text();let dados;try{dados=JSON.parse(texto)}catch(_){throw new Error('O servidor nao retornou JSON. Confira a implantacao.')}if(!dados.sucesso){const erro=new Error(dados.erro||'Nao foi possivel concluir.');erro.codigo=dados.codigo;throw erro}return dados}finally{clearTimeout(timer)}}
+    function somenteDigitos(v){return String(v||'').replace(/\D/g,'')}function formatarCpf(v){return somenteDigitos(v).slice(0,11).replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d{1,2})$/,'$1-$2')}
+    function feedback(id,m,t){const el=$(id);el.textContent=m||'';el.className='feedback'+(t?' '+t:'')}function carregando(b,a,n,c){b.disabled=a;b.innerHTML=a?'<span class="spinner" aria-hidden="true"></span>'+c:n}
+    function marcados(nome){return Array.from(document.querySelectorAll('input[name="'+nome+'"]:checked')).map(i=>i.value)}
+    function marcarDias(nome,valor){const recebidos=normalizar(valor).split(/[,;|]/).map(i=>i.trim()).filter(Boolean);document.querySelectorAll('input[name="'+nome+'"]').forEach(cb=>{const d=normalizar(cb.value);cb.checked=recebidos.some(i=>i.includes(d.slice(0,3))||d.includes(i.slice(0,3)))})}
+    function selecionar(id,valor){const el=$(id);const alvo=normalizar(valor);const opcao=Array.from(el.options).find(o=>normalizar(o.value)===alvo);el.value=opcao?opcao.value:''}
+    function preencher(a){$('nome').value=a.nome||'';$('nascimento').value=a.nascimento||'';$('rg').value=a.rg||'';$('cpf').value=formatarCpf(a.cpf||'');$('endereco').value=a.endereco||'';$('telefone').value=a.telefone||'';$('instituicao').value=a.instituicao||'';selecionar('embarque',a.embarque);selecionar('sobral',a.sobral);selecionar('novato',a.novato);selecionar('comorbidade',a.comorbidade);marcarDias('dias-manha',a.dias_manha);marcarDias('dias-noite',a.dias_noite);$('apenas-retorno').checked=normalizar(a.apenas_retorno)==='SIM'}
+    async function consultar(){const cpf=somenteDigitos($('cpf-consulta').value);if(cpf.length!==11){feedback('feedback-acesso','Informe o CPF completo.','error');return}const botao=$('consultar');carregando(botao,true,'Consultar cadastro','Consultando...');feedback('feedback-acesso','Localizando cadastro...','');try{const dados=await api({acao:'iniciar_atualizacao',cpf});updateToken=dados.update_token;preencher(dados.aluno);$('acesso').classList.add('hidden');$('formulario').classList.remove('hidden');$('nome').focus()}catch(erro){feedback('feedback-acesso',erro.name==='AbortError'?'O servidor demorou para responder.':erro.message,'error')}finally{carregando(botao,false,'Consultar cadastro','Consultando...')}}
+    async function enviar(evento){evento.preventDefault();if(!updateToken){feedback('feedback-envio','A sessao expirou. Consulte novamente.','error');return}const manha=marcados('dias-manha'),noite=marcados('dias-noite');if(!manha.length&&!noite.length){feedback('feedback-envio','Selecione pelo menos um dia de viagem.','error');return}if($('apenas-retorno').checked&&!noite.length){feedback('feedback-envio','Para marcar apenas retorno, selecione ao menos um dia da noite.','error');return}const botao=$('enviar');carregando(botao,true,'Enviar para analise','Enviando...');feedback('feedback-envio','','');try{await api({acao:'atualizar_aluno',update_token:updateToken,nome:$('nome').value,nascimento:$('nascimento').value,rg:$('rg').value,cpf:$('cpf').value,endereco:$('endereco').value,telefone:$('telefone').value,instituicao:$('instituicao').value,embarque:$('embarque').value,sobral:$('sobral').value,novato:$('novato').value,comorbidade:$('comorbidade').value,dias_manha:manha,dias_noite:noite,apenas_retorno:$('apenas-retorno').checked});updateToken='';$('formulario').classList.add('hidden');$('sucesso').classList.remove('hidden')}catch(erro){feedback('feedback-envio',erro.name==='AbortError'?'O servidor demorou para responder.':erro.message,'error')}finally{carregando(botao,false,'Enviar para analise','Enviando...')}}
+    $('cpf-consulta').addEventListener('input',e=>e.target.value=formatarCpf(e.target.value));$('cpf').addEventListener('input',e=>e.target.value=formatarCpf(e.target.value));$('cpf-consulta').addEventListener('keydown',e=>{if(e.key==='Enter')consultar()});$('consultar').addEventListener('click',consultar);$('form-atualizacao').addEventListener('submit',enviar);$('cancelar').addEventListener('click',()=>location.reload());$('sair').addEventListener('click',()=>location.href='index.html');
   </script>
 </body>
 </html>
