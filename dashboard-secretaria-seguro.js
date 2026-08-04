@@ -29,12 +29,48 @@ function selecionar(id,valor,fallback=''){const el=elemento(id),alvo=normalizar(
 
 function abrirModalPorCpf(cpf){abrirModal(listaAlunosGlobais.findIndex(a=>PortalAPI.somenteDigitos(a.cpf)===PortalAPI.somenteDigitos(cpf)))}
 
-function abrirModal(index=-1){const form=elemento('form-aluno');form.reset();elemento('aluno-id').value='';criarCheckboxes();if(index>=0){const a=listaAlunosGlobais[index];elemento('modal-titulo').textContent=normalizar(a.status)==='em analise'?'Revisar atualizacao':'Editar aluno';elemento('aluno-id').value=PortalAPI.normalizarCpf(a.cpf);elemento('aluno-nome').value=a.nome||'';elemento('aluno-nascimento').value=a.nascimento||'';elemento('aluno-rg').value=a.rg||'';elemento('aluno-cpf').value=cpfFormatado(a.cpf);elemento('aluno-telefone').value=a.telefone||'';elemento('aluno-endereco').value=a.endereco||'';elemento('aluno-instituicao').value=a.instituicao||'';selecionar('aluno-embarque',a.embarque);selecionar('aluno-sobral',a.sobral);selecionar('aluno-novato',a.novato);selecionar('aluno-comorbidade',a.comorbidade);selecionar('aluno-retorno',a.apenas_retorno,'Nao');selecionar('aluno-onibus',a.onibus);selecionar('aluno-status',a.status,'Pendente');marcarDias('admin-dias-manha',a.dias_manha);marcarDias('admin-dias-noite',a.dias_noite)}else{elemento('modal-titulo').textContent='Adicionar novo aluno';selecionar('aluno-retorno','Nao','Nao');selecionar('aluno-status','Pendente','Pendente')}elemento('modal-aluno').style.display='block'}
+function abrirModal(index=-1){
+  const form=elemento('form-aluno');
+  form.reset();
+  elemento('aluno-id').value='';
+  criarCheckboxes();
+  if(index>=0){
+    const a=listaAlunosGlobais[index];
+    elemento('modal-titulo').textContent=normalizar(a.status)==='em analise'?'Revisar atualizacao':'Editar aluno';
+    // Mantém o CPF original no ID para que o backend consiga localizar a linha exata
+    elemento('aluno-id').value=a.cpf||'';
+    elemento('aluno-nome').value=a.nome||'';
+    elemento('aluno-nascimento').value=a.nascimento||'';
+    elemento('aluno-rg').value=a.rg||'';
+    elemento('aluno-cpf').value=cpfFormatado(a.cpf);
+    elemento('aluno-telefone').value=a.telefone||'';
+    elemento('aluno-endereco').value=a.endereco||'';
+    elemento('aluno-instituicao').value=a.instituicao||'';
+    selecionar('aluno-embarque',a.embarque);
+    selecionar('aluno-sobral',a.sobral);
+    selecionar('aluno-novato',a.novato);
+    selecionar('aluno-comorbidade',a.comorbidade);
+    selecionar('aluno-retorno',a.apenas_retorno,'Nao');
+    selecionar('aluno-onibus',a.onibus);
+    selecionar('aluno-status',a.status,'Pendente');
+    marcarDias('admin-dias-manha',a.dias_manha);
+    marcarDias('admin-dias-noite',a.dias_noite);
+  } else {
+    elemento('modal-titulo').textContent='Adicionar novo aluno';
+    selecionar('aluno-retorno','Nao','Nao');
+    selecionar('aluno-status','Pendente','Pendente');
+  }
+  elemento('modal-aluno').style.display='block';
+}
 function fecharModal(){elemento('modal-aluno').style.display='none'}
 
 async function salvarAluno(evento) {
   evento.preventDefault();
-  const cpfAntigo = PortalAPI.normalizarCpf(elemento('aluno-id').value);
+  
+  // Envia o CPF antigo sem normalizar, para que o App Script o encontre na planilha
+  const cpfAntigo = elemento('aluno-id').value;
+  
+  // O CPF novo sim é limpo e validado
   const cpfNovo = PortalAPI.normalizarCpf(elemento('aluno-cpf').value);
   
   if (cpfNovo.length !== 11 || !PortalAPI.validarCpf(cpfNovo)) {
@@ -59,7 +95,7 @@ async function salvarAluno(evento) {
     await apiAdmin({
       acao: cpfAntigo ? 'editar_aluno' : 'adicionar_aluno',
       cpfAntigo: cpfAntigo,
-      cpf: cpfNovo,
+      cpf: cpfNovo, // O novo CPF é salvo com 11 dígitos limpos
       nome: elemento('aluno-nome').value,
       nascimento: elemento('aluno-nascimento').value,
       rg: elemento('aluno-rg').value,
@@ -86,8 +122,10 @@ async function salvarAluno(evento) {
   }
 }
 
-async function reabrirAtualizacao(aluno){if(!confirm('Reabrir a atualizacao de '+(aluno.nome||'este aluno')+'? O aluno podera entrar novamente usando o CPF.'))return;try{await apiAdmin({acao:'reabrir_atualizacao',cpf:PortalAPI.normalizarCpf(aluno.cpf)});await carregarDadosDaPlanilha();alert('Atualizacao reaberta. O aluno ja pode consultar pelo CPF.')}catch(erro){alert(erro.message)}}
-async function excluirAluno(cpf){if(!confirm('Excluir definitivamente este aluno? Essa acao nao pode ser desfeita.'))return;try{await apiAdmin({acao:'excluir_aluno',cpf:PortalAPI.normalizarCpf(cpf)});await carregarDadosDaPlanilha()}catch(erro){alert(erro.message)}}
+// Enviam o CPF exato que veio do banco de dados para evitar erro de "Aluno não encontrado"
+async function reabrirAtualizacao(aluno){if(!confirm('Reabrir a atualizacao de '+(aluno.nome||'este aluno')+'? O aluno podera entrar novamente usando o CPF.'))return;try{await apiAdmin({acao:'reabrir_atualizacao',cpf:aluno.cpf});await carregarDadosDaPlanilha();alert('Atualizacao reaberta. O aluno ja pode consultar pelo CPF.')}catch(erro){alert(erro.message)}}
+async function excluirAluno(cpf){if(!confirm('Excluir definitivamente este aluno? Essa acao nao pode ser desfeita.'))return;try{await apiAdmin({acao:'excluir_aluno',cpf:cpf});await carregarDadosDaPlanilha()}catch(erro){alert(erro.message)}}
+
 function fazerLogout(){sessionStorage.removeItem('admin_token');location.replace('admin.html')}
 window.abrirModal=abrirModal;window.fecharModal=fecharModal;window.salvarAluno=salvarAluno;window.excluirAluno=excluirAluno;window.fazerLogout=fazerLogout;
 elemento('busca').addEventListener('input',renderizarTabela);elemento('filtro-status').addEventListener('change',renderizarTabela);if(!tokenAdmin)fazerLogout();else carregarDadosDaPlanilha();
