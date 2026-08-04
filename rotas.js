@@ -146,13 +146,31 @@ function renderizarTabela(alunos) {
     td.colSpan = 4; td.className = 'empty'; td.textContent = 'Nenhum passageiro para o dia e turno selecionados.';
     tr.appendChild(td); tbody.appendChild(tr); return;
   }
-  [...alunos].sort((a, b) => String(a.nome).localeCompare(String(b.nome), 'pt-BR')).forEach((aluno, index) => {
+  
+  // Lista ordenada alfabeticamente
+  [...alunos].sort((a, b) => String(a.nome || '').localeCompare(String(b.nome || ''), 'pt-BR')).forEach((aluno, index) => {
     const tr = document.createElement('tr');
-    const numero = document.createElement('td'); numero.className = 'number'; numero.textContent = index + 1;
-    const nome = document.createElement('td'); nome.textContent = `Passageiro ${index + 1}`; nome.style.fontWeight = '750';
-    const instituicao = document.createElement('td'); instituicao.textContent = aluno.instituicao || 'Nao informada';
-    const embarque = document.createElement('td'); const badge = document.createElement('span'); badge.className = 'badge'; badge.textContent = aluno.embarque || 'Nao informado'; embarque.appendChild(badge);
-    tr.append(numero, nome, instituicao, embarque); tbody.appendChild(tr);
+    
+    const numero = document.createElement('td'); 
+    numero.className = 'number'; 
+    numero.textContent = index + 1;
+    
+    const nome = document.createElement('td'); 
+    // CORREÇÃO: Mostra o nome real vindo da planilha ao invés de passageiro anônimo
+    nome.textContent = aluno.nome || `Passageiro ${index + 1}`; 
+    nome.style.fontWeight = '750';
+    
+    const instituicao = document.createElement('td'); 
+    instituicao.textContent = aluno.instituicao || 'Nao informada';
+    
+    const embarque = document.createElement('td'); 
+    const badge = document.createElement('span'); 
+    badge.className = 'badge'; 
+    badge.textContent = aluno.embarque || 'Nao informado'; 
+    embarque.appendChild(badge);
+    
+    tr.append(numero, nome, instituicao, embarque); 
+    tbody.appendChild(tr);
   });
 }
 
