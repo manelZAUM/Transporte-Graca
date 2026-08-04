@@ -2,7 +2,7 @@ body.consulta-body { --route: #0a7b69; --route-dark: #075348; --route-soft: #e5f
 .login-explanation { margin: 0 0 18px; color: var(--muted); line-height: 1.55; }
 .google-login-wrap { display: flex; justify-content: center; min-height: 44px; }
 .consulta-panel { margin-top: 10px; }
-.overview-grid { display: grid; grid-template-columns: repeat(6,minmax(0,1fr)); gap: 12px; margin-bottom: 22px; }
+.overview-grid { display: grid; grid-template-columns: repeat(7,minmax(0,1fr)); gap: 12px; margin-bottom: 22px; }
 .overview-grid .kpi strong { font-size: 1.55rem; }
 .dashboard-layout { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 20px; }
 .span-2 { grid-column: 1 / -1; }

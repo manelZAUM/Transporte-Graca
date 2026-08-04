@@ -15,7 +15,7 @@ let observadorMapa;
 
 const $ = (id) => document.getElementById(id);
 const statusNormalizado = (aluno) => PortalAPI.normalizar(aluno.status || 'Pendente');
-const demandaAtiva = (aluno) => statusNormalizado(aluno) !== 'REPROVADO';
+const demandaAtiva = (aluno) => statusNormalizado(aluno) === 'APROVADO';
 
 function mostrarMensagem(texto, tipo = 'info') {
   const box = $('msgBox');
@@ -164,7 +164,10 @@ function renderizarDashboard(resumo = {}) {
   const demanda = cadastros.filter(demandaAtiva);
   $('kpi-total').textContent = Number(resumo.total ?? cadastros.length);
   $('kpi-aprovados').textContent = Number(resumo.aprovados ?? cadastros.filter((aluno) => statusNormalizado(aluno) === 'APROVADO').length);
-  $('kpi-analise').textContent = Number(resumo.em_analise ?? cadastros.filter((aluno) => ['PENDENTE', 'EM ANALISE'].includes(statusNormalizado(aluno))).length);
+  $('kpi-analise').textContent = Number(resumo.em_analise ?? cadastros.filter((aluno) => statusNormalizado(aluno) === 'EM ANALISE').length);
+  if ($('kpi-pendentes')) {
+    $('kpi-pendentes').textContent = Number(resumo.pendentes ?? cadastros.filter((aluno) => statusNormalizado(aluno) === 'PENDENTE').length);
+  }
   $('kpi-prioridade').textContent = Number(resumo.prioridade ?? cadastros.filter((aluno) => statusNormalizado(aluno) === 'PRIORIDADE').length);
   $('kpi-novatos').textContent = Number(resumo.novatos ?? 0);
   $('kpi-sobral').textContent = Number(resumo.sobral ?? 0);
