@@ -15,8 +15,34 @@
     return String(valor || '').replace(/\D/g, '');
   }
 
+  function normalizarCpf(valor) {
+    const d = somenteDigitos(valor);
+    if (d.length === 9 || d.length === 10) return d.padStart(11, '0');
+    return d;
+  }
+
+  function validarCpf(valor) {
+    const d = normalizarCpf(valor);
+    if (d.length !== 11 || /^(\d)\1{10}$/.test(d)) return false;
+
+    let soma = 0;
+    for (let i = 0; i < 9; i++) soma += parseInt(d.charAt(i), 10) * (10 - i);
+    let resto = (soma * 10) % 11;
+    if (resto === 10 || resto === 11) resto = 0;
+    if (resto !== parseInt(d.charAt(9), 10)) return false;
+
+    soma = 0;
+    for (let i = 0; i < 10; i++) soma += parseInt(d.charAt(i), 10) * (11 - i);
+    resto = (soma * 10) % 11;
+    if (resto === 10 || resto === 11) resto = 0;
+    if (resto !== parseInt(d.charAt(10), 10)) return false;
+
+    return true;
+  }
+
   function formatarCpf(valor) {
-    return somenteDigitos(valor).slice(0, 11)
+    const d = normalizarCpf(valor);
+    return d.slice(0, 11)
       .replace(/(\d{3})(\d)/, '$1.$2')
       .replace(/(\d{3})(\d)/, '$1.$2')
       .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
@@ -175,6 +201,8 @@
     requisicao,
     normalizar,
     somenteDigitos,
+    normalizarCpf,
+    validarCpf,
     formatarCpf,
     listaDias,
     diasDoAluno
