@@ -149,7 +149,7 @@ function renderizarTabela() {
   }
   filtrados.forEach((aluno, indiceRegistro) => {
     const tr = document.createElement('tr');
-    [`Cadastro ${String(indiceRegistro + 1).padStart(3, '0')}`, aluno.instituicao || 'Não informada', aluno.embarque || 'Não informado'].forEach((texto, indice) => {
+  [aluno.nome || 'Nome não informado', aluno.instituicao || 'Não informada', aluno.embarque || 'Não informado'].forEach((texto, indice) => {
       const td = document.createElement('td'); td.textContent = texto; if (indice === 0) td.style.fontWeight = '750'; tr.appendChild(td);
     });
     const rotaTd = document.createElement('td'); const rota = document.createElement('span'); rota.className = 'route-chip';
