@@ -11,9 +11,10 @@ async function apiAdmin(payload,tempoLimite=90000){if(!API_URL||API_URL.includes
 function mostrarCarregamento(mensagem,erro=false){elemento('conteudo-painel').style.display='none';const el=elemento('mensagem-carregamento');el.style.display='block';el.style.color=erro?'#c82333':'#0056b3';el.textContent=mensagem}
 function classeStatus(status){const s=normalizar(status).replace(/\s+/g,'-');return 'status-badge status-'+s}
 
+// CORREÇÃO: Garante que o zero perdido seja reposto antes de formatar
 function cpfFormatado(v){
-  const formatado = PortalAPI.formatarCpf(v);
-  // Se não conseguir formatar (ex: estiver escrito "CPF INVÁLIDO" na planilha), mostra o texto original
+  const puro = PortalAPI.normalizarCpf(v);
+  const formatado = PortalAPI.formatarCpf(puro);
   return formatado ? formatado : (v || '-');
 }
 
@@ -29,7 +30,6 @@ function marcarDias(nome,valor){const itens=normalizar(valor).split(/[,;|]/).map
 function diasMarcados(nome){return Array.from(document.querySelectorAll('input[name="'+nome+'"]:checked')).map(i=>i.value)}
 function selecionar(id,valor,fallback=''){const el=elemento(id),alvo=normalizar(valor),opcao=Array.from(el.options).find(o=>normalizar(o.value)===alvo);el.value=opcao?opcao.value:fallback}
 
-// CORREÇÃO CRÍTICA 1: Busca o aluno usando o texto EXATO do CPF para não dar "Aluno não encontrado"
 function abrirModalPorCpf(cpf){
   const index = listaAlunosGlobais.findIndex(a => String(a.cpf).trim() === String(cpf).trim());
   abrirModal(index);
@@ -43,13 +43,12 @@ function abrirModal(index=-1){
   if(index>=0){
     const a=listaAlunosGlobais[index];
     elemento('modal-titulo').textContent=normalizar(a.status)==='em analise'?'Revisar atualizacao':'Editar aluno';
-    // O ID armazena o valor exato que veio da planilha (mesmo que seja "CPF INVÁLIDO")
     elemento('aluno-id').value=a.cpf||'';
     elemento('aluno-nome').value=a.nome||'';
     elemento('aluno-nascimento').value=a.nascimento||'';
     elemento('aluno-rg').value=a.rg||'';
-    // Se a planilha tiver "CPF INVÁLIDO", o input fica limpo para a secretária digitar o certo
-    elemento('aluno-cpf').value=PortalAPI.formatarCpf(a.cpf);
+    // CORREÇÃO: Repõe o zero à esquerda e formata ao abrir o modal
+    elemento('aluno-cpf').value=PortalAPI.formatarCpf(PortalAPI.normalizarCpf(a.cpf));
     elemento('aluno-telefone').value=a.telefone||'';
     elemento('aluno-endereco').value=a.endereco||'';
     elemento('aluno-instituicao').value=a.instituicao||'';
@@ -74,16 +73,14 @@ function fecharModal(){elemento('modal-aluno').style.display='none'}
 async function salvarAluno(evento) {
   evento.preventDefault();
   
-  // CPF Antigo vai exatamente como veio da planilha para o servidor conseguir encontrar a linha
   const cpfAntigo = elemento('aluno-id').value;
-  
   const cpfPuro = PortalAPI.normalizarCpf(elemento('aluno-cpf').value);
+  
   if (cpfPuro.length !== 11 || !PortalAPI.validarCpf(cpfPuro)) {
     alert('Informe um CPF válido com 11 dígitos.');
     return;
   }
 
-  // CORREÇÃO CRÍTICA 2: Formata com a máscara para o Google Sheets não rejeitar
   const cpfFormatadoComMascara = PortalAPI.formatarCpf(cpfPuro);
 
   const botao = document.querySelector('.btn-salvar');
@@ -103,7 +100,7 @@ async function salvarAluno(evento) {
     await apiAdmin({
       acao: cpfAntigo ? 'editar_aluno' : 'adicionar_aluno',
       cpfAntigo: cpfAntigo,
-      cpf: cpfFormatadoComMascara, // Vai com pontos e traço
+      cpf: cpfFormatadoComMascara,
       nome: elemento('aluno-nome').value,
       nascimento: elemento('aluno-nascimento').value,
       rg: elemento('aluno-rg').value,
