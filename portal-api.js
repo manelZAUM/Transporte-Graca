@@ -40,9 +40,9 @@
     return true;
   }
 
+  // CORREÇÃO: Removido o bloqueio que impedia a digitação em tempo real
   function formatarCpf(valor) {
-    const d = normalizarCpf(valor);
-    if (d.length !== 11) return '';
+    const d = somenteDigitos(valor);
     return d.slice(0, 11)
       .replace(/(\d{3})(\d)/, '$1.$2')
       .replace(/(\d{3})(\d)/, '$1.$2')

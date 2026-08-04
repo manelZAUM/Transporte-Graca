@@ -81,7 +81,9 @@
     function marcados(nome){return Array.from(document.querySelectorAll('input[name="'+nome+'"]:checked')).map(i=>i.value)}
     function marcarDias(nome,valor){const recebidos=normalizar(valor).split(/[,;|]/).map(i=>i.trim()).filter(Boolean);document.querySelectorAll('input[name="'+nome+'"]').forEach(cb=>{const d=normalizar(cb.value);cb.checked=recebidos.some(i=>i.includes(d.slice(0,3))||d.includes(i.slice(0,3)))})}
     function selecionar(id,valor){const el=$(id);const alvo=normalizar(valor);const opcao=Array.from(el.options).find(o=>normalizar(o.value)===alvo);el.value=opcao?opcao.value:''}
-    function preencher(a){$('nome').value=a.nome||'';$('nascimento').value=a.nascimento||'';$('rg').value=a.rg||'';$('cpf').value=PortalAPI.formatarCpf(a.cpf||'');$('endereco').value=a.endereco||'';$('telefone').value=a.telefone||'';$('instituicao').value=a.instituicao||'';selecionar('embarque',a.embarque);selecionar('sobral',a.sobral);selecionar('novato',a.novato);selecionar('comorbidade',a.comorbidade);marcarDias('dias-manha',a.dias_manha);marcarDias('dias-noite',a.dias_noite);$('apenas-retorno').checked=normalizar(a.apenas_retorno)==='SIM'}
+    
+    // CORREÇÃO: Garante que o CPF da base de dados recupere o zero à esquerda antes de ser preenchido
+    function preencher(a){$('nome').value=a.nome||'';$('nascimento').value=a.nascimento||'';$('rg').value=a.rg||'';$('cpf').value=PortalAPI.formatarCpf(PortalAPI.normalizarCpf(a.cpf||''));$('endereco').value=a.endereco||'';$('telefone').value=a.telefone||'';$('instituicao').value=a.instituicao||'';selecionar('embarque',a.embarque);selecionar('sobral',a.sobral);selecionar('novato',a.novato);selecionar('comorbidade',a.comorbidade);marcarDias('dias-manha',a.dias_manha);marcarDias('dias-noite',a.dias_noite);$('apenas-retorno').checked=normalizar(a.apenas_retorno)==='SIM'}
     
     async function consultar() {
       const cpfPuro = PortalAPI.normalizarCpf($('cpf-consulta').value);
@@ -93,7 +95,6 @@
         feedback('feedback-acesso', 'CPF inválido. Verifique os números digitados.', 'error');
         return;
       }
-      // Mandamos o CPF formatado para a busca, caso o Google Sheets exija a máscara
       const cpfFormatado = PortalAPI.formatarCpf(cpfPuro);
       
       const botao = $('consultar');
@@ -141,7 +142,7 @@
         nome: $('nome').value,
         nascimento: $('nascimento').value,
         rg: $('rg').value,
-        cpf: PortalAPI.formatarCpf(cpfPuro), // Garantimos o envio formatado XXX.XXX.XXX-XX
+        cpf: PortalAPI.formatarCpf(cpfPuro), 
         endereco: $('endereco').value,
         telefone: $('telefone').value,
         instituicao: $('instituicao').value,
