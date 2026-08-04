@@ -23,11 +23,12 @@
 <body>
   <header><img src="Logo prefeitura.png" alt="Governo Municipal de Graca"></header>
   <main>
+    <!-- Tela Inicial: Consulta -->
     <section id="acesso" class="card">
       <div class="card-header"><h1>Atualizacao cadastral</h1><p>Transporte universitario</p></div>
       <div class="card-body">
         <p>Informe o CPF para localizar seu cadastro.</p>
-        <div class="aviso">Depois do envio, os dados ficarao como <strong>Em analise</strong> no painel da Secretaria.</div>
+        <div class="aviso">Ao consultar, o sistema verificará se você já possui uma atualização registrada.</div>
         <div class="field"><label for="cpf-consulta">CPF</label><input id="cpf-consulta" type="text" inputmode="numeric" maxlength="14" autocomplete="off" placeholder="000.000.000-00"></div>
         <button id="consultar" type="button">Consultar cadastro</button>
         <div id="feedback-acesso" class="feedback" aria-live="polite"></div>
@@ -35,6 +36,23 @@
       </div>
     </section>
 
+    <!-- Tela de Status: Caso já tenha cadastrado/atualizado -->
+    <section id="tela-status" class="card hidden">
+      <div class="card-header"><h1>Situacao do Cadastro</h1></div>
+      <div class="card-body" style="text-align:center">
+        <p>Olá, <strong id="status-nome"></strong>!</p>
+        <p>Sua atualização cadastral já foi recebida. No momento, o status do seu cadastro é:</p>
+        
+        <div id="badge-status" style="display:inline-block; padding:12px 28px; border-radius:30px; font-weight:800; font-size:1.15rem; margin:20px 0; text-transform:uppercase; border: 1px solid transparent;">
+          <!-- O status (Aprovado, Pendente...) será injetado aqui -->
+        </div>
+        
+        <p class="help">Para alterar alguma informação enviada, entre em contato diretamente com a Secretaria.</p>
+        <button type="button" onclick="location.reload()" style="margin-top:20px; background:var(--dark);">Fazer nova consulta</button>
+      </div>
+    </section>
+
+    <!-- Tela do Formulário: Caso precise atualizar -->
     <section id="formulario" class="card hidden">
       <div class="card-header"><h1>Confira e atualize seus dados</h1></div>
       <div class="card-body">
@@ -67,22 +85,28 @@
       </div>
     </section>
 
+    <!-- Tela Final de Sucesso -->
     <section id="sucesso" class="card hidden"><div class="card-header"><h1>Atualizacao recebida</h1></div><div class="card-body" style="text-align:center"><p>Seus dados foram enviados e ja aparecem como <strong>Em analise</strong> para a Secretaria.</p><button type="button" id="sair">Sair</button></div></section>
   </main>
+  
   <script src="config.js"></script>
   <script src="portal-api.js"></script>
   <script>
     'use strict';
-    const API_URL=window.APP_CONFIG&&window.APP_CONFIG.API_URL;let updateToken='';const $=(id)=>document.getElementById(id);const normalizar=(v)=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().trim();
+    const API_URL=window.APP_CONFIG&&window.APP_CONFIG.API_URL;
+    let updateToken='';
+    const $=(id)=>document.getElementById(id);
+    const normalizar=(v)=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().trim();
+    
     function conferirConfiguracao(){if(!API_URL||API_URL.includes('COLE_AQUI'))throw new Error('Configure a URL da implantacao no arquivo config.js.');}
     async function api(payload){conferirConfiguracao();if(!window.PortalAPI)throw new Error('O modulo de comunicacao nao foi carregado.');return PortalAPI.requisicao(payload,{tempoLimite:90000})}
     
-    function feedback(id,m,t){const el=$(id);el.textContent=m||'';el.className='feedback'+(t?' '+t:'')}function carregando(b,a,n,c){b.disabled=a;b.innerHTML=a?'<span class="spinner" aria-hidden="true"></span>'+c:n}
+    function feedback(id,m,t){const el=$(id);el.textContent=m||'';el.className='feedback'+(t?' '+t:'')}
+    function carregando(b,a,n,c){b.disabled=a;b.innerHTML=a?'<span class="spinner" aria-hidden="true"></span>'+c:n}
     function marcados(nome){return Array.from(document.querySelectorAll('input[name="'+nome+'"]:checked')).map(i=>i.value)}
     function marcarDias(nome,valor){const recebidos=normalizar(valor).split(/[,;|]/).map(i=>i.trim()).filter(Boolean);document.querySelectorAll('input[name="'+nome+'"]').forEach(cb=>{const d=normalizar(cb.value);cb.checked=recebidos.some(i=>i.includes(d.slice(0,3))||d.includes(i.slice(0,3)))})}
     function selecionar(id,valor){const el=$(id);const alvo=normalizar(valor);const opcao=Array.from(el.options).find(o=>normalizar(o.value)===alvo);el.value=opcao?opcao.value:''}
     
-    // CORREÇÃO: Garante que o CPF da base de dados recupere o zero à esquerda antes de ser preenchido
     function preencher(a){$('nome').value=a.nome||'';$('nascimento').value=a.nascimento||'';$('rg').value=a.rg||'';$('cpf').value=PortalAPI.formatarCpf(PortalAPI.normalizarCpf(a.cpf||''));$('endereco').value=a.endereco||'';$('telefone').value=a.telefone||'';$('instituicao').value=a.instituicao||'';selecionar('embarque',a.embarque);selecionar('sobral',a.sobral);selecionar('novato',a.novato);selecionar('comorbidade',a.comorbidade);marcarDias('dias-manha',a.dias_manha);marcarDias('dias-noite',a.dias_noite);$('apenas-retorno').checked=normalizar(a.apenas_retorno)==='SIM'}
     
     async function consultar() {
@@ -102,11 +126,43 @@
       feedback('feedback-acesso', 'Localizando cadastro...', '');
       try {
         const dados = await api({ acao: 'iniciar_atualizacao', cpf: cpfFormatado });
-        updateToken = dados.update_token;
-        preencher(dados.aluno);
+        
         $('acesso').classList.add('hidden');
-        $('formulario').classList.remove('hidden');
-        $('nome').focus();
+        
+        // NOVA LOGICA: Se ja enviou, exibe a tela de status do aluno
+        if (dados.ja_enviado) {
+          $('tela-status').classList.remove('hidden');
+          $('status-nome').textContent = dados.aluno.nome || 'Passageiro';
+          
+          const statusOficial = dados.aluno.status || 'Em Analise';
+          const badge = $('badge-status');
+          badge.textContent = statusOficial;
+          
+          // Estilização condicional do status
+          const s = normalizar(statusOficial);
+          if (s === 'APROVADO' || s === 'PRIORIDADE') {
+            badge.style.background = '#d4edda';
+            badge.style.color = '#155724';
+            badge.style.borderColor = '#c3e6cb';
+          } else if (s === 'REPROVADO') {
+            badge.style.background = '#f8d7da';
+            badge.style.color = '#721c24';
+            badge.style.borderColor = '#f5c6cb';
+          } else {
+            // Em Analise / Pendente
+            badge.style.background = '#fff3cd';
+            badge.style.color = '#856404';
+            badge.style.borderColor = '#ffeeba';
+          }
+        } 
+        // Se NÃO enviou (liberado para preencher), mostra o formulário
+        else {
+          updateToken = dados.update_token;
+          preencher(dados.aluno);
+          $('formulario').classList.remove('hidden');
+          $('nome').focus();
+        }
+        
       } catch (erro) {
         feedback('feedback-acesso', erro.name === 'AbortError' ? 'O servidor demorou para responder.' : erro.message, 'error');
       } finally {
@@ -154,22 +210,27 @@
         dias_noite: noite,
         apenas_retorno: $('apenas-retorno').checked
       };
+      
       const botao = $('enviar');
       carregando(botao, true, 'Enviar para analise', 'Enviando...');
       feedback('feedback-envio', '', '');
+      
       try {
         await api(envio);
         mostrarSucesso();
       } catch (erro) {
+        // Redundância de segurança para verificar se houve timeout durante o envio
         if (erro.name === 'AbortError' || erro.codigo === 'RESPOSTA_NAO_JSON') {
           feedback('feedback-envio', 'Confirmando o recebimento dos dados...', '');
           try {
-            await api({ acao: 'iniciar_atualizacao', cpf: envio.cpf });
-          } catch (confirmacao) {
-            if (confirmacao.codigo === 'ATUALIZACAO_JA_ENVIADA') {
+            const confirmacao = await api({ acao: 'iniciar_atualizacao', cpf: envio.cpf });
+            if (confirmacao.ja_enviado) {
               mostrarSucesso();
               return;
             }
+            feedback('feedback-envio', 'Nao foi possivel confirmar o envio. Recarregue e consulte o CPF antes de tentar novamente.', 'error');
+            return;
+          } catch (erroSecundario) {
             feedback('feedback-envio', 'Nao foi possivel confirmar o envio. Recarregue e consulte o CPF antes de tentar novamente.', 'error');
             return;
           }
@@ -180,7 +241,13 @@
       }
     }
 
-    $('cpf-consulta').addEventListener('input',e=>e.target.value=PortalAPI.formatarCpf(e.target.value));$('cpf').addEventListener('input',e=>e.target.value=PortalAPI.formatarCpf(e.target.value));$('cpf-consulta').addEventListener('keydown',e=>{if(e.key==='Enter')consultar()});$('consultar').addEventListener('click',consultar);$('form-atualizacao').addEventListener('submit',enviar);$('cancelar').addEventListener('click',()=>location.reload());$('sair').addEventListener('click',()=>location.href='index.html');
+    $('cpf-consulta').addEventListener('input',e=>e.target.value=PortalAPI.formatarCpf(e.target.value));
+    $('cpf').addEventListener('input',e=>e.target.value=PortalAPI.formatarCpf(e.target.value));
+    $('cpf-consulta').addEventListener('keydown',e=>{if(e.key==='Enter')consultar()});
+    $('consultar').addEventListener('click',consultar);
+    $('form-atualizacao').addEventListener('submit',enviar);
+    $('cancelar').addEventListener('click',()=>location.reload());
+    $('sair').addEventListener('click',()=>location.href='index.html');
   </script>
 </body>
 </html>
