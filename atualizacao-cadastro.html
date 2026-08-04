@@ -77,10 +77,6 @@
     function conferirConfiguracao(){if(!API_URL||API_URL.includes('COLE_AQUI'))throw new Error('Configure a URL da implantacao no arquivo config.js.');}
     async function api(payload){conferirConfiguracao();if(!window.PortalAPI)throw new Error('O modulo de comunicacao nao foi carregado.');return PortalAPI.requisicao(payload,{tempoLimite:90000})}
     
-    // Substituindo utilitários locais pelos do PortalAPI para não duplicar regras
-    function formatarCpf(v) { return PortalAPI.formatarCpf(v); }
-    function somenteDigitos(v) { return PortalAPI.somenteDigitos(v); }
-
     function feedback(id,m,t){const el=$(id);el.textContent=m||'';el.className='feedback'+(t?' '+t:'')}function carregando(b,a,n,c){b.disabled=a;b.innerHTML=a?'<span class="spinner" aria-hidden="true"></span>'+c:n}
     function marcados(nome){return Array.from(document.querySelectorAll('input[name="'+nome+'"]:checked')).map(i=>i.value)}
     function marcarDias(nome,valor){const recebidos=normalizar(valor).split(/[,;|]/).map(i=>i.trim()).filter(Boolean);document.querySelectorAll('input[name="'+nome+'"]').forEach(cb=>{const d=normalizar(cb.value);cb.checked=recebidos.some(i=>i.includes(d.slice(0,3))||d.includes(i.slice(0,3)))})}
@@ -88,20 +84,23 @@
     function preencher(a){$('nome').value=a.nome||'';$('nascimento').value=a.nascimento||'';$('rg').value=a.rg||'';$('cpf').value=PortalAPI.formatarCpf(a.cpf||'');$('endereco').value=a.endereco||'';$('telefone').value=a.telefone||'';$('instituicao').value=a.instituicao||'';selecionar('embarque',a.embarque);selecionar('sobral',a.sobral);selecionar('novato',a.novato);selecionar('comorbidade',a.comorbidade);marcarDias('dias-manha',a.dias_manha);marcarDias('dias-noite',a.dias_noite);$('apenas-retorno').checked=normalizar(a.apenas_retorno)==='SIM'}
     
     async function consultar() {
-      const cpf = PortalAPI.normalizarCpf($('cpf-consulta').value);
-      if (cpf.length !== 11) {
+      const cpfPuro = PortalAPI.normalizarCpf($('cpf-consulta').value);
+      if (cpfPuro.length !== 11) {
         feedback('feedback-acesso', 'Informe o CPF completo.', 'error');
         return;
       }
-      if (!PortalAPI.validarCpf(cpf)) {
+      if (!PortalAPI.validarCpf(cpfPuro)) {
         feedback('feedback-acesso', 'CPF inválido. Verifique os números digitados.', 'error');
         return;
       }
+      // Mandamos o CPF formatado para a busca, caso o Google Sheets exija a máscara
+      const cpfFormatado = PortalAPI.formatarCpf(cpfPuro);
+      
       const botao = $('consultar');
       carregando(botao, true, 'Consultar cadastro', 'Consultando...');
       feedback('feedback-acesso', 'Localizando cadastro...', '');
       try {
-        const dados = await api({ acao: 'iniciar_atualizacao', cpf });
+        const dados = await api({ acao: 'iniciar_atualizacao', cpf: cpfFormatado });
         updateToken = dados.update_token;
         preencher(dados.aluno);
         $('acesso').classList.add('hidden');
@@ -122,8 +121,8 @@
         feedback('feedback-envio', 'A sessao expirou. Consulte novamente.', 'error');
         return;
       }
-      const cpfLimpo = PortalAPI.normalizarCpf($('cpf').value);
-      if (cpfLimpo.length !== 11 || !PortalAPI.validarCpf(cpfLimpo)) {
+      const cpfPuro = PortalAPI.normalizarCpf($('cpf').value);
+      if (cpfPuro.length !== 11 || !PortalAPI.validarCpf(cpfPuro)) {
         feedback('feedback-envio', 'Informe um CPF válido com 11 dígitos.', 'error');
         return;
       }
@@ -142,7 +141,7 @@
         nome: $('nome').value,
         nascimento: $('nascimento').value,
         rg: $('rg').value,
-        cpf: cpfLimpo, // Enviado formatado para 11 dígitos puros
+        cpf: PortalAPI.formatarCpf(cpfPuro), // Garantimos o envio formatado XXX.XXX.XXX-XX
         endereco: $('endereco').value,
         telefone: $('telefone').value,
         instituicao: $('instituicao').value,
@@ -164,7 +163,7 @@
         if (erro.name === 'AbortError' || erro.codigo === 'RESPOSTA_NAO_JSON') {
           feedback('feedback-envio', 'Confirmando o recebimento dos dados...', '');
           try {
-            await api({ acao: 'iniciar_atualizacao', cpf: cpfLimpo });
+            await api({ acao: 'iniciar_atualizacao', cpf: envio.cpf });
           } catch (confirmacao) {
             if (confirmacao.codigo === 'ATUALIZACAO_JA_ENVIADA') {
               mostrarSucesso();

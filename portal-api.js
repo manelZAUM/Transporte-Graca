@@ -42,6 +42,7 @@
 
   function formatarCpf(valor) {
     const d = normalizarCpf(valor);
+    if (d.length !== 11) return '';
     return d.slice(0, 11)
       .replace(/(\d{3})(\d)/, '$1.$2')
       .replace(/(\d{3})(\d)/, '$1.$2')
