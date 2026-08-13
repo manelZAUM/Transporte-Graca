@@ -95,6 +95,7 @@
     'use strict';
     const API_URL=window.APP_CONFIG&&window.APP_CONFIG.API_URL;
     let updateToken='';
+    let cpfConsultado='';
     const $=(id)=>document.getElementById(id);
     const normalizar=(v)=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().trim();
     
@@ -115,10 +116,6 @@
         feedback('feedback-acesso', 'Informe o CPF completo.', 'error');
         return;
       }
-      if (!PortalAPI.validarCpf(cpfPuro)) {
-        feedback('feedback-acesso', 'CPF inválido. Verifique os números digitados.', 'error');
-        return;
-      }
       const cpfFormatado = PortalAPI.formatarCpf(cpfPuro);
       
       const botao = $('consultar');
@@ -126,6 +123,7 @@
       feedback('feedback-acesso', 'Localizando cadastro...', '');
       try {
         const dados = await api({ acao: 'iniciar_atualizacao', cpf: cpfFormatado });
+        cpfConsultado = cpfPuro;
         
         $('acesso').classList.add('hidden');
         
@@ -179,8 +177,12 @@
         return;
       }
       const cpfPuro = PortalAPI.normalizarCpf($('cpf').value);
-      if (cpfPuro.length !== 11 || !PortalAPI.validarCpf(cpfPuro)) {
-        feedback('feedback-envio', 'Informe um CPF válido com 11 dígitos.', 'error');
+      if (cpfPuro.length !== 11) {
+        feedback('feedback-envio', 'Informe o CPF completo com 11 dígitos.', 'error');
+        return;
+      }
+      if (cpfPuro !== cpfConsultado && !PortalAPI.validarCpf(cpfPuro)) {
+        feedback('feedback-envio', 'O novo CPF informado não é válido. Confira os números digitados.', 'error');
         return;
       }
       const manha = marcados('dias-manha'), noite = marcados('dias-noite');
