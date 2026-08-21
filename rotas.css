@@ -122,6 +122,11 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .dashboard-header h1 { margin: 4px 0 6px; font-size: clamp(1.5rem, 3vw, 2.15rem); }
 .dashboard-header p { margin: 0; opacity: .9; }
 .ghost-button { padding: 10px 15px; color: #fff; background: rgba(255,255,255,.13); border: 1px solid rgba(255,255,255,.45); border-radius: 9px; font-weight: 800; cursor: pointer; }
+.transport-notice { margin: 20px 26px 0; padding: 17px 19px; color: #5f4300; background: #fff7d6; border: 1px solid #efd37a; border-left: 5px solid #d99b00; border-radius: 13px; }
+.transport-notice h2 { margin: 0; font-size: 1rem; }
+.transport-notice p { margin: 6px 0 10px; line-height: 1.45; }
+.transport-notice ul { display: grid; gap: 6px; margin: 0; padding-left: 21px; }
+.transport-notice li { font-weight: 750; line-height: 1.4; }
 .dashboard-body { padding: 26px; }
 
 .kpi-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 14px; margin-bottom: 22px; }
@@ -200,6 +205,7 @@ tbody tr:last-child td { border-bottom: 0; }
   .site-header { align-items: flex-start; }
   .brand span { display: none; }
   .dashboard-header { padding: 22px; }
+  .transport-notice { margin: 16px 20px 0; }
   .dashboard-body, .login-body { padding: 20px; }
   .kpi-grid { grid-template-columns: 1fr 1fr; gap: 9px; }
   .kpi { padding: 14px; }

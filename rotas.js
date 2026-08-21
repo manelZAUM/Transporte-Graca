@@ -58,6 +58,34 @@ function mostrarMensagem(texto, tipo = 'info') {
   box.className = `message show ${tipo}`;
 }
 
+function nomeDoVeiculo(onibus) {
+  const rota = PortalAPI.normalizar(onibus);
+  if (rota === 'MICRO') return 'Micro-onibus';
+  if (rota === 'AMARELO') return 'Onibus amarelo';
+  if (rota === 'AZUL') return 'Onibus azul';
+  return onibus || 'Veiculo nao informado';
+}
+
+function renderizarAvisoTransportes(agenda) {
+  const anterior = $('aviso-transportes');
+  if (anterior) anterior.remove();
+  if (!agenda || !agenda.multiplos || !Array.isArray(agenda.itens)) return;
+
+  const aviso = document.createElement('section'); aviso.id = 'aviso-transportes'; aviso.className = 'transport-notice';
+  const titulo = document.createElement('h2'); titulo.textContent = 'Atencao: voce utiliza mais de um veiculo';
+  const explicacao = document.createElement('p'); explicacao.textContent = 'Confira em qual transporte voce esta cadastrado em cada dia e turno:';
+  const lista = document.createElement('ul');
+  agenda.itens.forEach((item) => {
+    const li = document.createElement('li');
+    const periodo = item.turno === 'MANHA' ? 'pela manha' : 'a noite';
+    const retorno = item.sentido === 'RETORNO' ? ' — apenas retorno' : '';
+    li.textContent = `${item.dia}-feira ${periodo}: ${nomeDoVeiculo(item.onibus)}${retorno}`;
+    lista.appendChild(li);
+  });
+  aviso.append(titulo, explicacao, lista);
+  document.querySelector('.dashboard-header').after(aviso);
+}
+
 function criarIcone(destino) {
   return L.divIcon({
     className: 'leaflet-div-icon',
@@ -264,6 +292,7 @@ async function verificarAcesso() {
     const dadosPassageiro = resposta.dados || resposta.aluno || {};
     $('nomeAlunoLogado').textContent = String(dadosPassageiro.nome || resposta.nome || 'Passageiro cadastrado').trim();
     $('login-section').classList.add('hidden'); $('main-section').classList.remove('hidden');
+    renderizarAvisoTransportes(resposta.agenda_transportes);
     sincronizarFiltros();
     carregarMapa(); atualizarPainel();
     setTimeout(() => mapa && mapa.invalidateSize(), 100);

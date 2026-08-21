@@ -47,7 +47,7 @@ function abrirModal(index=-1){
   if(index>=0){
     const a=listaAlunosGlobais[index];
     elemento('modal-titulo').textContent=normalizar(a.status)==='em analise'?'Revisar atualizacao':'Editar aluno';
-    elemento('aluno-id').value=a.cpf||'';
+    elemento('aluno-id').value=PortalAPI.normalizarCpf(a.cpf||'');
     elemento('aluno-nome').value=a.nome||'';
     elemento('aluno-nascimento').value=a.nascimento||'';
     elemento('aluno-rg').value=a.rg||'';
@@ -85,7 +85,8 @@ async function salvarAluno(evento) {
   const cpfAntigo = elemento('aluno-id').value;
   const cpfPuro = PortalAPI.normalizarCpf(elemento('aluno-cpf').value);
   
-  if (cpfPuro.length !== 11 || !PortalAPI.validarCpf(cpfPuro)) {
+  const cpfOriginal = PortalAPI.normalizarCpf(cpfAntigo);
+  if (cpfPuro.length !== 11 || (cpfPuro !== cpfOriginal && !PortalAPI.validarCpf(cpfPuro))) {
     alert('Informe um CPF válido com 11 dígitos.');
     return;
   }
