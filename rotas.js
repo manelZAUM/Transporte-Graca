@@ -41,7 +41,7 @@ const DESTINOS = {
 
 const $ = (id) => document.getElementById(id);
 const positivo = (valor) => ['SIM', 'S', 'TRUE', '1'].includes(PortalAPI.normalizar(valor));
-const rotaNoTurno = (aluno, turno) => PortalAPI.normalizar(turno === 'MANHA' ? aluno.onibus_manha : aluno.onibus_noite) || PortalAPI.normalizar(aluno.onibus);
+const rotaNoTurno = (aluno, turno) => { const campo = turno === 'MANHA' ? 'onibus_manha' : 'onibus_noite'; return Object.prototype.hasOwnProperty.call(aluno, campo) ? PortalAPI.normalizar(aluno[campo]) : PortalAPI.normalizar(aluno.onibus); };
 
 function periodoDisponivel(turno, dia) {
   return ROTA !== 'MICRO' || turno === 'NOITE' || dia === 'Segunda';
@@ -102,6 +102,7 @@ function recarregarMapa() {
 }
 
 function alunoNoFiltro(aluno, turno, dia) {
+  if (ROTA === 'MICRO' && turno === 'MANHA' && dia === 'Segunda' && positivo(aluno.micro_segunda_manha)) return true;
   return periodoDisponivel(turno, dia) && rotaNoTurno(aluno, turno) === ROTA && PortalAPI.diasDoAluno(aluno, turno).includes(dia);
 }
 

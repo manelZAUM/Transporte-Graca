@@ -16,8 +16,9 @@ let observadorMapa;
 const $ = (id) => document.getElementById(id);
 const statusNormalizado = (aluno) => PortalAPI.normalizar(aluno.status || 'Pendente');
 const demandaAtiva = (aluno) => statusNormalizado(aluno) === 'APROVADO';
-const rotaNoTurno = (aluno, turno) => PortalAPI.normalizar(turno === 'MANHA' ? aluno.onibus_manha : aluno.onibus_noite) || PortalAPI.normalizar(aluno.onibus);
-const rotasDoAluno = (aluno) => [...new Set([rotaNoTurno(aluno, 'MANHA'), rotaNoTurno(aluno, 'NOITE')].filter(Boolean))];
+const rotaNoTurno = (aluno, turno) => { const campo = turno === 'MANHA' ? 'onibus_manha' : 'onibus_noite'; return Object.prototype.hasOwnProperty.call(aluno, campo) ? PortalAPI.normalizar(aluno[campo]) : PortalAPI.normalizar(aluno.onibus); };
+const usaMicroSegunda = (aluno) => ['SIM', 'S', 'TRUE', '1'].includes(PortalAPI.normalizar(aluno.micro_segunda_manha));
+const rotasDoAluno = (aluno) => [...new Set([...(usaMicroSegunda(aluno) ? ['MICRO'] : []), rotaNoTurno(aluno, 'MANHA'), rotaNoTurno(aluno, 'NOITE')].filter(Boolean))];
 
 function mostrarMensagem(texto, tipo = 'info') {
   const box = $('msgBox');
@@ -56,7 +57,10 @@ function matrizDaRota(rota) {
   const passageiros = cadastros.filter((aluno) => demandaAtiva(aluno) && rotasDoAluno(aluno).includes(rota));
   const matriz = { MANHA: {}, NOITE: {} };
   ['MANHA', 'NOITE'].forEach((turno) => DIAS_CONSULTA.forEach((dia) => {
-    matriz[turno][dia] = passageiros.filter((aluno) => rotaNoTurno(aluno, turno) === rota && PortalAPI.diasDoAluno(aluno, turno).includes(dia)).length;
+    matriz[turno][dia] = passageiros.filter((aluno) => {
+      const microEspecial = rota === 'MICRO' && turno === 'MANHA' && dia === 'Segunda' && usaMicroSegunda(aluno);
+      return microEspecial || (rotaNoTurno(aluno, turno) === rota && PortalAPI.diasDoAluno(aluno, turno).includes(dia));
+    }).length;
   }));
   return { passageiros, matriz };
 }
@@ -157,7 +161,8 @@ function renderizarTabela() {
     });
     const rotaTd = document.createElement('td'); const rota = document.createElement('span'); rota.className = 'route-chip';
     const manha = rotaNoTurno(aluno, 'MANHA'), noite = rotaNoTurno(aluno, 'NOITE');
-    const nomeRota = manha && noite && manha !== noite ? `MANHÃ: ${manha} · NOITE: ${noite}` : (manha || noite || 'NÃO INFORMADO'); const coresRotas = { AMARELO: '#e0a800', AZUL: '#1565c0', MICRO: '#0f8b78' }; rota.style.setProperty('--chip', manha === noite || !manha || !noite ? (coresRotas[manha || noite] || '#68737d') : '#68737d'); rota.textContent = nomeRota; rotaTd.appendChild(rota);
+    const partesRotas = []; if (usaMicroSegunda(aluno)) partesRotas.push('SEG MANHÃ: MICRO'); if (manha) partesRotas.push(`MANHÃ: ${manha}`); if (noite) partesRotas.push(`NOITE: ${noite}`);
+    const nomeRota = partesRotas.join(' · ') || 'NÃO INFORMADO'; const coresRotas = { AMARELO: '#e0a800', AZUL: '#1565c0', MICRO: '#0f8b78' }; const rotasUnicas = rotasDoAluno(aluno); rota.style.setProperty('--chip', rotasUnicas.length === 1 ? (coresRotas[rotasUnicas[0]] || '#68737d') : '#68737d'); rota.textContent = nomeRota; rotaTd.appendChild(rota);
     const turnoTd = document.createElement('td'); turnoTd.textContent = aluno.turno || 'Não informado';
     const statusTd = document.createElement('td'); const badge = document.createElement('span'); badge.className = `status ${classeStatus(aluno.status)}`; badge.textContent = aluno.status || 'Pendente'; statusTd.appendChild(badge);
     tr.append(rotaTd, turnoTd, statusTd); tbody.appendChild(tr);

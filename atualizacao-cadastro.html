@@ -72,9 +72,10 @@
             <div class="field wide"><label for="comorbidade">Possui comorbidade?</label><select id="comorbidade" required><option value="">Selecione...</option><option value="Sim">Sim</option><option value="Nao">Nao</option></select></div>
           </div>
 
-          <fieldset><legend>Dias no turno da manha</legend><div class="checks">
+          <fieldset><legend>Micro-onibus — segunda pela manha</legend><div class="checks"><label><input id="micro-segunda-manha" type="checkbox">Vou no micro-onibus na ida de segunda-feira pela manha</label></div><p class="help">Esta opcao e independente do veiculo usado nos outros dias e no retorno.</p></fieldset>
+          <fieldset><legend>Outros dias no turno da manha</legend><div class="checks">
             <label><input type="checkbox" name="dias-manha" value="Segunda">Seg</label><label><input type="checkbox" name="dias-manha" value="Terca">Ter</label><label><input type="checkbox" name="dias-manha" value="Quarta">Qua</label><label><input type="checkbox" name="dias-manha" value="Quinta">Qui</label><label><input type="checkbox" name="dias-manha" value="Sexta">Sex</label>
-          </div><div class="rota-turno"><label for="onibus-manha">Veiculo usado pela manha</label><select id="onibus-manha"><option value="">Selecione...</option><option>AMARELO</option><option>AZUL</option><option>MICRO</option></select></div></fieldset>
+          </div><div class="rota-turno"><label for="onibus-manha">Veiculo usado nos outros dias da manha</label><select id="onibus-manha"><option value="">Selecione...</option><option>AMARELO</option><option>AZUL</option></select></div></fieldset>
           <fieldset><legend>Dias no turno da noite</legend><div class="checks">
             <label><input type="checkbox" name="dias-noite" value="Segunda">Seg</label><label><input type="checkbox" name="dias-noite" value="Terca">Ter</label><label><input type="checkbox" name="dias-noite" value="Quarta">Qua</label><label><input type="checkbox" name="dias-noite" value="Quinta">Qui</label><label><input type="checkbox" name="dias-noite" value="Sexta">Sex</label>
           </div><div class="rota-turno"><label for="onibus-noite">Veiculo usado pela noite</label><select id="onibus-noite"><option value="">Selecione...</option><option>AMARELO</option><option>AZUL</option><option>MICRO</option></select></div><div class="checks" style="margin-top:15px;padding-top:12px;border-top:1px dashed #bbb"><label><input id="apenas-retorno" type="checkbox">Apenas retorno no onibus da noite</label></div></fieldset>
@@ -131,8 +132,10 @@
     function marcarDias(nome,valor){const recebidos=normalizar(valor).split(/[,;|]/).map(i=>i.trim()).filter(Boolean);document.querySelectorAll('input[name="'+nome+'"]').forEach(cb=>{const d=normalizar(cb.value);cb.checked=recebidos.some(i=>i.includes(d.slice(0,3))||d.includes(i.slice(0,3)))})}
     function selecionar(id,valor){const el=$(id);const alvo=normalizar(valor);const opcao=Array.from(el.options).find(o=>normalizar(o.value)===alvo);el.value=opcao?opcao.value:''}
     function sincronizarVeiculosTurno(){['manha','noite'].forEach(turno=>{const temDias=marcados('dias-'+turno).length>0,select=$('onibus-'+turno);select.disabled=!temDias;select.required=temDias;if(!temDias)select.value=''})}
+    function valorSim(valor){return valor===true||['SIM','S','TRUE','1'].includes(normalizar(valor))}
+    function ajustarMicroSegunda(origem){const micro=$('micro-segunda-manha'),segunda=document.querySelector('input[name="dias-manha"][value="Segunda"]');if(origem==='micro'&&micro.checked)segunda.checked=false;if(origem==='dias'&&segunda.checked)micro.checked=false;sincronizarVeiculosTurno()}
     
-    function preencher(a){$('nome').value=a.nome||'';$('nascimento').value=a.nascimento||'';$('rg').value=a.rg||'';$('cpf').value=PortalAPI.formatarCpf(PortalAPI.normalizarCpf(a.cpf||''));$('endereco').value=a.endereco||'';$('telefone').value=a.telefone||'';$('instituicao').value=a.instituicao||'';selecionar('embarque',a.embarque);selecionar('sobral',a.sobral);selecionar('novato',a.novato);selecionar('comorbidade',a.comorbidade);marcarDias('dias-manha',a.dias_manha);marcarDias('dias-noite',a.dias_noite);selecionar('onibus-manha',a.onibus_manha||(a.dias_manha?a.onibus:''));selecionar('onibus-noite',a.onibus_noite||(a.dias_noite?a.onibus:''));$('apenas-retorno').checked=normalizar(a.apenas_retorno)==='SIM';sincronizarVeiculosTurno()}
+    function preencher(a){$('nome').value=a.nome||'';$('nascimento').value=a.nascimento||'';$('rg').value=a.rg||'';$('cpf').value=PortalAPI.formatarCpf(PortalAPI.normalizarCpf(a.cpf||''));$('endereco').value=a.endereco||'';$('telefone').value=a.telefone||'';$('instituicao').value=a.instituicao||'';selecionar('embarque',a.embarque);selecionar('sobral',a.sobral);selecionar('novato',a.novato);selecionar('comorbidade',a.comorbidade);marcarDias('dias-manha',a.dias_manha);marcarDias('dias-noite',a.dias_noite);const microLegado=normalizar(a.onibus_manha)==='MICRO'&&normalizar(a.dias_manha).includes('SEG');$('micro-segunda-manha').checked=valorSim(a.micro_segunda_manha)||microLegado;if(microLegado){const segunda=document.querySelector('input[name="dias-manha"][value="Segunda"]');if(segunda)segunda.checked=false}selecionar('onibus-manha',normalizar(a.onibus_manha)==='MICRO'?'':(a.onibus_manha||(a.dias_manha?a.onibus:'')));selecionar('onibus-noite',a.onibus_noite||(a.dias_noite?a.onibus:''));$('apenas-retorno').checked=normalizar(a.apenas_retorno)==='SIM';sincronizarVeiculosTurno()}
     
     async function consultar() {
       const cpfPuro = PortalAPI.somenteDigitos($('cpf-consulta').value);
@@ -206,7 +209,8 @@
         return;
       }
       const manha = marcados('dias-manha'), noite = marcados('dias-noite');
-      if (!manha.length && !noite.length) {
+      const microSegundaManha = $('micro-segunda-manha').checked;
+      if (!manha.length && !noite.length && !microSegundaManha) {
         feedback('feedback-envio', 'Selecione pelo menos um dia de viagem.', 'error');
         return;
       }
@@ -255,7 +259,8 @@
         dias_noite: noite,
         onibus_manha: $('onibus-manha').value,
         onibus_noite: $('onibus-noite').value,
-        onibus: $('onibus-noite').value || $('onibus-manha').value,
+        micro_segunda_manha: microSegundaManha,
+        onibus: $('onibus-noite').value || $('onibus-manha').value || (microSegundaManha ? 'MICRO' : ''),
         apenas_retorno: $('apenas-retorno').checked
       };
       
@@ -315,7 +320,9 @@
     $('cpf').addEventListener('input',e=>e.target.value=PortalAPI.formatarCpf(e.target.value));
     $('cpf-consulta').addEventListener('keydown',e=>{if(e.key==='Enter')consultar()});
     $('consultar').addEventListener('click',consultar);
-    document.querySelectorAll('input[name="dias-manha"],input[name="dias-noite"]').forEach(cb=>cb.addEventListener('change',sincronizarVeiculosTurno));
+    document.querySelectorAll('input[name="dias-manha"]').forEach(cb=>cb.addEventListener('change',()=>ajustarMicroSegunda('dias')));
+    document.querySelectorAll('input[name="dias-noite"]').forEach(cb=>cb.addEventListener('change',sincronizarVeiculosTurno));
+    $('micro-segunda-manha').addEventListener('change',()=>ajustarMicroSegunda('micro'));
     sincronizarVeiculosTurno();
     $('form-atualizacao').addEventListener('submit',enviar);
     $('cancelar').addEventListener('click',()=>location.reload());
