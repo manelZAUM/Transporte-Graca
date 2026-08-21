@@ -16,6 +16,8 @@ let observadorMapa;
 const $ = (id) => document.getElementById(id);
 const statusNormalizado = (aluno) => PortalAPI.normalizar(aluno.status || 'Pendente');
 const demandaAtiva = (aluno) => statusNormalizado(aluno) === 'APROVADO';
+const rotaNoTurno = (aluno, turno) => PortalAPI.normalizar(turno === 'MANHA' ? aluno.onibus_manha : aluno.onibus_noite) || PortalAPI.normalizar(aluno.onibus);
+const rotasDoAluno = (aluno) => [...new Set([rotaNoTurno(aluno, 'MANHA'), rotaNoTurno(aluno, 'NOITE')].filter(Boolean))];
 
 function mostrarMensagem(texto, tipo = 'info') {
   const box = $('msgBox');
@@ -51,10 +53,10 @@ function renderizarBarras(id, itens) {
 }
 
 function matrizDaRota(rota) {
-  const passageiros = cadastros.filter((aluno) => demandaAtiva(aluno) && PortalAPI.normalizar(aluno.onibus) === rota);
+  const passageiros = cadastros.filter((aluno) => demandaAtiva(aluno) && rotasDoAluno(aluno).includes(rota));
   const matriz = { MANHA: {}, NOITE: {} };
   ['MANHA', 'NOITE'].forEach((turno) => DIAS_CONSULTA.forEach((dia) => {
-    matriz[turno][dia] = passageiros.filter((aluno) => PortalAPI.diasDoAluno(aluno, turno).includes(dia)).length;
+    matriz[turno][dia] = passageiros.filter((aluno) => rotaNoTurno(aluno, turno) === rota && PortalAPI.diasDoAluno(aluno, turno).includes(dia)).length;
   }));
   return { passageiros, matriz };
 }
@@ -138,11 +140,11 @@ function renderizarTabela() {
   const turno = $('filtroTurno').value;
   const status = $('filtroStatus').value;
   const filtrados = cadastros.filter((aluno) => {
-    const correspondeBusca = !busca || PortalAPI.normalizar(aluno.instituicao).includes(busca);
+    const correspondeBusca = !busca || PortalAPI.normalizar(aluno.nome).includes(busca) || PortalAPI.normalizar(aluno.instituicao).includes(busca);
     return correspondeBusca && (!instituicao || aluno.instituicao === instituicao) &&
-      (!onibus || PortalAPI.normalizar(aluno.onibus) === onibus) && (!embarque || aluno.embarque === embarque) &&
+      (!onibus || rotasDoAluno(aluno).includes(onibus)) && (!embarque || aluno.embarque === embarque) &&
       (!turno || PortalAPI.normalizar(aluno.turno).includes(turno)) && (!status || aluno.status === status);
-  }).sort((a, b) => String(a.nome).localeCompare(String(b.nome), 'pt-BR'));
+  }).sort((a, b) => String(a.nome || '').localeCompare(String(b.nome || ''), 'pt-BR'));
   $('resultado-contagem').textContent = `${filtrados.length} resultado${filtrados.length === 1 ? '' : 's'}`;
   const tbody = $('lista-geral'); tbody.replaceChildren();
   if (!filtrados.length) {
@@ -150,11 +152,12 @@ function renderizarTabela() {
   }
   filtrados.forEach((aluno, indiceRegistro) => {
     const tr = document.createElement('tr');
-  [aluno.nome || 'Nome não informado', aluno.instituicao || 'Não informada', aluno.embarque || 'Não informado'].forEach((texto, indice) => {
+    [aluno.nome || `Aluno ${String(indiceRegistro + 1).padStart(3, '0')}`, aluno.instituicao || 'Não informada', aluno.embarque || 'Não informado'].forEach((texto, indice) => {
       const td = document.createElement('td'); td.textContent = texto; if (indice === 0) td.style.fontWeight = '750'; tr.appendChild(td);
     });
     const rotaTd = document.createElement('td'); const rota = document.createElement('span'); rota.className = 'route-chip';
-    const nomeRota = PortalAPI.normalizar(aluno.onibus) || 'NÃO INFORMADO'; const coresRotas = { AMARELO: '#e0a800', AZUL: '#1565c0', MICRO: '#0f8b78' }; rota.style.setProperty('--chip', coresRotas[nomeRota] || '#68737d'); rota.textContent = nomeRota; rotaTd.appendChild(rota);
+    const manha = rotaNoTurno(aluno, 'MANHA'), noite = rotaNoTurno(aluno, 'NOITE');
+    const nomeRota = manha && noite && manha !== noite ? `MANHÃ: ${manha} · NOITE: ${noite}` : (manha || noite || 'NÃO INFORMADO'); const coresRotas = { AMARELO: '#e0a800', AZUL: '#1565c0', MICRO: '#0f8b78' }; rota.style.setProperty('--chip', manha === noite || !manha || !noite ? (coresRotas[manha || noite] || '#68737d') : '#68737d'); rota.textContent = nomeRota; rotaTd.appendChild(rota);
     const turnoTd = document.createElement('td'); turnoTd.textContent = aluno.turno || 'Não informado';
     const statusTd = document.createElement('td'); const badge = document.createElement('span'); badge.className = `status ${classeStatus(aluno.status)}`; badge.textContent = aluno.status || 'Pendente'; statusTd.appendChild(badge);
     tr.append(rotaTd, turnoTd, statusTd); tbody.appendChild(tr);

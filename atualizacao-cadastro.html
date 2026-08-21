@@ -13,11 +13,11 @@
     .card-header{padding:24px;text-align:center;background:var(--yellow)}.card-header h1{margin:0;font-size:1.5rem}.card-body{padding:26px}.hidden{display:none!important}
     .grid{display:grid;grid-template-columns:1fr 1fr;gap:0 18px}.field{margin-bottom:18px}.wide{grid-column:1/-1}label,legend{display:block;margin-bottom:7px;font-weight:700;font-size:.92rem}
     input,select{width:100%;padding:13px;border:1px solid #cfd4d8;border-radius:8px;background:#fff;color:var(--dark);font:inherit}input:focus,select:focus,button:focus-visible{outline:3px solid rgba(0,86,179,.28);outline-offset:2px}
-    fieldset{margin:0 0 18px;padding:15px;border:1px solid #d9dee2;border-radius:10px}.checks{display:flex;flex-wrap:wrap;gap:12px}.checks label{display:flex;align-items:center;gap:5px;margin:0;font-weight:500}.checks input{width:auto}
+    fieldset{margin:0 0 18px;padding:15px;border:1px solid #d9dee2;border-radius:10px}.checks{display:flex;flex-wrap:wrap;gap:12px}.checks label{display:flex;align-items:center;gap:5px;margin:0;font-weight:500}.checks input{width:auto}.rota-turno{display:grid;grid-template-columns:minmax(210px,1fr) 1fr;align-items:end;gap:16px;margin-top:15px;padding-top:13px;border-top:1px dashed #bbb}.rota-turno label{margin:0}.rota-turno select:disabled{background:#eef0f2;color:#777}
     .help{color:var(--muted);font-size:.84rem;margin-top:6px}.feedback{min-height:24px;margin:14px 0;text-align:center;font-weight:700}.feedback.error{color:var(--danger)}.feedback.success{color:var(--success)}
     button{width:100%;padding:14px 18px;border:0;border-radius:8px;cursor:pointer;color:#fff;background:var(--dark);font:700 1rem Inter,Arial,sans-serif}button:disabled{opacity:.65;cursor:not-allowed}.submit{background:var(--success)}.cancel{margin-top:10px;background:var(--danger)}.back{display:block;margin-top:20px;text-align:center;color:var(--muted);text-decoration:none}
     .aviso{padding:12px 14px;border-left:4px solid var(--blue);background:#eaf3fc;border-radius:6px;margin-bottom:20px}.spinner{display:inline-block;width:16px;height:16px;margin-right:8px;border:2px solid #ffffff55;border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;vertical-align:-3px}@keyframes spin{to{transform:rotate(360deg)}}
-    @media(max-width:650px){.grid{grid-template-columns:1fr}.wide{grid-column:auto}.card-body{padding:20px}}@media(prefers-reduced-motion:reduce){.spinner{animation:none}}
+    @media(max-width:650px){.grid{grid-template-columns:1fr}.wide{grid-column:auto}.card-body{padding:20px}.rota-turno{grid-template-columns:1fr}}@media(prefers-reduced-motion:reduce){.spinner{animation:none}}
   </style>
 </head>
 <body>
@@ -74,10 +74,10 @@
 
           <fieldset><legend>Dias no turno da manha</legend><div class="checks">
             <label><input type="checkbox" name="dias-manha" value="Segunda">Seg</label><label><input type="checkbox" name="dias-manha" value="Terca">Ter</label><label><input type="checkbox" name="dias-manha" value="Quarta">Qua</label><label><input type="checkbox" name="dias-manha" value="Quinta">Qui</label><label><input type="checkbox" name="dias-manha" value="Sexta">Sex</label>
-          </div></fieldset>
+          </div><div class="rota-turno"><label for="onibus-manha">Veiculo usado pela manha</label><select id="onibus-manha"><option value="">Selecione...</option><option>AMARELO</option><option>AZUL</option><option>MICRO</option></select></div></fieldset>
           <fieldset><legend>Dias no turno da noite</legend><div class="checks">
             <label><input type="checkbox" name="dias-noite" value="Segunda">Seg</label><label><input type="checkbox" name="dias-noite" value="Terca">Ter</label><label><input type="checkbox" name="dias-noite" value="Quarta">Qua</label><label><input type="checkbox" name="dias-noite" value="Quinta">Qui</label><label><input type="checkbox" name="dias-noite" value="Sexta">Sex</label>
-          </div><div class="checks" style="margin-top:15px;padding-top:12px;border-top:1px dashed #bbb"><label><input id="apenas-retorno" type="checkbox">Apenas retorno no onibus da noite</label></div></fieldset>
+          </div><div class="rota-turno"><label for="onibus-noite">Veiculo usado pela noite</label><select id="onibus-noite"><option value="">Selecione...</option><option>AMARELO</option><option>AZUL</option><option>MICRO</option></select></div><div class="checks" style="margin-top:15px;padding-top:12px;border-top:1px dashed #bbb"><label><input id="apenas-retorno" type="checkbox">Apenas retorno no onibus da noite</label></div></fieldset>
 
           <div id="feedback-envio" class="feedback" aria-live="polite"></div>
           <button id="enviar" class="submit" type="submit">Enviar para analise</button><button class="cancel" type="button" id="cancelar">Cancelar e sair</button>
@@ -130,8 +130,9 @@
     function marcados(nome){return Array.from(document.querySelectorAll('input[name="'+nome+'"]:checked')).map(i=>i.value)}
     function marcarDias(nome,valor){const recebidos=normalizar(valor).split(/[,;|]/).map(i=>i.trim()).filter(Boolean);document.querySelectorAll('input[name="'+nome+'"]').forEach(cb=>{const d=normalizar(cb.value);cb.checked=recebidos.some(i=>i.includes(d.slice(0,3))||d.includes(i.slice(0,3)))})}
     function selecionar(id,valor){const el=$(id);const alvo=normalizar(valor);const opcao=Array.from(el.options).find(o=>normalizar(o.value)===alvo);el.value=opcao?opcao.value:''}
+    function sincronizarVeiculosTurno(){['manha','noite'].forEach(turno=>{const temDias=marcados('dias-'+turno).length>0,select=$('onibus-'+turno);select.disabled=!temDias;select.required=temDias;if(!temDias)select.value=''})}
     
-    function preencher(a){$('nome').value=a.nome||'';$('nascimento').value=a.nascimento||'';$('rg').value=a.rg||'';$('cpf').value=PortalAPI.formatarCpf(PortalAPI.normalizarCpf(a.cpf||''));$('endereco').value=a.endereco||'';$('telefone').value=a.telefone||'';$('instituicao').value=a.instituicao||'';selecionar('embarque',a.embarque);selecionar('sobral',a.sobral);selecionar('novato',a.novato);selecionar('comorbidade',a.comorbidade);marcarDias('dias-manha',a.dias_manha);marcarDias('dias-noite',a.dias_noite);$('apenas-retorno').checked=normalizar(a.apenas_retorno)==='SIM'}
+    function preencher(a){$('nome').value=a.nome||'';$('nascimento').value=a.nascimento||'';$('rg').value=a.rg||'';$('cpf').value=PortalAPI.formatarCpf(PortalAPI.normalizarCpf(a.cpf||''));$('endereco').value=a.endereco||'';$('telefone').value=a.telefone||'';$('instituicao').value=a.instituicao||'';selecionar('embarque',a.embarque);selecionar('sobral',a.sobral);selecionar('novato',a.novato);selecionar('comorbidade',a.comorbidade);marcarDias('dias-manha',a.dias_manha);marcarDias('dias-noite',a.dias_noite);selecionar('onibus-manha',a.onibus_manha||(a.dias_manha?a.onibus:''));selecionar('onibus-noite',a.onibus_noite||(a.dias_noite?a.onibus:''));$('apenas-retorno').checked=normalizar(a.apenas_retorno)==='SIM';sincronizarVeiculosTurno()}
     
     async function consultar() {
       const cpfPuro = PortalAPI.somenteDigitos($('cpf-consulta').value);
@@ -209,6 +210,14 @@
         feedback('feedback-envio', 'Selecione pelo menos um dia de viagem.', 'error');
         return;
       }
+      if (manha.length && !$('onibus-manha').value) {
+        feedback('feedback-envio', 'Selecione o veiculo usado pela manha.', 'error');
+        return;
+      }
+      if (noite.length && !$('onibus-noite').value) {
+        feedback('feedback-envio', 'Selecione o veiculo usado pela noite.', 'error');
+        return;
+      }
       if ($('apenas-retorno').checked && !noite.length) {
         feedback('feedback-envio', 'Para marcar apenas retorno, selecione ao menos um dia da noite.', 'error');
         return;
@@ -244,6 +253,9 @@
         comorbidade: $('comorbidade').value,
         dias_manha: manha,
         dias_noite: noite,
+        onibus_manha: $('onibus-manha').value,
+        onibus_noite: $('onibus-noite').value,
+        onibus: $('onibus-noite').value || $('onibus-manha').value,
         apenas_retorno: $('apenas-retorno').checked
       };
       
@@ -303,6 +315,8 @@
     $('cpf').addEventListener('input',e=>e.target.value=PortalAPI.formatarCpf(e.target.value));
     $('cpf-consulta').addEventListener('keydown',e=>{if(e.key==='Enter')consultar()});
     $('consultar').addEventListener('click',consultar);
+    document.querySelectorAll('input[name="dias-manha"],input[name="dias-noite"]').forEach(cb=>cb.addEventListener('change',sincronizarVeiculosTurno));
+    sincronizarVeiculosTurno();
     $('form-atualizacao').addEventListener('submit',enviar);
     $('cancelar').addEventListener('click',()=>location.reload());
     $('sair').addEventListener('click',()=>location.href='index.html');

@@ -20,15 +20,17 @@ function cpfFormatado(v){
 
 function botao(texto,classe,acao){const b=document.createElement('button');b.type='button';b.className='btn-acao '+classe;b.textContent=texto;b.addEventListener('click',acao);return b}
 function textoTd(valor){const td=document.createElement('td');td.textContent=valor||'-';return td}
+function rotasResumo(aluno){const manha=String(aluno.onibus_manha||'').trim(),noite=String(aluno.onibus_noite||'').trim();if(manha&&noite)return manha===noite?manha:'Manha: '+manha+' / Noite: '+noite;return manha||noite||aluno.onibus||'-'}
 
 async function carregarDadosDaPlanilha(){mostrarCarregamento('Carregando a base de dados...');try{const dados=await apiAdmin({acao:'painel_admin'});listaAlunosGlobais=(dados.dadosGerais||[]).sort((a,b)=>{const prioridade=normalizar(a.status)==='em analise'?0:1;const prioridadeB=normalizar(b.status)==='em analise'?0:1;return prioridade-prioridadeB||String(a.nome||'').localeCompare(String(b.nome||''),'pt-BR')});renderizarTabela()}catch(erro){mostrarCarregamento(erro.name==='AbortError'?'O servidor demorou para responder.':erro.message,true)}}
 
-function renderizarTabela(){const corpo=elemento('corpo-tabela');corpo.replaceChildren();const busca=normalizar(elemento('busca').value);const status=normalizar(elemento('filtro-status').value);const filtrados=listaAlunosGlobais.filter(a=>(!busca||normalizar(a.nome).includes(busca)||PortalAPI.somenteDigitos(a.cpf).includes(busca.replace(/\D/g,''))||String(a.cpf).toLowerCase().includes(busca))&&(!status||normalizar(a.status)===status));filtrados.forEach(aluno=>{const tr=document.createElement('tr');if(normalizar(aluno.status)==='em analise')tr.className='em-analise';tr.append(textoTd(aluno.nome),textoTd(cpfFormatado(aluno.cpf)),textoTd(aluno.instituicao),textoTd(aluno.turno),textoTd(aluno.onibus));const tdStatus=document.createElement('td'),badge=document.createElement('span');badge.className=classeStatus(aluno.status);badge.textContent=aluno.status||'Pendente';tdStatus.appendChild(badge);tr.appendChild(tdStatus);tr.appendChild(textoTd(normalizar(aluno.status_atualizacao)==='sim'?'Enviada':'Liberada'));const acoes=document.createElement('td');acoes.appendChild(botao(normalizar(aluno.status)==='em analise'?'Revisar':'Editar','btn-editar',()=>abrirModalPorCpf(aluno.cpf)));if(normalizar(aluno.status_atualizacao)==='sim')acoes.appendChild(botao('Reabrir','btn-reabrir',()=>reabrirAtualizacao(aluno)));acoes.appendChild(botao('Excluir','btn-excluir',()=>excluirAluno(aluno.cpf)));tr.appendChild(acoes);corpo.appendChild(tr)});if(!filtrados.length){const tr=document.createElement('tr'),td=document.createElement('td');td.colSpan=8;td.textContent='Nenhum cadastro encontrado.';td.style.textAlign='center';tr.appendChild(td);corpo.appendChild(tr)}elemento('mensagem-carregamento').style.display='none';elemento('conteudo-painel').style.display='block'}
+function renderizarTabela(){const corpo=elemento('corpo-tabela');corpo.replaceChildren();const busca=normalizar(elemento('busca').value);const status=normalizar(elemento('filtro-status').value);const filtrados=listaAlunosGlobais.filter(a=>(!busca||normalizar(a.nome).includes(busca)||PortalAPI.somenteDigitos(a.cpf).includes(busca.replace(/\D/g,''))||String(a.cpf).toLowerCase().includes(busca))&&(!status||normalizar(a.status)===status));filtrados.forEach(aluno=>{const tr=document.createElement('tr');if(normalizar(aluno.status)==='em analise')tr.className='em-analise';tr.append(textoTd(aluno.nome),textoTd(cpfFormatado(aluno.cpf)),textoTd(aluno.instituicao),textoTd(aluno.turno),textoTd(rotasResumo(aluno)));const tdStatus=document.createElement('td'),badge=document.createElement('span');badge.className=classeStatus(aluno.status);badge.textContent=aluno.status||'Pendente';tdStatus.appendChild(badge);tr.appendChild(tdStatus);tr.appendChild(textoTd(normalizar(aluno.status_atualizacao)==='sim'?'Enviada':'Liberada'));const acoes=document.createElement('td');acoes.appendChild(botao(normalizar(aluno.status)==='em analise'?'Revisar':'Editar','btn-editar',()=>abrirModalPorCpf(aluno.cpf)));if(normalizar(aluno.status_atualizacao)==='sim')acoes.appendChild(botao('Reabrir','btn-reabrir',()=>reabrirAtualizacao(aluno)));acoes.appendChild(botao('Excluir','btn-excluir',()=>excluirAluno(aluno.cpf)));tr.appendChild(acoes);corpo.appendChild(tr)});if(!filtrados.length){const tr=document.createElement('tr'),td=document.createElement('td');td.colSpan=8;td.textContent='Nenhum cadastro encontrado.';td.style.textAlign='center';tr.appendChild(td);corpo.appendChild(tr)}elemento('mensagem-carregamento').style.display='none';elemento('conteudo-painel').style.display='block'}
 
-function criarCheckboxes(){['manha','noite'].forEach(turno=>{const box=elemento('dias-'+turno+'-admin');box.replaceChildren();DIAS.forEach(dia=>{const label=document.createElement('label'),input=document.createElement('input');input.type='checkbox';input.name='admin-dias-'+turno;input.value=dia;label.append(input,document.createTextNode(dia.slice(0,3)));box.appendChild(label)})})}
+function criarCheckboxes(){['manha','noite'].forEach(turno=>{const box=elemento('dias-'+turno+'-admin');box.replaceChildren();DIAS.forEach(dia=>{const label=document.createElement('label'),input=document.createElement('input');input.type='checkbox';input.name='admin-dias-'+turno;input.value=dia;input.addEventListener('change',sincronizarVeiculosTurno);label.append(input,document.createTextNode(dia.slice(0,3)));box.appendChild(label)})})}
 function marcarDias(nome,valor){const itens=normalizar(valor).split(/[,;|]/).map(i=>i.trim()).filter(Boolean);document.querySelectorAll('input[name="'+nome+'"]').forEach(cb=>{const d=normalizar(cb.value);cb.checked=itens.some(i=>i.includes(d.slice(0,3))||d.includes(i.slice(0,3)))})}
 function diasMarcados(nome){return Array.from(document.querySelectorAll('input[name="'+nome+'"]:checked')).map(i=>i.value)}
 function selecionar(id,valor,fallback=''){const el=elemento(id),alvo=normalizar(valor),opcao=Array.from(el.options).find(o=>normalizar(o.value)===alvo);el.value=opcao?opcao.value:fallback}
+function sincronizarVeiculosTurno(){['manha','noite'].forEach(turno=>{const temDias=diasMarcados('admin-dias-'+turno).length>0,select=elemento('aluno-onibus-'+turno);select.disabled=!temDias;select.required=temDias;if(!temDias)select.value=''})}
 
 function abrirModalPorCpf(cpf){
   const index = listaAlunosGlobais.findIndex(a => String(a.cpf).trim() === String(cpf).trim());
@@ -57,15 +59,17 @@ function abrirModal(index=-1){
     selecionar('aluno-novato',a.novato);
     selecionar('aluno-comorbidade',a.comorbidade);
     selecionar('aluno-retorno',a.apenas_retorno,'Nao');
-    selecionar('aluno-onibus',a.onibus);
     selecionar('aluno-status',a.status,'Pendente');
     marcarDias('admin-dias-manha',a.dias_manha);
     marcarDias('admin-dias-noite',a.dias_noite);
+    selecionar('aluno-onibus-manha',a.onibus_manha||(a.dias_manha?a.onibus:''));
+    selecionar('aluno-onibus-noite',a.onibus_noite||(a.dias_noite?a.onibus:''));
   } else {
     elemento('modal-titulo').textContent='Adicionar novo aluno';
     selecionar('aluno-retorno','Nao','Nao');
     selecionar('aluno-status','Pendente','Pendente');
   }
+  sincronizarVeiculosTurno();
   elemento('modal-aluno').style.display='block';
 }
 function fecharModal(){elemento('modal-aluno').style.display='none'}
@@ -92,6 +96,16 @@ async function salvarAluno(evento) {
     alert('Selecione pelo menos um dia de viagem.');
     return;
   }
+  const onibusManha = elemento('aluno-onibus-manha').value;
+  const onibusNoite = elemento('aluno-onibus-noite').value;
+  if (manha.length && !onibusManha) {
+    alert('Selecione o veiculo usado pela manha.');
+    return;
+  }
+  if (noite.length && !onibusNoite) {
+    alert('Selecione o veiculo usado pela noite.');
+    return;
+  }
 
   botao.disabled = true;
   botao.textContent = 'Salvando e registrando auditoria...';
@@ -114,7 +128,9 @@ async function salvarAluno(evento) {
       apenas_retorno: elemento('aluno-retorno').value,
       dias_manha: manha,
       dias_noite: noite,
-      onibus: elemento('aluno-onibus').value,
+      onibus_manha: onibusManha,
+      onibus_noite: onibusNoite,
+      onibus: onibusNoite || onibusManha,
       status: elemento('aluno-status').value
     }, 90000);
     fecharModal();

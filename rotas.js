@@ -41,6 +41,7 @@ const DESTINOS = {
 
 const $ = (id) => document.getElementById(id);
 const positivo = (valor) => ['SIM', 'S', 'TRUE', '1'].includes(PortalAPI.normalizar(valor));
+const rotaNoTurno = (aluno, turno) => PortalAPI.normalizar(turno === 'MANHA' ? aluno.onibus_manha : aluno.onibus_noite) || PortalAPI.normalizar(aluno.onibus);
 
 function periodoDisponivel(turno, dia) {
   return ROTA !== 'MICRO' || turno === 'NOITE' || dia === 'Segunda';
@@ -101,7 +102,7 @@ function recarregarMapa() {
 }
 
 function alunoNoFiltro(aluno, turno, dia) {
-  return periodoDisponivel(turno, dia) && PortalAPI.diasDoAluno(aluno, turno).includes(dia);
+  return periodoDisponivel(turno, dia) && rotaNoTurno(aluno, turno) === ROTA && PortalAPI.diasDoAluno(aluno, turno).includes(dia);
 }
 
 function calcularMatriz() {
@@ -259,7 +260,8 @@ async function verificarAcesso() {
   try {
     const resposta = await PortalAPI.requisicao({ acao: 'painel_rota', rota: ROTA, cpf });
     passageirosRota = Array.isArray(resposta.passageiros) ? resposta.passageiros : [];
-    $('nomeAlunoLogado').textContent = resposta.dados && resposta.dados.nome ? resposta.dados.nome : 'passageiro';
+    const dadosPassageiro = resposta.dados || resposta.aluno || {};
+    $('nomeAlunoLogado').textContent = String(dadosPassageiro.nome || resposta.nome || 'Passageiro cadastrado').trim();
     $('login-section').classList.add('hidden'); $('main-section').classList.remove('hidden');
     sincronizarFiltros();
     carregarMapa(); atualizarPainel();
