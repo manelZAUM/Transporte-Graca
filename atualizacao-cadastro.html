@@ -95,12 +95,35 @@
     'use strict';
     const API_URL=window.APP_CONFIG&&window.APP_CONFIG.API_URL;
     let updateToken='';
+    let updateTokenExpiraEm=0;
     let cpfConsultado='';
     const $=(id)=>document.getElementById(id);
     const normalizar=(v)=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().trim();
     
     function conferirConfiguracao(){if(!API_URL||API_URL.includes('COLE_AQUI'))throw new Error('Configure a URL da implantacao no arquivo config.js.');}
     async function api(payload){conferirConfiguracao();if(!window.PortalAPI)throw new Error('O modulo de comunicacao nao foi carregado.');return PortalAPI.requisicao(payload,{tempoLimite:90000})}
+
+    function registrarSessao(dados) {
+      updateToken = dados.update_token || '';
+      const duracao = Math.max(60, Number(dados.expira_em_segundos) || 3600);
+      updateTokenExpiraEm = Date.now() + (duracao * 1000);
+    }
+
+    async function renovarSessaoAtualizacao() {
+      const cpf = PortalAPI.formatarCpf(cpfConsultado);
+      if (PortalAPI.somenteDigitos(cpf).length !== 11) {
+        const erro = new Error('Nao foi possivel renovar a sessao. Consulte o CPF novamente.');
+        erro.codigo = 'CPF_SESSAO_INVALIDO';
+        throw erro;
+      }
+      const dados = await api({ acao: 'iniciar_atualizacao', cpf });
+      registrarSessao(dados);
+      return dados;
+    }
+
+    function sessaoPertoDeExpirar() {
+      return !updateToken || (updateTokenExpiraEm > 0 && Date.now() >= updateTokenExpiraEm - 120000);
+    }
     
     function feedback(id,m,t){const el=$(id);el.textContent=m||'';el.className='feedback'+(t?' '+t:'')}
     function carregando(b,a,n,c){b.disabled=a;b.innerHTML=a?'<span class="spinner" aria-hidden="true"></span>'+c:n}
@@ -155,7 +178,7 @@
         } 
         // Se NÃO enviou (liberado para preencher), mostra o formulário
         else {
-          updateToken = dados.update_token;
+          registrarSessao(dados);
           preencher(dados.aluno);
           $('formulario').classList.remove('hidden');
           $('nome').focus();
@@ -168,14 +191,10 @@
       }
     }
 
-    function mostrarSucesso(){updateToken='';$('formulario').classList.add('hidden');$('sucesso').classList.remove('hidden')}
+    function mostrarSucesso(){updateToken='';updateTokenExpiraEm=0;$('formulario').classList.add('hidden');$('sucesso').classList.remove('hidden')}
     
     async function enviar(evento) {
       evento.preventDefault();
-      if (!updateToken) {
-        feedback('feedback-envio', 'A sessao expirou. Consulte novamente.', 'error');
-        return;
-      }
       const cpfPuro = PortalAPI.somenteDigitos($('cpf').value);
       if (cpfPuro.length !== 11) {
         feedback('feedback-envio', 'Informe o CPF completo com 11 dígitos.', 'error');
@@ -194,6 +213,21 @@
         feedback('feedback-envio', 'Para marcar apenas retorno, selecione ao menos um dia da noite.', 'error');
         return;
       }
+
+      if (sessaoPertoDeExpirar()) {
+        feedback('feedback-envio', 'Renovando sua sessao com seguranca...', '');
+        try {
+          await renovarSessaoAtualizacao();
+        } catch (erro) {
+          if (erro.codigo === 'ATUALIZACAO_JA_ENVIADA') {
+            mostrarSucesso();
+            return;
+          }
+          feedback('feedback-envio', erro.message, 'error');
+          return;
+        }
+      }
+
       const envio = {
         acao: 'atualizar_aluno',
         update_token: updateToken,
@@ -221,6 +255,24 @@
         await api(envio);
         mostrarSucesso();
       } catch (erro) {
+        if (erro.codigo === 'SESSAO_ATUALIZACAO_EXPIRADA' || erro.codigo === 'SESSAO_ATUALIZACAO_INVALIDA') {
+          feedback('feedback-envio', 'A sessao foi renovada. Concluindo o envio...', '');
+          try {
+            await renovarSessaoAtualizacao();
+            envio.update_token = updateToken;
+            await api(envio);
+            mostrarSucesso();
+            return;
+          } catch (erroRenovacao) {
+            if (erroRenovacao.codigo === 'ATUALIZACAO_JA_ENVIADA') {
+              mostrarSucesso();
+              return;
+            }
+            feedback('feedback-envio', erroRenovacao.message, 'error');
+            return;
+          }
+        }
+
         // Redundância de segurança para verificar se houve timeout durante o envio
         if (erro.name === 'AbortError' || erro.codigo === 'RESPOSTA_NAO_JSON') {
           feedback('feedback-envio', 'Confirmando o recebimento dos dados...', '');
@@ -233,6 +285,10 @@
             feedback('feedback-envio', 'Nao foi possivel confirmar o envio. Recarregue e consulte o CPF antes de tentar novamente.', 'error');
             return;
           } catch (erroSecundario) {
+            if (erroSecundario.codigo === 'ATUALIZACAO_JA_ENVIADA') {
+              mostrarSucesso();
+              return;
+            }
             feedback('feedback-envio', 'Nao foi possivel confirmar o envio. Recarregue e consulte o CPF antes de tentar novamente.', 'error');
             return;
           }

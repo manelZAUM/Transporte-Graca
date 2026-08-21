@@ -60,6 +60,27 @@
             background-repeat: no-repeat;
         }
 
+        .portal-grid {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            width: 100%;
+            max-width: 1000px;
+            padding: 20px;
+        }
+
+        .card-calendario {
+            flex: 1 1 320px;
+            min-width: 320px;
+            max-width: 400px;
+            background-color: #ffffff;
+            padding: 40px 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
         /* Card Centralizado (Branco para destacar do fundo) */
         .card {
             background-color: #ffffff;
@@ -70,6 +91,11 @@
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
             text-align: center;
             animation: fadeIn 0.8s ease-in-out;
+        }
+
+        .card-portal {
+            flex: 1 1 360px;
+            margin: 0;
         }
 
         .card h2 {
@@ -138,6 +164,51 @@
             background-color: #ffc400e0;
         }
 
+        .aviso-veteranos {
+            flex: 1 1 340px;
+            width: 100%;
+            max-width: 400px;
+            background-color: rgba(255, 251, 223, 0.95);
+            backdrop-filter: blur(10px);
+            border: 2px solid #ffc107;
+            padding: 40px 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            text-align: center;
+        }
+
+        .aviso-icone {
+            font-size: 45px;
+            margin-bottom: 10px;
+            line-height: 1;
+        }
+
+        .aviso-veteranos h3 {
+            color: #856404;
+            font-size: 22px;
+            margin-bottom: 15px;
+        }
+
+        .aviso-veteranos p {
+            color: #664d03;
+            font-size: 15px;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .btn-atualizacao {
+            background-color: #ffc107;
+            color: #000000;
+            font-weight: 700;
+            padding: 15px;
+            box-shadow: 0 4px 10px rgba(255, 193, 7, 0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-atualizacao:hover {
+            background-color: #e5ad06;
+        }
+
         /* Rodapé Institucional */
         footer {
             background-color: var(--cor-fundo-footer);
@@ -158,4 +229,117 @@
                 transform: translateY(0);
             }
 
+        }
+
+        @media (max-width: 700px) {
+            .cabecalho-oficial {
+                position: relative;
+                top: auto;
+                flex-direction: column;
+                gap: 12px;
+                padding: 12px 16px 16px;
+            }
+
+            .pill-logo img {
+                display: block;
+                max-width: min(78vw, 280px);
+                max-height: 52px;
+            }
+
+            .botaosec {
+                position: static;
+                width: 100%;
+                max-width: 360px;
+                min-height: 46px;
+                padding: 11px 16px;
+                text-align: center;
+                line-height: 1.25;
+            }
+
+            .area-portal {
+                flex-direction: column;
+                align-items: center;
+                padding: 18px 12px;
+                background-attachment: scroll;
+            }
+
+            .portal-grid {
+                display: grid;
+                grid-template-columns: minmax(0, 1fr);
+                gap: 18px;
+                max-width: 480px;
+                padding: 0;
+            }
+
+            .card,
+            .card-calendario,
+            .aviso-veteranos {
+                width: 100%;
+                min-width: 0;
+                max-width: none;
+                padding: 26px 20px;
+                border-radius: 10px;
+            }
+
+            .card-calendario {
+                flex: none;
+                max-width: 480px;
+            }
+
+            .card h2 {
+                font-size: clamp(22px, 7vw, 26px);
+            }
+
+            .card p {
+                margin-bottom: 22px;
+                line-height: 1.45;
+            }
+
+            .btn-group {
+                gap: 12px;
+            }
+
+            .btn {
+                width: 100%;
+                min-height: 50px;
+                padding: 13px 14px;
+                font-size: 15px;
+                line-height: 1.25;
+                text-align: center;
+            }
+
+            .aviso-icone {
+                font-size: 38px;
+            }
+
+            .aviso-veteranos h3 {
+                font-size: 20px;
+            }
+
+            .aviso-veteranos p {
+                font-size: 14px;
+                margin-bottom: 20px;
+                line-height: 1.55;
+            }
+
+            footer {
+                padding: 16px 18px;
+                line-height: 1.5;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .area-portal {
+                padding-inline: 8px;
+            }
+
+            .card,
+            .card-calendario,
+            .aviso-veteranos {
+                padding-inline: 16px;
+            }
+
+            .btn {
+                font-size: 14px;
+            }
         }

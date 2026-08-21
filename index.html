@@ -15,8 +15,8 @@
     </header>
 
     <main class="area-portal">
-        <div class="card-calendario" style="flex:1; min-width:320px; max-width:400px; background-color:#ffffff; padding:40px 30px; border-radius:12px; box-shadow:0 8px 25px rgba(0,0,0,.15);">
-    <h3 style="color:#0a7b69; font-size:22px; margin-bottom:15px; text-align:center;">
+        <section class="card-calendario" aria-labelledby="titulo-calendario">
+    <h3 id="titulo-calendario" style="color:#0a7b69; font-size:22px; margin-bottom:15px; text-align:center;">
         📅 Calendário Letivo 2026.2
     </h3>
     <p style="color:#555; font-size:15px; margin-bottom:20px; text-align:center; line-height:1.5;">
@@ -107,9 +107,9 @@
         </div>
 
     </div>
-</div>
-        <div style="display:flex;justify-content:center;align-items:center;gap:30px;flex-wrap:wrap;width:100%;max-width:1000px;padding:20px">
-            <div class="card" style="margin:0;flex:1;min-width:320px;max-width:450px">
+</section>
+        <div class="portal-grid">
+            <section class="card card-portal">
                 <h2>Portal do Universitario</h2>
                 <p>Selecione sua rota ou acesse os serviços da Secretaria</p>
                 <div class="btn-group">
@@ -118,18 +118,18 @@
                     <a href="consulta.html" class="btn bg-verde">Painel de consulta da Demanda</a>
                     <a href="micro_onibus.html" class="btn bg-amarelo2">Micro-Onibus</a>
                 </div>
-            </div>
+            </section>
 
-            <div class="aviso-veteranos" style="flex:1;min-width:320px;max-width:400px;background-color:rgba(255,251,223,.95);backdrop-filter:blur(10px);border:2px solid #ffc107;padding:40px 30px;border-radius:12px;box-shadow:0 8px 25px rgba(0,0,0,.15);text-align:center">
-                <div style="font-size:45px;margin-bottom:10px;line-height:1" aria-hidden="true">&#9888;</div>
-                <h3 style="color:#856404;font-size:22px;margin-bottom:15px">Atencão, Veteranos!</h3>
-                <p style="color:#664d03;font-size:15px;margin-bottom:25px;line-height:1.6">
+            <aside class="aviso-veteranos">
+                <div class="aviso-icone" aria-hidden="true">&#9888;</div>
+                <h3>Atenção, Veteranos!</h3>
+                <p>
                     O periodo de atualizacao cadastral esta aberto. Confira e renove seus dados para que a Secretaria possa organizar a demanda do transporte conforme os calendarios letivos.
                 </p>
-                <a href="atualizacao-cadastro.html" class="btn" style="background-color:#ffc107;color:#000;font-weight:700;border:0;display:flex;justify-content:center;padding:15px;text-decoration:none;border-radius:8px;box-shadow:0 4px 10px rgba(255,193,7,.3)">
+                <a href="atualizacao-cadastro.html" class="btn btn-atualizacao">
                     Realizar Atualizacao Cadastral
                 </a>
-            </div>
+            </aside>
         </div>
     </main>
 
