@@ -152,7 +152,7 @@ function renderizarTabela() {
   $('resultado-contagem').textContent = `${filtrados.length} resultado${filtrados.length === 1 ? '' : 's'}`;
   const tbody = $('lista-geral'); tbody.replaceChildren();
   if (!filtrados.length) {
-    const tr = document.createElement('tr'); const td = document.createElement('td'); td.colSpan = 6; td.className = 'empty'; td.textContent = 'Nenhum cadastro corresponde aos filtros.'; tr.appendChild(td); tbody.appendChild(tr); return;
+    const tr = document.createElement('tr'); const td = document.createElement('td'); td.colSpan = 7; td.className = 'empty'; td.textContent = 'Nenhum cadastro corresponde aos filtros.'; tr.appendChild(td); tbody.appendChild(tr); return;
   }
   filtrados.forEach((aluno, indiceRegistro) => {
     const tr = document.createElement('tr');
@@ -164,8 +164,9 @@ function renderizarTabela() {
     const partesRotas = []; if (usaMicroSegunda(aluno)) partesRotas.push('SEG MANHÃ: MICRO'); if (manha) partesRotas.push(`MANHÃ: ${manha}`); if (noite) partesRotas.push(`NOITE: ${noite}`);
     const nomeRota = partesRotas.join(' · ') || 'NÃO INFORMADO'; const coresRotas = { AMARELO: '#e0a800', AZUL: '#1565c0', MICRO: '#0f8b78' }; const rotasUnicas = rotasDoAluno(aluno); rota.style.setProperty('--chip', rotasUnicas.length === 1 ? (coresRotas[rotasUnicas[0]] || '#68737d') : '#68737d'); rota.textContent = nomeRota; rotaTd.appendChild(rota);
     const turnoTd = document.createElement('td'); turnoTd.textContent = aluno.turno || 'Não informado';
+    const validadeTd = document.createElement('td'); validadeTd.textContent = aluno.validade_ate || 'Não informada';
     const statusTd = document.createElement('td'); const badge = document.createElement('span'); badge.className = `status ${classeStatus(aluno.status)}`; badge.textContent = aluno.status || 'Pendente'; statusTd.appendChild(badge);
-    tr.append(rotaTd, turnoTd, statusTd); tbody.appendChild(tr);
+    tr.append(rotaTd, turnoTd, validadeTd, statusTd); tbody.appendChild(tr);
   });
 }
 
