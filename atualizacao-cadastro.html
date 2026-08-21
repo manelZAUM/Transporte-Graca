@@ -111,7 +111,7 @@
     function preencher(a){$('nome').value=a.nome||'';$('nascimento').value=a.nascimento||'';$('rg').value=a.rg||'';$('cpf').value=PortalAPI.formatarCpf(PortalAPI.normalizarCpf(a.cpf||''));$('endereco').value=a.endereco||'';$('telefone').value=a.telefone||'';$('instituicao').value=a.instituicao||'';selecionar('embarque',a.embarque);selecionar('sobral',a.sobral);selecionar('novato',a.novato);selecionar('comorbidade',a.comorbidade);marcarDias('dias-manha',a.dias_manha);marcarDias('dias-noite',a.dias_noite);$('apenas-retorno').checked=normalizar(a.apenas_retorno)==='SIM'}
     
     async function consultar() {
-      const cpfPuro = PortalAPI.normalizarCpf($('cpf-consulta').value);
+      const cpfPuro = PortalAPI.somenteDigitos($('cpf-consulta').value);
       if (cpfPuro.length !== 11) {
         feedback('feedback-acesso', 'Informe o CPF completo.', 'error');
         return;
@@ -176,7 +176,7 @@
         feedback('feedback-envio', 'A sessao expirou. Consulte novamente.', 'error');
         return;
       }
-      const cpfPuro = PortalAPI.normalizarCpf($('cpf').value);
+      const cpfPuro = PortalAPI.somenteDigitos($('cpf').value);
       if (cpfPuro.length !== 11) {
         feedback('feedback-envio', 'Informe o CPF completo com 11 dígitos.', 'error');
         return;
