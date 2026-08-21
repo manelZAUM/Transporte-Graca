@@ -1,12 +1,13 @@
 'use strict';
 
 const ROTA = document.body.dataset.rota;
-const COR_ROTA = ROTA === 'AMARELO' ? '#e0a800' : '#1565c0';
+const CORES_ROTAS = { AMARELO: '#e0a800', AZUL: '#1565c0', MICRO: '#0f8b78' };
+const COR_ROTA = CORES_ROTAS[ROTA] || '#1565c0';
 const DIAS = ['Segunda', 'Terca', 'Quarta', 'Quinta', 'Sexta'];
 const NOMES_DIAS = { Segunda: 'Seg', Terca: 'Ter', Quarta: 'Qua', Quinta: 'Qui', Sexta: 'Sex' };
 let passageirosRota = [];
-let turnoSelecionado = 'MANHA';
 let diaSelecionado = DIAS[Math.min(Math.max(new Date().getDay() - 1, 0), 4)];
+let turnoSelecionado = ROTA === 'MICRO' && diaSelecionado !== 'Segunda' ? 'NOITE' : 'MANHA';
 let mapa;
 
 const PONTOS_ORIGEM = [
@@ -27,11 +28,28 @@ const DESTINOS = {
   AMARELO: [
     { nome: 'UNINTA', coords: [-3.6942643851, -40.3443842203] },
     { nome: 'Faculdade Luciano Feijao', coords: [-3.7005444510, -40.3484365319] }
-  ]
+  ],
+  MICRO: {
+    MANHA: [
+      { nome: 'UFC - Mucambinho', coords: [-3.6930838878, -40.3549683921] }
+    ],
+    NOITE: [
+      { nome: 'Faculdade Luciano Feijao', coords: [-3.7005444510, -40.3484365319] }
+    ]
+  }
 };
 
 const $ = (id) => document.getElementById(id);
 const positivo = (valor) => ['SIM', 'S', 'TRUE', '1'].includes(PortalAPI.normalizar(valor));
+
+function periodoDisponivel(turno, dia) {
+  return ROTA !== 'MICRO' || turno === 'NOITE' || dia === 'Segunda';
+}
+
+function destinosDaSelecao() {
+  const configuracao = DESTINOS[ROTA] || [];
+  return Array.isArray(configuracao) ? configuracao : (configuracao[turnoSelecionado] || []);
+}
 
 function mostrarMensagem(texto, tipo = 'info') {
   const box = $('msgBox');
@@ -56,7 +74,7 @@ function carregarMapa() {
     maxZoom: 18
   }).addTo(mapa);
 
-  const destinos = DESTINOS[ROTA];
+  const destinos = destinosDaSelecao();
   const todos = [...PONTOS_ORIGEM, ...destinos];
   PONTOS_ORIGEM.forEach((ponto) => {
     L.marker(ponto.coords, { icon: criarIcone(false) }).addTo(mapa).bindPopup(`<strong>Embarque</strong><br>${ponto.nome}`);
@@ -73,8 +91,17 @@ function carregarMapa() {
   mapa.fitBounds(L.latLngBounds(todos.map((ponto) => ponto.coords)), { padding: [28, 28] });
 }
 
+function recarregarMapa() {
+  if (mapa) {
+    mapa.remove();
+    mapa = null;
+  }
+  carregarMapa();
+  setTimeout(() => mapa && mapa.invalidateSize(), 50);
+}
+
 function alunoNoFiltro(aluno, turno, dia) {
-  return PortalAPI.diasDoAluno(aluno, turno).includes(dia);
+  return periodoDisponivel(turno, dia) && PortalAPI.diasDoAluno(aluno, turno).includes(dia);
 }
 
 function calcularMatriz() {
@@ -91,6 +118,7 @@ function calcularMatriz() {
 function maiorPico(matriz) {
   let pico = { quantidade: 0, turno: 'Manha', dia: 'Segunda' };
   ['MANHA', 'NOITE'].forEach((turno) => DIAS.forEach((dia) => {
+    if (!periodoDisponivel(turno, dia)) return;
     const quantidade = matriz[turno][dia];
     if (quantidade > pico.quantidade) pico = { quantidade, turno: turno === 'MANHA' ? 'Manha' : 'Noite', dia };
   }));
@@ -109,7 +137,17 @@ function renderizarMatriz(matriz) {
   ['MANHA', 'NOITE'].forEach((turno) => {
     const tr = document.createElement('tr');
     const nome = document.createElement('td'); nome.textContent = turno === 'MANHA' ? 'Manha' : 'Noite'; nome.style.fontWeight = '800'; tr.appendChild(nome);
-    DIAS.forEach((dia) => { const td = document.createElement('td'); td.textContent = matriz[turno][dia]; tr.appendChild(td); });
+    DIAS.forEach((dia) => {
+      const td = document.createElement('td');
+      if (periodoDisponivel(turno, dia)) {
+        td.textContent = matriz[turno][dia];
+      } else {
+        td.textContent = '—';
+        td.className = 'unavailable';
+        td.setAttribute('aria-label', 'Sem rota neste periodo');
+      }
+      tr.appendChild(td);
+    });
     tbody.appendChild(tr);
   });
   tabela.append(thead, tbody);
@@ -183,19 +221,33 @@ function atualizarPainel() {
   $('kpi-selecao').textContent = filtrados.length;
   $('kpi-instituicoes').textContent = instituicoes.size;
   $('kpi-retorno').textContent = passageirosRota.filter((aluno) => positivo(aluno.apenas_retorno)).length;
-  $('texto-selecao').textContent = `${turnoSelecionado === 'MANHA' ? 'Manha' : 'Noite'} · ${diaSelecionado}`;
+  const destino = ROTA === 'MICRO' ? (turnoSelecionado === 'MANHA' ? 'UFC' : 'FLF') : '';
+  $('texto-selecao').textContent = `${turnoSelecionado === 'MANHA' ? 'Manha' : 'Noite'} · ${diaSelecionado}${destino ? ` · ${destino}` : ''}`;
   $('texto-pico').textContent = pico.quantidade ? `${pico.dia}, ${pico.turno.toLowerCase()} (${pico.quantidade})` : 'Sem demanda registrada';
   renderizarMatriz(matriz);
   renderizarBarras(filtrados);
   renderizarTabela(filtrados);
 }
 
+function sincronizarFiltros() {
+  const botaoManha = document.querySelector('[data-turno="MANHA"]');
+  if (ROTA === 'MICRO' && botaoManha) {
+    const disponivel = diaSelecionado === 'Segunda';
+    botaoManha.disabled = !disponivel;
+    botaoManha.title = disponivel ? 'Rota da UFC na segunda pela manha' : 'O micro-onibus nao opera pela manha neste dia';
+    if (!disponivel && turnoSelecionado === 'MANHA') turnoSelecionado = 'NOITE';
+  }
+
+  document.querySelectorAll('[data-turno]').forEach((item) => item.classList.toggle('active', item.dataset.turno === turnoSelecionado));
+  document.querySelectorAll('[data-dia]').forEach((item) => item.classList.toggle('active', item.dataset.dia === diaSelecionado));
+}
+
 function selecionarSegmento(botao) {
-  const grupo = botao.parentElement;
-  grupo.querySelectorAll('.segment').forEach((item) => item.classList.remove('active'));
-  botao.classList.add('active');
+  const turnoAnterior = turnoSelecionado;
   if (botao.dataset.turno) turnoSelecionado = botao.dataset.turno;
   if (botao.dataset.dia) diaSelecionado = botao.dataset.dia;
+  sincronizarFiltros();
+  if (ROTA === 'MICRO' && turnoAnterior !== turnoSelecionado) recarregarMapa();
   atualizarPainel();
 }
 
@@ -209,9 +261,7 @@ async function verificarAcesso() {
     passageirosRota = Array.isArray(resposta.passageiros) ? resposta.passageiros : [];
     $('nomeAlunoLogado').textContent = resposta.dados && resposta.dados.nome ? resposta.dados.nome : 'passageiro';
     $('login-section').classList.add('hidden'); $('main-section').classList.remove('hidden');
-    const botaoDia = document.querySelector(`[data-dia="${diaSelecionado}"]`);
-    document.querySelectorAll('[data-dia]').forEach((item) => item.classList.remove('active'));
-    if (botaoDia) botaoDia.classList.add('active');
+    sincronizarFiltros();
     carregarMapa(); atualizarPainel();
     setTimeout(() => mapa && mapa.invalidateSize(), 100);
   } catch (erro) {

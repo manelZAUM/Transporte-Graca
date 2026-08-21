@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Micro-onibus - Demanda e rota</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap">
+  <link rel="stylesheet" href="leaflet.css">
+  <link rel="stylesheet" href="rotas.css">
+</head>
+<body class="rota-micro" data-rota="MICRO">
+  <header class="site-header">
+    <div class="brand"><img src="Logo prefeitura.png" alt="Prefeitura Municipal de Graca"><span>Transporte universitario</span></div>
+    <a class="home-link" href="index.html">Voltar ao portal</a>
+  </header>
+
+  <div class="page-shell">
+    <section id="login-section" class="panel login-panel">
+      <div class="hero">
+        <p class="hero-kicker">Portal do passageiro</p>
+        <h1>Micro-onibus</h1>
+        <p>Segunda pela manha para a UFC e, de segunda a sexta a noite, para a Faculdade Luciano Feijao.</p>
+      </div>
+      <div class="login-body">
+        <label for="cpfInput">CPF do passageiro</label>
+        <input id="cpfInput" inputmode="numeric" maxlength="14" autocomplete="off" placeholder="000.000.000-00">
+        <button id="btnEntrar" class="primary-button" type="button">Acessar rota e demanda</button>
+        <div id="msgBox" class="message" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <main id="main-section" class="panel hidden">
+      <div class="dashboard-header">
+        <div><p class="hero-kicker">Rota autorizada</p><h1>Micro-onibus</h1><p>Ola, <strong id="nomeAlunoLogado"></strong>. Estes dados refletem os cadastros aprovados.</p></div>
+        <button id="btnSair" class="ghost-button" type="button">Sair</button>
+      </div>
+
+      <div class="dashboard-body">
+        <section class="route-schedule" aria-label="Funcionamento do micro-onibus">
+          <div><span class="schedule-icon" aria-hidden="true">☀️</span><p><strong>Segunda pela manha</strong><span>Destino: UFC — Campus Mucambinho</span></p></div>
+          <div><span class="schedule-icon" aria-hidden="true">🌙</span><p><strong>Segunda a sexta a noite</strong><span>Destino: Faculdade Luciano Feijao</span></p></div>
+        </section>
+
+        <section class="kpi-grid" aria-label="Resumo da demanda">
+          <div class="kpi accent"><span>Total da rota</span><strong id="kpi-total">0</strong></div>
+          <div class="kpi"><span>Na selecao</span><strong id="kpi-selecao">0</strong></div>
+          <div class="kpi"><span>Instituicoes</span><strong id="kpi-instituicoes">0</strong></div>
+          <div class="kpi"><span>Apenas retorno</span><strong id="kpi-retorno">0</strong></div>
+        </section>
+
+        <section class="content-grid">
+          <article class="section-card">
+            <div class="section-head"><div><h2>Mapa da rota</h2><p>O destino muda conforme o turno selecionado.</p></div><div class="map-legend"><span><i class="legend-dot"></i>Embarque</span><span><i class="legend-dot destination"></i>Destino</span></div></div>
+            <div id="mapa-rota" role="img" aria-label="Mapa ilustrativo da rota do micro-onibus"></div>
+            <p class="map-note">A linha apresenta a sequencia aproximada dos pontos. O itinerario oficial pode variar conforme orientacao da Secretaria.</p>
+          </article>
+
+          <article class="section-card"><div class="section-head"><div><h2>Demanda por embarque</h2><p id="texto-selecao">Manha · Segunda · UFC</p></div></div><div id="demanda-embarque" class="demand-list"></div></article>
+
+          <article class="section-card full-width">
+            <div class="section-head"><div><h2>Escolha o periodo</h2><p>Pico semanal: <strong id="texto-pico">Calculando...</strong></p></div></div>
+            <div class="filters">
+              <div class="filter-group"><span>Turno</span><div class="segmented"><button class="segment active" data-turno="MANHA" type="button">Manha</button><button class="segment" data-turno="NOITE" type="button">Noite</button></div></div>
+              <div class="filter-group"><span>Dia</span><div class="segmented"><button class="segment active" data-dia="Segunda" type="button">Seg</button><button class="segment" data-dia="Terca" type="button">Ter</button><button class="segment" data-dia="Quarta" type="button">Qua</button><button class="segment" data-dia="Quinta" type="button">Qui</button><button class="segment" data-dia="Sexta" type="button">Sex</button></div></div>
+            </div>
+            <div id="matriz-demanda" class="matrix-wrap"></div>
+          </article>
+
+          <article class="section-card full-width"><div class="section-head"><div><h2>Demanda prevista</h2><p>Passageiros previstos para o turno e dia selecionados.</p></div></div><div class="table-wrap"><table><thead><tr><th>#</th><th>Nome do passageiro</th><th>Instituicao</th><th>Embarque</th></tr></thead><tbody id="lista-passageiros"></tbody></table></div></article>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script src="leaflet.js"></script><script src="config.js"></script><script src="portal-api.js"></script><script src="rotas.js"></script>
+</body>
+</html>

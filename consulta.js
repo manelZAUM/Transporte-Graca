@@ -61,11 +61,12 @@ function matrizDaRota(rota) {
 
 function renderizarFrota() {
   const container = $('cards-frota'); container.replaceChildren();
-  ['AZUL', 'AMARELO'].forEach((rota) => {
+  ['AZUL', 'AMARELO', 'MICRO'].forEach((rota) => {
     const dados = matrizDaRota(rota);
     const card = document.createElement('article'); card.className = 'fleet-card';
-    card.style.setProperty('--bus-color', rota === 'AZUL' ? '#1565c0' : '#e0a800');
-    const titulo = document.createElement('h3'); titulo.textContent = `Ônibus ${rota.toLowerCase()}`;
+    const cores = { AZUL: '#1565c0', AMARELO: '#e0a800', MICRO: '#0f8b78' };
+    card.style.setProperty('--bus-color', cores[rota]);
+    const titulo = document.createElement('h3'); titulo.textContent = rota === 'MICRO' ? 'Micro-ônibus' : `Ônibus ${rota.toLowerCase()}`;
     const resumo = document.createElement('p'); resumo.textContent = `${dados.passageiros.length} cadastros na demanda potencial`;
     const tabela = document.createElement('table'); tabela.className = 'mini-matrix';
     const thead = document.createElement('thead'); const trh = document.createElement('tr');
@@ -153,7 +154,7 @@ function renderizarTabela() {
       const td = document.createElement('td'); td.textContent = texto; if (indice === 0) td.style.fontWeight = '750'; tr.appendChild(td);
     });
     const rotaTd = document.createElement('td'); const rota = document.createElement('span'); rota.className = 'route-chip';
-    const nomeRota = PortalAPI.normalizar(aluno.onibus) || 'NÃO INFORMADO'; rota.style.setProperty('--chip', nomeRota === 'AMARELO' ? '#e0a800' : '#1565c0'); rota.textContent = nomeRota; rotaTd.appendChild(rota);
+    const nomeRota = PortalAPI.normalizar(aluno.onibus) || 'NÃO INFORMADO'; const coresRotas = { AMARELO: '#e0a800', AZUL: '#1565c0', MICRO: '#0f8b78' }; rota.style.setProperty('--chip', coresRotas[nomeRota] || '#68737d'); rota.textContent = nomeRota; rotaTd.appendChild(rota);
     const turnoTd = document.createElement('td'); turnoTd.textContent = aluno.turno || 'Não informado';
     const statusTd = document.createElement('td'); const badge = document.createElement('span'); badge.className = `status ${classeStatus(aluno.status)}`; badge.textContent = aluno.status || 'Pendente'; statusTd.appendChild(badge);
     tr.append(rotaTd, turnoTd, statusTd); tbody.appendChild(tr);
